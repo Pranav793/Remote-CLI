@@ -1,0 +1,27 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>User Registration Form</title>
+  </head>
+  <body>
+
+  <form method="POST" class="post-form" >
+    {% csrf_token %}
+    {{ form.as_p }}
+
+      {% if form.data %}
+        <p>
+            {{ form.data }}<br>
+        </p>
+
+      {% endif %}
+
+    <button type="submit" class="save btn btn-default">Submit</button>
+
+  </form>
+
+  </body>
+
+</html>
