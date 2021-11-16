@@ -1,0 +1,26 @@
+
+
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="boxed_cmd">
+
+         <h3>AL > {{ command }}</h3>
+
+        {% for line in text %}
+            {% if line[0] == "text" %}
+                {{ line[1] }}
+            {% endif %}
+            {% if line[0] == "url" %}
+                <a href="{{ line[1] }}">Link to help page</a>
+                {% if line[2] %}
+                    &nbsp
+                    {{ line[2] }}
+                {% endif %}
+            {% endif %}
+        <br>
+        {% endfor %}
+
+    </div>
+ {% endblock %}

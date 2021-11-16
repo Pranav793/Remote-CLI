@@ -1,0 +1,47 @@
+
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<ul class="tree">
+
+    {% for entry in text %}
+
+        {% if entry.start_list %}
+            <ul>
+        {% endif %}
+
+        {% if entry.end_list  %}
+            <li class="last">
+        {% else %}
+            <li>
+        {% endif %}
+
+        {% if entry.key  %}
+            {{entry.key}}  &nbsp : &nbsp
+        {% endif %}
+        {% if entry.value  %}
+            <span class="key">
+            {{entry.value}}
+            </span>
+        {% endif %}
+
+
+        {% if entry.end_list %}
+            </li>
+            </ul>
+        {% else %}
+            {% if entry.with_children %}
+            {% else %}
+            </li>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
+</ul>
+
+<br>
+
+
+{% endblock %}
