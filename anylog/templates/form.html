@@ -11,12 +11,6 @@
     {% csrf_token %}
     {{ form.as_p }}
 
-      {% if node_reply %}
-        <p>
-            {{ node_reply }}<br>
-        </p>
-
-      {% endif %}
 
     <br/>
     <div align="justified">
@@ -40,6 +34,13 @@
     </div>
     <br/>
     <button type="submit" class="save btn btn-default">Submit</button>
+
+    {% if node_reply %}
+    <p>
+        {{ node_reply }}<br>
+    </p>
+
+   {% endif %}
 
   </form>
 

@@ -38,20 +38,21 @@ def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False)->
             error = other.error_message(conn=conn, command_type='GET', error_type='network', error_msg=r.status_code)
         else:
             try:
-                results = r.json()
+                results = r.text        # results = r.json()
             except Exception as error_msg:
-                try:
-                    results = r.text
-                except Exception as e:
-                    error = other.error_message(conn=conn, command_type='GET', error_type='formatting', error_msg=error_msg)
+                error = other.error_message(conn=conn, command_type='GET', error_type='formatting', error_msg=error_msg)
 
     if results is None:
         content = error
     else:
-        content = other.format_content(content=results)
-        # if fails to format in table print raw content
-        if '<table style="font-family: arial, sans-serif; border-collapse: collapse;"></table>' == content:
+        try:
+            content = other.format_content(content=results)
+            # if fails to format in table print raw content
+            if '<table style="font-family: arial, sans-serif; border-collapse: collapse;"></table>' == content:
+                content = results
+        except:
             content = results
+
     return content
 
 
