@@ -3,10 +3,10 @@ from django.shortcuts import render
 # Create your views here.
 # Import necessary modules
 from django.shortcuts import render
-from anylog.forms import AnyLogForm
+from anylog.forms import AnyLogCredentials
 from django.http import HttpResponse
 
-import   anylog.anylog_conn.anylog_conn as anylog_conn
+import anylog.anylog_conn.anylog_conn as anylog_conn
 
 # ---------------------------------------------------------------------------------------
 # GET / POST  AnyLog command form
@@ -15,18 +15,20 @@ def form_request(request):
 
     # Check the form is submitted or not
     if request.method == 'POST':
-        user_info = AnyLogForm(request.POST)
+        user_info = AnyLogCredentials(request.POST)
         # Check the form data are valid or not
         if user_info.is_valid():
             # Proces the command
             data = process_anylog(request)
 
-            # Return the form values as response
-            return render(request, "form.html", {'form': user_info, 'data': data })
-            #return HttpResponse(data)
+            # print to existing screen content of data (currently DNW)
+            #return render(request, "form.html", {'form': user_info, 'data': data})
+
+            # print to (new) screen content of data
+            return HttpResponse(data)
     else:
         # Display the html form
-        user_info = AnyLogForm()
+        user_info = AnyLogCredentials()
 
         return render(request, "form.html", {'form': user_info})
 
@@ -38,6 +40,8 @@ def process_anylog(request):
     :param request: The info needed to execute command to the AnyLog network
     :return: The data to display on the output form
     '''
+    authentication = ()
+    remote = False
 
     # Get the needed info from the form
     conn_info = request.POST.get('conn_info')
@@ -46,22 +50,10 @@ def process_anylog(request):
     command = request.POST.get('command')
 
 
-    # name = request.POST.get("name")
-    # email = request.POST.get("email")
-    # username = request.POST.get("username")
-    #
-    # # Call AnyLog using REST with the info provided
-    #
-    data = {
-        'conn_info': conn_info,
-        'username': username,
-        'password': password,
-        'command': command
-    }
     authentication = ()
-    if data['username'] != '' and data['password'] !=  '':
-        authentication = (data['username'], data['password'])
+    if username != '' and password != '':
+        authentication = (username, password)
 
-    output = anylog_conn.get_cmd(conn=data['conn_info'], command=data['command'], authentication=authentication, remote=False)
+    output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=False)
 
     return output     # Data returned from AnyLog or an Error Message

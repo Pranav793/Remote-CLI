@@ -49,7 +49,9 @@ def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False)->
         content = error
     else:
         content = other.format_content(content=results)
-
+        # if fails to format in table print raw content
+        if '<table style="font-family: arial, sans-serif; border-collapse: collapse;"></table>' == content:
+            content = results
     return content
 
 
