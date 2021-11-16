@@ -11,9 +11,9 @@
     {% csrf_token %}
     {{ form.as_p }}
 
-      {% if form.data %}
+      {% if node_reply %}
         <p>
-            {{ form.data }}<br>
+            {{ node_reply }}<br>
         </p>
 
       {% endif %}

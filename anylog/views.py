@@ -19,13 +19,13 @@ def form_request(request):
         # Check the form data are valid or not
         if user_info.is_valid():
             # Proces the command
-            data = process_anylog(request)
+            node_reply = process_anylog(request)
 
             # print to existing screen content of data (currently DNW)
-            #return render(request, "form.html", {'form': user_info, 'data': data})
+            return render(request, "form.html", {'form': user_info, 'node_reply': node_reply})
 
             # print to (new) screen content of data
-            return HttpResponse(data)
+            # return HttpResponse(data)
     else:
         # Display the html form
         user_info = AnyLogCredentials()
