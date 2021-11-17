@@ -43,11 +43,11 @@ def error_message(conn:str, command_type:str, error_type:str, error_msg:str)->st
         full error message
     """
     if error_type == 'network':
-        return "Failed to execute %s against '%s' <br/><b>Network Error</b>: %s" % (command_type, conn, error_msg)
+        return "Failed to execute %s against '%s' (Network Error: %s)" % (command_type, conn, error_msg)
     elif error_type == 'formatting':
-        return "Failed to format %s results against '%s' <br/><b>Error</b>: %s" % (command_type, conn, error_msg)
+        return "Failed to format %s results against '%s' (Error: %s)" % (command_type, conn, error_msg)
     else:
-        return "Failed to execute %s against '%s' <br/><b>Error</b>: %s" % (command_type, conn, error_msg)
+        return "Failed to execute %s against '%s' (Error: %s)" % (command_type, conn, error_msg)
 
 def format_content(content:str)->str:
     """
@@ -74,4 +74,5 @@ def format_content(content:str)->str:
                         body += __table_column_headers(row)
                         column_names = True
                     body += __table_column_values(row)
-    return '<table style="font-family: arial, sans-serif; border-collapse: collapse;">%s</table>' % body
+
+    return '%s' % body

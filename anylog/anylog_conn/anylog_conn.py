@@ -45,14 +45,42 @@ def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False)->
     if results is None:
         content = error
     else:
-        try:
-            content = other.format_content(content=results)
-            # if fails to format in table print raw content
-            if '<table style="font-family: arial, sans-serif; border-collapse: collapse;"></table>' == content:
-                content = results
-        except:
-            content = results
+        content = results
 
     return content
+
+
+def post_cmd(conn:str, command:str, authentication:tuple=())->str:
+    """
+    Execute POST command
+    :args:
+        conn:str - REST connection info (IP:PORT)
+        command:str - command to execute
+        authentication:tuple - tuple of username and password if set
+    :params:
+        output:str - content to return
+         headers:dict - REST header info
+    :return:
+        if fails return error message, else return "Success!"
+    """
+
+    headers = {
+        'command': command,
+        'User-Agent': 'AnyLog/1.23'
+    }
+
+    try:
+        r = requests.post('http://%s' % conn, headers=headers, auth=authentication)
+    except Exception as error_msg:
+        output = other.error_message(conn=conn, command_type='POST', error_type='other', error_msg=error_msg)
+    else:
+        if int(r.status_code) != 200:
+            output = other.error_message(conn=conn, command_type='GET', error_type='network', error_msg=r.status_code)
+        else:
+            output = 'Success!'
+
+    return output
+
+
 
 

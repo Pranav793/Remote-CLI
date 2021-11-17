@@ -8,6 +8,24 @@ from django.http import HttpResponse
 
 import anylog.anylog_conn.anylog_conn as anylog_conn
 
+
+ANYLOG_COMMANDS = {
+    1: 'get status',                         # Get Node Status
+    2: 'get event log where format=json',    # Get Event Log
+    3: 'get error log where format=json',    # Get Error Log
+    40: 'set rest log off',                  # Set REST Log Off
+    41: 'set rest log on',                   # Set REST Log On
+    5: 'get rest all',                       # Get REST
+    6: 'get rest',                           # GET REST log
+    7: 'get streaming',                      # Get Streaming
+    8: 'get operator',                       # Get Operator
+    9: 'get publisher',                      # Get Publishe
+    10: 'query status all',                  # Get Query Status
+    11: 'query status',                      # Get Last Query Status
+    12: 'get rows count',                    # Get Rows Count
+    13: 'get rows count where group=table',  # Get Rows Count by Table
+}
+
 # ---------------------------------------------------------------------------------------
 # GET / POST  AnyLog command form
 # ---------------------------------------------------------------------------------------
@@ -48,12 +66,35 @@ def process_anylog(request):
     username = request.POST.get('username')
     password = request.POST.get('password')
     command = request.POST.get('command')
+    anylog_cmd = request.POST.get('anylog_cmd')
+    network = request.POST.get('network')
 
+    if network == 'on':
+        network = True
+    else:
+        network = False
+    post = request.POST.get('post')
+    if post == 'on':
+        post = True
+    else:
+        post = False
+
+    if anylog_cmd is not None:
+        anylog_cmd = int(anylog_cmd)
+        if anylog_cmd == 40 or anylog_cmd == 41:
+            post = True
+
+        command = ANYLOG_COMMANDS[anylog_cmd]
 
     authentication = ()
     if username != '' and password != '':
         authentication = (username, password)
 
-    output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=False)
+    print(command)
+    if post is True:
+        output = anylog_conn.post_cmd(conn=conn_info, command=command, authentication=authentication)
+    else:
+        output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network)
 
-    return output     # Data returned from AnyLog or an Error Message
+    # Data returned from AnyLog or an Error Message
+    return output
