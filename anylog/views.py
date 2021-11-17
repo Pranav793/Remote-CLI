@@ -91,10 +91,10 @@ def process_anylog(request):
 
     if anylog_cmd is not None:
         anylog_cmd = int(anylog_cmd)
-        if ANYLOG_COMMANDS[anylog_cmd]['type'] == 'POST'
+        if ANYLOG_COMMANDS[anylog_cmd]['type'] == 'POST':
             post = True
 
-        command = ANYLOG_COMMANDS[anylog_cmd]
+        command = ANYLOG_COMMANDS[anylog_cmd]['command']
 
     authentication = ()
     if username != '' and password != '':
