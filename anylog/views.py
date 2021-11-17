@@ -10,8 +10,6 @@ from django.http import HttpResponse
 import anylog.json_api as json_api
 import anylog.anylog_conn.anylog_conn as anylog_conn
 
-<<<<<<< HEAD
-
 ANYLOG_COMMANDS = {
     1: 'get status',                         # Get Node Status
     2: 'get event log where format=json',    # Get Event Log
@@ -34,13 +32,7 @@ ANYLOG_COMMANDS = {
     24: "blockchain get table",              # Blockchain Tables
     25: "blockchain get * where ip=%s"       # Local Node Decleration
 }
-=======
-al_commands = [
-    None,
-    ["get status" , "table"],        # 1
-    ["get event log" , "table"]      # 2
-]
->>>>>>> c2b67d4a6991e421af3c2fe64b3677cea93cd30e
+
 
 # ---------------------------------------------------------------------------------------
 # GET / POST  AnyLog command form
@@ -103,8 +95,6 @@ def process_anylog(request):
             post = True
 
         command = ANYLOG_COMMANDS[anylog_cmd]
-        if anylog_cmd == 25:
-            command = command % conn_info.split(':')[0]
 
     authentication = ()
     if username != '' and password != '':
@@ -116,10 +106,6 @@ def process_anylog(request):
     else:
         output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network)
 
-<<<<<<< HEAD
-    # Data returned from AnyLog or an Error Message
-    return output
-=======
     return [command, output]     # Data returned from AnyLog or an Error Message
 
 
@@ -257,4 +243,4 @@ def format_message_reply(msg_text):
                 data_list.append(key_val)
 
     return [None, None, data_list, None]
->>>>>>> c2b67d4a6991e421af3c2fe64b3677cea93cd30e
+
