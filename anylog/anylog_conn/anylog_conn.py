@@ -18,9 +18,8 @@ def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False)->
     :return:
         content
     """
-    error = None
     results = None
-    content = None
+
     headers = {
         'command': command,
         'User-Agent': 'AnyLog/1.23'
@@ -32,22 +31,18 @@ def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False)->
     try:
         r = requests.get('http://%s' % conn, headers=headers, auth=authentication, timeout=30)
     except Exception as error_msg:
-        error = other.error_message(conn=conn, command_type='GET', error_type='other', error_msg=error_msg)
+        results = other.error_message(conn=conn, command_type='GET', error_type='other', error_msg=error_msg)
     else:
         if int(r.status_code) != 200:
-            error = other.error_message(conn=conn, command_type='GET', error_type='network', error_msg=r.status_code)
+            results = other.error_message(conn=conn, command_type='GET', error_type='network', error_msg=r.status_code)
         else:
             try:
                 results = r.text        # results = r.json()
             except Exception as error_msg:
-                error = other.error_message(conn=conn, command_type='GET', error_type='formatting', error_msg=error_msg)
+                results = other.error_message(conn=conn, command_type='GET', error_type='formatting', error_msg=error_msg)
 
-    if results is None:
-        content = error
-    else:
-        content = results
+    return results
 
-    return content
 
 
 def post_cmd(conn:str, command:str, authentication:tuple=())->str:
