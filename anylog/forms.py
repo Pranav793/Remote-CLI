@@ -15,7 +15,12 @@ ANYLOG_COMMANDS= [
     (10, 'Full Query Status List'),
     (11, 'Latest Query Status'),
     (12, 'Rows Count'),
-    (13, 'Rows Count by Table')
+    (13, 'Rows Count by Table'),
+    (20, 'Get Full Blockchain'),
+    (21, 'Blockchain Operators'),
+    (22, 'Blockchain Publishers'),
+    (23, 'Blockchain Queries'),
+    (24, 'Blockchain Tables'),
 ]
 
 

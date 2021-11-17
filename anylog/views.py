@@ -19,11 +19,17 @@ ANYLOG_COMMANDS = {
     6: 'get rest',                           # GET REST log
     7: 'get streaming',                      # Get Streaming
     8: 'get operator',                       # Get Operator
-    9: 'get publisher',                      # Get Publishe
+    9: 'get publisher',                      # Get Publisher
     10: 'query status all',                  # Get Query Status
     11: 'query status',                      # Get Last Query Status
     12: 'get rows count',                    # Get Rows Count
     13: 'get rows count where group=table',  # Get Rows Count by Table
+    20: "blockchain get *",                  # Get Full Blockchain
+    21: "blockchain get operator",           # Blockchain Operators
+    22: "blockchain get publisher",          # Blockchain Publishers
+    23: "blockchain get query",              # Blockchain Queries
+    24: "blockchain get table",              # Blockchain Tables
+    25: "blockchain get * where ip=%s"       # Local Node Decleration
 }
 
 # ---------------------------------------------------------------------------------------
@@ -85,6 +91,8 @@ def process_anylog(request):
             post = True
 
         command = ANYLOG_COMMANDS[anylog_cmd]
+        if anylog_cmd == 25:
+            command = command % conn_info.split(':')[0]
 
     authentication = ()
     if username != '' and password != '':
