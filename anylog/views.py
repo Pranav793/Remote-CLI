@@ -11,26 +11,26 @@ import anylog.json_api as json_api
 import anylog.anylog_conn.anylog_conn as anylog_conn
 
 ANYLOG_COMMANDS = {
-    1: 'get status',                         # Get Node Status
-    2: 'get event log where format=json',    # Get Event Log
-    3: 'get error log where format=json',    # Get Error Log
-    40: 'set rest log off',                  # Set REST Log Off
-    41: 'set rest log on',                   # Set REST Log On
-    5: 'get rest all',                       # Get REST
-    6: 'get rest',                           # GET REST log
-    7: 'get streaming',                      # Get Streaming
-    8: 'get operator',                       # Get Operator
-    9: 'get publisher',                      # Get Publisher
-    10: 'query status all',                  # Get Query Status
-    11: 'query status',                      # Get Last Query Status
-    12: 'get rows count',                    # Get Rows Count
-    13: 'get rows count where group=table',  # Get Rows Count by Table
-    20: "blockchain get *",                  # Get Full Blockchain
-    21: "blockchain get operator",           # Blockchain Operators
-    22: "blockchain get publisher",          # Blockchain Publishers
-    23: "blockchain get query",              # Blockchain Queries
-    24: "blockchain get table",              # Blockchain Tables
-    25: "blockchain get * where ip=%s"       # Local Node Decleration
+    1: {'command': 'get status', 'type': 'GET'},                        # Get Node Status
+    2: {'command': 'get event log where format=json', 'type': 'GET'},   # Get Event Log
+    3: {'command': 'get error log where format=json', 'type': 'GET'},   # Get Error Log
+    40: {'command': 'set rest log off', 'type': 'GET'},                 # Set REST Log Off
+    41: {'command': 'set rest log on', 'type': 'GET'},                  # Set REST Log On
+    5: {'command': 'get rest all', 'type': 'GET'},                      # Get REST
+    6: {'command': 'get rest', 'type': 'GET'},                          # GET REST log
+    7: {'command': 'get streaming', 'type': 'GET'},                     # Get Streaming
+    8: {'command': 'get operator', 'type': 'GET'},                      # Get Operator
+    9: {'command': 'get publisher', 'type': 'GET'},                     # Get Publisher
+    10: {'command': 'query status all', 'type': 'GET'},                 # Get Query Status
+    11: {'command': 'query status', 'type': 'GET'},                     # Get Last Query Status
+    12: {'command': 'get rows count', 'type': 'GET'},                   # Get Rows Count
+    13: {'command': 'get rows count where group=table', 'type': 'GET'}, # Get Rows Count by Table
+    20: {'command': 'blockchain get *', 'type': 'GET'},                 # Get Full Blockchain
+    21: {'command': 'blockchain get operator', 'type': 'GET'},          # Blockchain Operators
+    22: {'command': 'blockchain get publisher', 'type': 'GET'},         # Blockchain Publishers
+    23: {'command': 'blockchain get query', 'type': 'GET'},             # Blockchain Queries
+    24: {'command': 'blockchain get table', 'type': 'GET'},             # Blockchain Tables
+    25: {'command': 'blockchain get * where ip=%s', 'type': 'GET'},     # Local Node Decleration
 }
 
 
