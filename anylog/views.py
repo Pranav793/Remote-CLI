@@ -91,7 +91,7 @@ def process_anylog(request):
 
     if anylog_cmd is not None:
         anylog_cmd = int(anylog_cmd)
-        if anylog_cmd == 40 or anylog_cmd == 41:
+        if ANYLOG_COMMANDS[anylog_cmd]['type'] == 'POST'
             post = True
 
         command = ANYLOG_COMMANDS[anylog_cmd]
