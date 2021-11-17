@@ -100,7 +100,6 @@ def process_anylog(request):
     if username != '' and password != '':
         authentication = (username, password)
 
-    print(command)
     if post is True:
         output = anylog_conn.post_cmd(conn=conn_info, command=command, authentication=authentication)
     else:
