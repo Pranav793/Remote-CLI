@@ -27,10 +27,12 @@ def form_request(request):
         # Check the form data are valid or not
         if user_info.is_valid():
             # Proces the command
-            node_reply = process_anylog(request)
+            command, output = process_anylog(request)
+
+            return print_network_reply(request, user_info, command, output)
 
             # print to existing screen content of data (currently DNW)
-            return render(request, "base.html", {'form': user_info, 'node_reply': node_reply})
+            # return render(request, "base.html", {'form': user_info, 'node_reply': node_reply})
 
             # print to (new) screen content of data
             # return HttpResponse(data)
@@ -64,7 +66,7 @@ def process_anylog(request):
 
     output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=False)
 
-    return output     # Data returned from AnyLog or an Error Message
+    return [command, output]     # Data returned from AnyLog or an Error Message
 
 
 
@@ -74,11 +76,13 @@ def process_anylog(request):
 # Option 2 - a table
 # Option 3 - text
 # -----------------------------------------------------------------------------------
-def print_network_reply(command, data):
+def print_network_reply(request, user_info, command, data):
 
-    select_info = get_select_menu()
+    select_info = {}
+    select_info['form'] = user_info
     select_info['title'] = 'Network Command'
     select_info['command'] = command
+
 
     policy, table_info, print_info, error_msg = format_message_reply(data)
     if policy:
@@ -86,22 +90,23 @@ def print_network_reply(command, data):
         data_list = []
         json_api.setup_print_tree(policy, data_list)
         select_info['text'] = data_list
-        # path_selection(parent_menu, id, data)      # save the path, the key and the data on the report
-        return render_template('output_tree.html', **select_info)
+        return render(request, 'output_tree.html', select_info)
 
     if table_info:
         # Reply is structured as a table
+
         if 'header' in table_info:
             select_info['header'] = table_info['header']
         if 'table_title' in table_info:
             select_info['table_title'] = table_info['table_title']
         if 'rows' in table_info:
             select_info['rows'] = table_info['rows']
-        return render_template('output_table.html', **select_info)
+        return render(request, 'output_table.html', select_info)
+
 
     select_info['text'] = print_info        # Only TEXT
 
-    return render_template('output_cmd.html', **select_info)
+    return render(request, 'output_cmd.html', select_info)
 
 # -----------------------------------------------------------------------------------
 # Based on the message reply - organize as a table or as an attrubute values list
