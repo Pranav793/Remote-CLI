@@ -15,11 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include # new
-from anylog import views
+from anylog_query import views
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('anylog/', views.form_request)
+    path('anylog_query/', views.form_request)
 
 ]

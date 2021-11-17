@@ -3,12 +3,12 @@ from django.shortcuts import render
 # Create your views here.
 # Import necessary modules
 from django.shortcuts import render
-from anylog.forms import AnyLogCredentials
+from anylog_query.forms import AnyLogCredentials
 from django.http import HttpResponse
 
 
-import anylog.json_api as json_api
-import anylog.anylog_conn.anylog_conn as anylog_conn
+import anylog_query.json_api as json_api
+import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
 ANYLOG_COMMANDS = {
     1: {'command': 'get status', 'type': 'GET'},                        # Get Node Status

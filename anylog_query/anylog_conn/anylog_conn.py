@@ -1,5 +1,5 @@
 import requests
-import anylog.anylog_conn.other as other
+import anylog_query.anylog_conn.other as other
 
 
 def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False)->str:
