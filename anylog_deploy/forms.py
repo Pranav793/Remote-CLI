@@ -1,4 +1,7 @@
 from django import forms
+import os
+
+THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
 BUILDS = (
     ('', ("")),
@@ -17,6 +20,8 @@ NODE_TYPES = (
     ('query', ("Query")),
     ('single-node', ("single-node"))
 )
+
+NODE_TYPE = None
 
 AUTHENTICATION_TYPE = (
     ('admin', ("Admin")),
@@ -37,10 +42,20 @@ MQTT_COLUMN_TYPES = (
 )
 
 
+class SelectConfig(forms.Form):
+    config_files = [('', (''))]
+    for file in os.listdir(THIS_FOLDER + '/configs/'):
+        config_files.append((file, (file)))
+
+    config_files = tuple(config_files)
+    config_file = forms.ChoiceField(label='Config File', required=True, choices=config_files)
+
+
 class BaseInfo(forms.Form):
     build = forms.ChoiceField(label='Build', required=True, choices=BUILDS)
     node_type = forms.ChoiceField(label='Node Type', required=True, choices=NODE_TYPES)
     password = forms.CharField(label='Docker Password', required=False, widget=forms.PasswordInput)
+
 
 class GeneralInfo(forms.Form):
     node_name = forms.CharField(label='Node Name', required=True)
@@ -63,7 +78,8 @@ class NetworkingConfigs(forms.Form):
     anylog_broker_port = forms.IntegerField(label='Broker Port Number', required=False)
     master_node = forms.CharField(label='Master Node IP:Port Information', required=True)
 
-class DBOperatorConfigs(forms.Form, node_type):
+
+class DBConfigs(forms.Form):
     # database
     db_type = forms.ChoiceField(label='Database Type', required=False, choices=DATABASES)
     db_user = forms.CharField(label='Database User', required=True)
@@ -71,16 +87,23 @@ class DBOperatorConfigs(forms.Form, node_type):
     db_addr = forms.GenericIPAddressField(label='Database Address', required=True)
     db_port = forms.IntegerField(label='Database Port', required=True)
 
-    if node_type == 'operator':
-        # Operator specific params
-        default_dbms = forms.CharField(label='Operator Database Name', required=False)
-        enable_cluster = forms.BooleanField(label='Enable Cluster', required=False)
-        cluster_name = forms.CharField(label='Cluster Name', required=False)
+class DBOperatorConfigs(forms.Form):
+    # database
+    db_type = forms.ChoiceField(label='Database Type', required=False, choices=DATABASES)
+    db_user = forms.CharField(label='Database User', required=True)
+    db_pass = forms.CharField(label='Database Password', required=True, widget=forms.PasswordInput)
+    db_addr = forms.GenericIPAddressField(label='Database Address', required=True)
+    db_port = forms.IntegerField(label='Database Port', required=True)
 
-        # Operator partition
-        enable_partition = forms.BooleanField(label='Enable Partitions', required=False)
-        partition_column = forms.CharField(label='Column to Partition By', required=False)
-        partition_interval = forms.CharField(label='Partitioning Interval', required=False)
+    # Operator specific params
+    default_dbms = forms.CharField(label='Operator Database Name', required=False)
+    enable_cluster = forms.BooleanField(label='Enable Cluster', required=False)
+    cluster_name = forms.CharField(label='Cluster Name', required=False)
+
+    # Operator partition
+    enable_partition = forms.BooleanField(label='Enable Partitions', required=False)
+    partition_column = forms.CharField(label='Column to Partition By', required=False)
+    partition_interval = forms.CharField(label='Partitioning Interval', required=False)
 
 class MqttConfigs(forms.Form):
     mqtt_enable = forms.BooleanField(label='Enable MQTT', required=False)
