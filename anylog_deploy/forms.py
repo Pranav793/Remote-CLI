@@ -35,6 +35,25 @@ MQTT_COLUMN_TYPES = (
     ('timestamp', ("Timestamp")),
     ('bool', ("Boolean")),
 )
+
+
+class BaseInfo(forms.Form):
+    build = forms.ChoiceField(label='Build', required=True, choices=BUILDS)
+    node_type = forms.ChoiceField(label='Node Type', required=True, choices=NODE_TYPES)
+    password = forms.CharField(label='Docker Password', required=False, widget=forms.PasswordInput)
+
+class GeneralInfo(forms.Form):
+    node_name = forms.CharField(label='Node Name', required=True)
+    company_name = forms.CharField(label='Company Name', required=True)
+    location = forms.CharField(label='Location', required=False)
+
+    # authentication
+    authentication = forms.BooleanField(label='Authentication', required=False)
+    username = forms.CharField(label='Authentication User', required=False)
+    password = forms.CharField(label='Authentication Password', required=False, widget=forms.PasswordInput)
+    auth_type = forms.ChoiceField(label='Authentication User Type', required=False, choices=AUTHENTICATION_TYPE)
+
+
 class AnyLogDeployment(forms.Form):
     # general
     build = forms.ChoiceField(label='Build', required=True, choices=BUILDS)
