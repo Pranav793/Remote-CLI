@@ -6,18 +6,25 @@ import anylog_deploy.forms as forms
 
 class FormViews:
     def __init__(self):
-        self.params = {}
+        self.env_params = {}
+        self.deployment_options = {}
         self.docker_password = None
 
     # Create your views here.
     def basic_config(self, request):
+        """
+        Basic configurations
+            - build
+            - node type
+            - docker password
+        """
         if request.method == 'POST':
             base_configs = forms.BaseInfo(request.POST)
             if base_configs.is_valid():
-                self.params['BUILD'] = request.POST.get('build')
-                self.params['NODE_TYPE'] = request.POST.get('node_type')
+                self.env_params['BUILD'] = request.POST.get('build')
+                self.env_params['NODE_TYPE'] = request.POST.get('node_type')
                 self.docker_password = request.POST.get('password')
-                if self.params['NODE_TYPE'] == 'none' or self.params['NODE_TYPE'] == '':
+                if self.env_params['NODE_TYPE'] == 'none' or self.env_params['NODE_TYPE'] == '':
                     # Deploy AnyLog of type None
                     return render(request, "base.html", {'form': base_configs})
                 else:
@@ -26,34 +33,57 @@ class FormViews:
             base_configs = forms.BaseInfo()
             return render(request, "base.html", {'form': base_configs})
 
-
     def general_info(self, request):
+        """
+        General configuration
+            - node name
+            - company
+            - disable location
+                if set to False:
+                - location (optional)
+            - enable authentication
+                - username
+                - password
+                - user type
+        """
         if request.method == 'POST':
             general_config = forms.GeneralInfo(request.POST)
             if general_config.is_valid():
-                self.params['NODE_NAME'] = request.POST.get('node_name')
-                self.params['COMPANY_NAME'] = request.POST.get('company_name')
-                location = request.POST.get('location')
-                if location != '':
-                    self.params['LOCATION'] = location
+                self.env_params['NODE_NAME'] = request.POST.get('node_name')
+                self.env_params['COMPANY_NAME'] = request.POST.get('company_name')
+                try:
+                    disable_location = request.POST.get('disable_location')
+                except:
+                    disable_location = None
+
+                if disable_location == 'on':
+                    self.deployment_options['disable_location'] = True
+                else:
+                    self.deployment_options['disable_location'] = False
+                    location = request.POST.get('location')
+                    if location != '':
+                        self.env_params['LOCATION'] = location
+
                 try:
                     authentication = request.POST.get('authentication')
                 except:
                     authentication = None
                 if authentication is None:
-                    self.params['AUTHENTICATION'] = 'off'
+                    self.env_params['AUTHENTICATION'] = 'off'
                 else:
-                    self.params['AUTHENTICATION'] = 'on'
-                self.params['USERNAME'] = request.POST.get('username')
-                self.params['PASSWORD'] = request.POST.get('password')
-                self.params['AUTH_TYPE'] = request.POST.get('auth_type')
+                    self.env_params['AUTHENTICATION'] = 'on'
 
-                print(self.params)
-                return render(request, "base.html", {'form': general_config})
+                self.env_params['USERNAME'] = request.POST.get('username')
+                self.env_params['PASSWORD'] = request.POST.get('password')
+                self.env_params['AUTH_TYPE'] = request.POST.get('auth_type')
+
+                print(self.deployment_options)
+                return render(request, "general_configs.html", {'form': general_config})
         else:
             general_config = forms.GeneralInfo()
-            return render(request, "base.html", {'form': general_config})
+            return render(request, "general_configs.html", {'form': general_config})
 
+    def
 
 def index(request):
     if request.method == 'POST':
