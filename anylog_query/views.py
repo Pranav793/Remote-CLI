@@ -72,42 +72,27 @@ def process_anylog(request):
     :param request: The info needed to execute command to the AnyLog network
     :return: The data to display on the output form
     '''
-    authentication = ()
-    remote = False
 
+    post_data = request.POST
     # Get the needed info from the form
-    conn_info = request.POST.get('conn_info')
-    username = request.POST.get('username')
-    password = request.POST.get('password')
-    command = request.POST.get('command')
-    anylog_cmd = request.POST.get('anylog_cmd')
-    network = request.POST.get('network')
+    conn_info = post_data.get('connect_info')
+    username = post_data.get('auth_usr')
+    password = post_data.get('auth_pass')
+    command = post_data.get('cmd')
+    network = post_data.get('network')
+    rest_call = post_data.get('rest_call')
 
-    if network == 'on':
-        network = True
+    if command:
+        authentication = ()
+        if username != '' and password != '':
+            authentication = (username, password)
+
+        if rest_call is "post":
+            output = anylog_conn.post_cmd(conn=conn_info, command=command, authentication=authentication)
+        else:
+            output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network)
     else:
-        network = False
-    post = request.POST.get('post')
-    if post == 'on':
-        post = True
-    else:
-        post = False
-
-    if anylog_cmd is not None:
-        anylog_cmd = int(anylog_cmd)
-        if ANYLOG_COMMANDS[anylog_cmd]['type'] == 'POST':
-            post = True
-
-        command = ANYLOG_COMMANDS[anylog_cmd]['command']
-
-    authentication = ()
-    if username != '' and password != '':
-        authentication = (username, password)
-
-    if post is True:
-        output = anylog_conn.post_cmd(conn=conn_info, command=command, authentication=authentication)
-    else:
-        output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network)
+        output = None
 
     return [command, output]     # Data returned from AnyLog or an Error Message
 
@@ -127,24 +112,27 @@ def print_network_reply(request, command, data):
     select_info["commands_list"] = ANYLOG_COMMANDS
 
 
-    policy, table_info, print_info, error_msg = format_message_reply(data)
-    if policy:
-        # Reply was a JSON policy
-        data_list = []
-        json_api.setup_print_tree(policy, data_list)
-        select_info['text'] = data_list
-        return render(request, 'output_tree.html', select_info)
+    if data.startswith("Failed to"):
+        print_info = [("text", data)]       # Print the error msg
+    else:
+        policy, table_info, print_info, error_msg = format_message_reply(data)
+        if policy:
+            # Reply was a JSON policy
+            data_list = []
+            json_api.setup_print_tree(policy, data_list)
+            select_info['text'] = data_list
+            return render(request, 'output_tree.html', select_info)
 
-    if table_info:
-        # Reply is structured as a table
+        if table_info:
+            # Reply is structured as a table
 
-        if 'header' in table_info:
-            select_info['header'] = table_info['header']
-        if 'table_title' in table_info:
-            select_info['table_title'] = table_info['table_title']
-        if 'rows' in table_info:
-            select_info['rows'] = table_info['rows']
-        return render(request, 'output_table.html', select_info)
+            if 'header' in table_info:
+                select_info['header'] = table_info['header']
+            if 'table_title' in table_info:
+                select_info['table_title'] = table_info['table_title']
+            if 'rows' in table_info:
+                select_info['rows'] = table_info['rows']
+            return render(request, 'output_table.html', select_info)
 
 
     select_info['text'] = print_info        # Only TEXT
