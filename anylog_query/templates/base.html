@@ -30,14 +30,18 @@
       <br/>  <br/>  <br/> <br/>
 
     <select id="rest_call" name="rest_call">
-    <option value="get">&nbsp;GET</option>
-    <option selected value="post">&nbsp;POST</option>
+    <option selected value="get">&nbsp;GET</option>
+    <option value="post">&nbsp;POST</option>
     </select>
 
     &nbsp; &nbsp;
 
     <label for="connect_info">Connect info:</label>
-    <input type="text" id="connect_info" name="connect_info" value="127.0.0.1:2049">
+    {% if connect_info %}
+        <input type="text" id="connect_info" name="connect_info" value="{{connect_info}}">
+    {% else %}
+        <input type="text" id="connect_info" name="connect_info" value="127.0.0.1:2049">
+    {% endif %}
 
     &nbsp; &nbsp;
 

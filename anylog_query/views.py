@@ -93,7 +93,7 @@ def process_anylog(request):
         else:
             output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network)
     else:
-        output = None
+        output = "Mising commmand"
 
     return output     # Data returned from AnyLog or an Error Message
 
@@ -114,7 +114,7 @@ def print_network_reply(request, data):
     select_info["commands_list"] = ANYLOG_COMMANDS
 
 
-    if data.startswith("Failed to"):
+    if data and data.startswith("Failed to"):
         print_info = [("text", data)]       # Print the error msg
     else:
         policy, table_info, print_info, error_msg = format_message_reply(data)
