@@ -79,7 +79,7 @@ def process_anylog(request):
     conn_info = post_data.get('connect_info')
     username = post_data.get('auth_usr')
     password = post_data.get('auth_pass')
-    command = post_data.get('cmd')
+    command = post_data.get('command')
     network = post_data.get('network')
     rest_call = post_data.get('rest_call')
 
