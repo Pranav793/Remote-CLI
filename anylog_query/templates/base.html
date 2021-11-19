@@ -7,6 +7,19 @@
 
     <meta charset="UTF-8">
     <title>User Registration Form</title>
+
+      <style>
+        input[type=button], input[type=submit], input[type=reset] {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 16px 32px;
+        text-decoration: none;
+        margin: 4px 2px;
+        cursor: pointer;
+        }
+      </style>
+
   </head>
   <body>
 
@@ -17,8 +30,13 @@
 
     <br/>
 
-    <button type="submit" class="save btn btn-default">Submit</button>
-    <input type ="reset" value="Reset" />
+    {% for entry in commands_list %}
+        <input type ="submit" name = "command" value="{{entry.button}}"/>
+    {% endfor %}
+
+    <br/>
+
+    <input type ="submit" name = "Send" value="Send" />
 
     {% if node_reply %}
     <p>

@@ -33,8 +33,12 @@ class AnyLogCredentials(forms.Form):
     # destination = forms.CharField(label='Destination', required=False)
     command = forms.CharField(label='Command', required=False, widget=forms.TextInput)
 
+    '''
+    
     anylog_cmd = forms.CharField(label='Preset Commands', widget=forms.RadioSelect(choices=ANYLOG_COMMANDS),
                                  empty_value=None, required=False)
+    '''
+
 
     network = forms.BooleanField(label='Network', required=False)
     post = forms.BooleanField(label='POST Command', required=False)
