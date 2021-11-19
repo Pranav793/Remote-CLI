@@ -17,7 +17,11 @@
 
     <br/>
 
-    <button type="submit" class="save btn btn-default">Submit</button>
+    {% for entry in commands_list %}
+        <input type ="submit" name = "command" value={{entry.button}} />
+    {% endfor %}
+
+
     <input type ="reset" value="Reset" />
 
     {% if node_reply %}

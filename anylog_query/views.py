@@ -10,28 +10,26 @@ from django.http import HttpResponse
 import anylog_query.json_api as json_api
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
-ANYLOG_COMMANDS = {
-    1: {'command': 'get status', 'type': 'GET'},                        # Get Node Status
-    2: {'command': 'get event log where format=json', 'type': 'GET'},   # Get Event Log
-    3: {'command': 'get error log where format=json', 'type': 'GET'},   # Get Error Log
-    40: {'command': 'set rest log off', 'type': 'GET'},                 # Set REST Log Off
-    41: {'command': 'set rest log on', 'type': 'GET'},                  # Set REST Log On
-    5: {'command': 'get rest all', 'type': 'GET'},                      # Get REST
-    6: {'command': 'get rest', 'type': 'GET'},                          # GET REST log
-    7: {'command': 'get streaming', 'type': 'GET'},                     # Get Streaming
-    8: {'command': 'get operator', 'type': 'GET'},                      # Get Operator
-    9: {'command': 'get publisher', 'type': 'GET'},                     # Get Publisher
-    10: {'command': 'query status all', 'type': 'GET'},                 # Get Query Status
-    11: {'command': 'query status', 'type': 'GET'},                     # Get Last Query Status
-    12: {'command': 'get rows count', 'type': 'GET'},                   # Get Rows Count
-    13: {'command': 'get rows count where group=table', 'type': 'GET'}, # Get Rows Count by Table
-    20: {'command': 'blockchain get *', 'type': 'GET'},                 # Get Full Blockchain
-    21: {'command': 'blockchain get operator', 'type': 'GET'},          # Blockchain Operators
-    22: {'command': 'blockchain get publisher', 'type': 'GET'},         # Blockchain Publishers
-    23: {'command': 'blockchain get query', 'type': 'GET'},             # Blockchain Queries
-    24: {'command': 'blockchain get table', 'type': 'GET'},             # Blockchain Tables
-    25: {'command': 'blockchain get * where ip=%s', 'type': 'GET'},     # Local Node Decleration
-}
+ANYLOG_COMMANDS = [
+    {'button': 'Node Status',       'command': 'get status', 'type': 'GET'},                        # Get Node Status
+    {'button': 'Event Log',         'command': 'get event log where format=json', 'type': 'GET'},   # Get Event Log
+    {'button': 'Error Log',         'command': 'get error log where format=json', 'type': 'GET'},   # Get Error Log
+    {'button': 'Reset Error',       'command': 'set rest log off', 'type': 'POST'},              # Set REST Log Off
+    {'button': 'Set REST',          'command': 'set rest log on', 'type': 'POST'},                  # Set REST Log On
+    {'button': 'Get REST',          'command': 'get rest all', 'type': 'GET'},                      # Get REST
+    {'button': 'GET REST log',      'command': 'get rest', 'type': 'GET'},                          # GET REST log
+    {'button': 'Get Streaming',     'command': 'get streaming', 'type': 'GET'},                     # Get Streaming
+    {'button': 'Get Operator',      'command': 'get operator', 'type': 'GET'},                      # Get Operator
+    {'button': 'Get Publisher',     'command': 'get publisher', 'type': 'GET'},                     # Get Publisher
+    {'button': 'Get Query Status',  'command': 'query status all', 'type': 'GET'},                 # Get Query Status
+    {'button': 'Get Last Query Status',     'command': 'query status', 'type': 'GET'},                     # Get Last Query Status
+    {'button': 'Get Rows Count',            'command': 'get rows count', 'type': 'GET'},                   # Get Rows Count
+    {'button': 'Get Rows Count by Table',   'command': 'get rows count where group=table', 'type': 'GET'}, # Get Rows Count by Table
+    {'button': 'Blockchain Operators',      'command': 'blockchain get operator', 'type': 'GET'},          # Blockchain Operators
+    {'button': 'Blockchain Publishers',     'command': 'blockchain get publisher', 'type': 'GET'},         # Blockchain Publishers
+    {'button': 'Blockchain Queries',        'command': 'blockchain get query', 'type': 'GET'},             # Blockchain Queries
+    {'button': 'Blockchain Tables',         'command': 'blockchain get table', 'type': 'GET'},             # Blockchain Tables
+]
 
 
 # ---------------------------------------------------------------------------------------
@@ -57,8 +55,11 @@ def form_request(request):
     else:
         # Display the html form
         user_info = AnyLogCredentials()
+        select_info = {}
+        select_info["form"] = user_info
+        select_info["commands_list"] = ANYLOG_COMMANDS
 
-        return render(request, "base.html", {'form': user_info})
+        return render(request, "base.html", select_info)
 
 # ---------------------------------------------------------------------------------------
 # Process the AnyLog command form
@@ -121,6 +122,7 @@ def print_network_reply(request, user_info, command, data):
     select_info['form'] = user_info
     select_info['title'] = 'Network Command'
     select_info['command'] = command
+    select_info["commands_list"] = ANYLOG_COMMANDS
 
 
     policy, table_info, print_info, error_msg = format_message_reply(data)
