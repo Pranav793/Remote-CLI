@@ -1,9 +1,10 @@
 from django.shortcuts import render
 
-# Create your views here.
+import copy
 # Import necessary modules
 from django.shortcuts import render
 from django.http import HttpResponse
+
 
 
 import anylog_query.json_api as json_api
@@ -46,21 +47,20 @@ def form_request(request):
     if request.method == 'POST' and send:
 
         # Proces the command
-        command, output = process_anylog(request)
+        output = process_anylog(request)
 
-        return print_network_reply(request, command, output)
+        return print_network_reply(request, output)
 
     else:
         # Display the html form
         select_info = {}
         button = request.POST.get("button")
         if button:
+            add_form_value(select_info, request)
             cmd_info = ANYLOG_COMMANDS[COMMAND_BY_BUTTON[button]]
             user_cmd = cmd_info["command"]
-            select_info["command"] = user_cmd           # provide selection to html
+            select_info["command"] = user_cmd
 
-
-        #select_info["form"] = user_info
         select_info["commands_list"] = ANYLOG_COMMANDS
 
         return render(request, "base.html", select_info)
@@ -74,6 +74,7 @@ def process_anylog(request):
     '''
 
     post_data = request.POST
+
     # Get the needed info from the form
     conn_info = post_data.get('connect_info')
     username = post_data.get('auth_usr')
@@ -94,7 +95,7 @@ def process_anylog(request):
     else:
         output = None
 
-    return [command, output]     # Data returned from AnyLog or an Error Message
+    return output     # Data returned from AnyLog or an Error Message
 
 
 
@@ -104,11 +105,12 @@ def process_anylog(request):
 # Option 2 - a table
 # Option 3 - text
 # -----------------------------------------------------------------------------------
-def print_network_reply(request, command, data):
+def print_network_reply(request, data):
 
     select_info = {}
+    add_form_value(select_info, request)        # add the values of the last form to the select_info
+
     select_info['title'] = 'Network Command'
-    select_info['command'] = command
     select_info["commands_list"] = ANYLOG_COMMANDS
 
 
@@ -138,6 +140,14 @@ def print_network_reply(request, command, data):
     select_info['text'] = print_info        # Only TEXT
 
     return render(request, 'output_cmd.html', select_info)
+
+# -----------------------------------------------------------------------------------
+# add the values of the last form to the select_info
+# -----------------------------------------------------------------------------------
+def add_form_value(select_info, request):
+    post_data = request.POST
+    for key, value in post_data.items():
+        select_info[key] = value
 
 # -----------------------------------------------------------------------------------
 # Based on the message reply - organize as a table or as an attrubute values list
