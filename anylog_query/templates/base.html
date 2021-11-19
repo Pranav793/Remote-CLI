@@ -27,6 +27,14 @@
     {% csrf_token %}
     {{ form.as_p }}
 
+     <br/>
+    <select id="post">
+    <option value="get">&nbsp;GET</option>
+    <option selected value="post">&nbsp;POST</option>
+    </select>
+
+    <label for="fname">First name:</label>
+    <input type="text" id="fname" name="fname" value="test value">
 
     <br/>
 
