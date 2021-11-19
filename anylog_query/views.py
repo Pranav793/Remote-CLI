@@ -3,7 +3,6 @@ from django.shortcuts import render
 # Create your views here.
 # Import necessary modules
 from django.shortcuts import render
-from anylog_query.forms import AnyLogCredentials
 from django.http import HttpResponse
 
 
@@ -49,19 +48,12 @@ def form_request(request):
 
     # Check the form is submitted or not
     if request.method == 'POST' and is_send:
-        user_info = AnyLogCredentials(request.POST)
-        # Check the form data are valid or not
-        if user_info.is_valid():
-            # Proces the command
-            command, output = process_anylog(request)
 
-            return print_network_reply(request, user_info, command, output)
+        # Proces the command
+        command, output = process_anylog(request)
 
-            # print to existing screen content of data (currently DNW)
-            # return render(request, "base.html", {'form': user_info, 'node_reply': node_reply})
+        return print_network_reply(request, command, output)
 
-            # print to (new) screen content of data
-            # return HttpResponse(data)
     else:
         # Display the html form
         if button:
@@ -76,9 +68,10 @@ def form_request(request):
             #user_info.fields['command'].intial=user_cmd
             #user_info.data['command'] = user_cmd             # Command to display
         else:
-            user_info = AnyLogCredentials()                 # Empty form
+            pass
+            #user_info = AnyLogCredentials()                 # Empty form
         select_info = {}
-        select_info["form"] = user_info
+        #select_info["form"] = user_info
         select_info["commands_list"] = ANYLOG_COMMANDS
 
         return render(request, "base.html", select_info)
@@ -137,10 +130,9 @@ def process_anylog(request):
 # Option 2 - a table
 # Option 3 - text
 # -----------------------------------------------------------------------------------
-def print_network_reply(request, user_info, command, data):
+def print_network_reply(request, command, data):
 
     select_info = {}
-    select_info['form'] = user_info
     select_info['title'] = 'Network Command'
     select_info['command'] = command
     select_info["commands_list"] = ANYLOG_COMMANDS
