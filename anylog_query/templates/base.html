@@ -53,10 +53,20 @@
     <br/>
     <br/>
 
-    <label for="cmd">Command:</label>
+    {% if query %}
+        <input type="checkbox" id="network" name="network" checked>
+    {% else %}
+        <input type="checkbox" id="network" name="network">
+    {% endif %}
+
+    <label for="network">Network</label>
+
+     &nbsp; &nbsp;
+
+    <label for="cmd">Command:&nbsp;</label>
     <input type="text" id="cmd" name="cmd">
 
-    <br/>
+    <br/> <br/> <br/>
 
     {% for entry in commands_list %}
         <input type ="submit" name = "command" value="{{entry.button}}"/>
