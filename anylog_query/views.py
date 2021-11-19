@@ -60,7 +60,6 @@ def form_request(request):
         select_info["commands_list"] = ANYLOG_COMMANDS
 
         return render(request, "base.html", select_info)
-
 # ---------------------------------------------------------------------------------------
 # Process the AnyLog command form
 # ---------------------------------------------------------------------------------------
