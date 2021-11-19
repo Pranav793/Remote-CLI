@@ -43,7 +43,7 @@ MQTT_COLUMN_TYPES = (
 
 
 class SelectConfig(forms.Form):
-    config_files = [('', (''))]
+    config_files = [('', ('')), ('new-config', ('New Config'))]
     for file in os.listdir(THIS_FOLDER + '/configs/'):
         config_files.append((file, (file)))
 
@@ -60,7 +60,6 @@ class BaseInfo(forms.Form):
 class GeneralInfo(forms.Form):
     node_name = forms.CharField(label='Node Name', required=True)
     company_name = forms.CharField(label='Company Name', required=True)
-    disable_location = forms.BooleanField(label='Disable Node Location', required=False)
     location = forms.CharField(label='Location', required=False)
 
     # authentication
