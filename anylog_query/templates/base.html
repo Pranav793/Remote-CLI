@@ -31,11 +31,12 @@
     <br/>
 
     {% for entry in commands_list %}
-        <input type ="submit" name = "command" value="{{entry.button}}" />
+        <input type ="submit" name = "command" value="{{entry.button}}"/>
     {% endfor %}
 
+    <br/>
 
-    <input type ="reset" value="Reset" />
+    <input type ="submit" name = "Send" value="Send" />
 
     {% if node_reply %}
     <p>
