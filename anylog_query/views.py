@@ -31,14 +31,24 @@ ANYLOG_COMMANDS = [
     {'button': 'Blockchain Tables',         'command': 'blockchain get table', 'type': 'GET'},             # Blockchain Tables
 ]
 
+COMMAND_BY_BUTTON = {}
+for index, entry in enumerate(ANYLOG_COMMANDS):
+    COMMAND_BY_BUTTON[entry['button']] = index     # Organize commands as f(button)
+
 
 # ---------------------------------------------------------------------------------------
 # GET / POST  AnyLog command form
 # ---------------------------------------------------------------------------------------
 def form_request(request):
 
+    button = request.POST.get("command")
+    if button:
+        is_send = button == "send"
+    else:
+        is_send = False
+
     # Check the form is submitted or not
-    if request.method == 'POST':
+    if request.method == 'POST' and is_send:
         user_info = AnyLogCredentials(request.POST)
         # Check the form data are valid or not
         if user_info.is_valid():
@@ -54,7 +64,19 @@ def form_request(request):
             # return HttpResponse(data)
     else:
         # Display the html form
-        user_info = AnyLogCredentials()
+        if button:
+            request.POST.command = "aaa"
+            user_info = AnyLogCredentials(request.POST)     # command selected on the form
+
+
+            cmd_info = ANYLOG_COMMANDS[COMMAND_BY_BUTTON[button]]
+            user_cmd = cmd_info["command"]
+
+
+            #user_info.fields['command'].intial=user_cmd
+            #user_info.data['command'] = user_cmd             # Command to display
+        else:
+            user_info = AnyLogCredentials()                 # Empty form
         select_info = {}
         select_info["form"] = user_info
         select_info["commands_list"] = ANYLOG_COMMANDS
