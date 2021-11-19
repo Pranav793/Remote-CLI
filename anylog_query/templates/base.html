@@ -53,18 +53,29 @@
     <br/>
     <br/>
 
+    <input type ="submit" name = "Send" value="Send" style="font-face: 'Comic Sans MS'; color: whitesmoke; background-color: gray; border: 3pt ridge lightgrey" />
+
+    &nbsp; &nbsp;
+
+    <label for="network">Network</label>
     {% if query %}
         <input type="checkbox" id="network" name="network" checked>
     {% else %}
         <input type="checkbox" id="network" name="network">
     {% endif %}
 
-    <label for="network">Network</label>
 
      &nbsp; &nbsp;
 
     <label for="cmd">Command:&nbsp;</label>
-    <input type="text" id="cmd" name="cmd">
+
+
+    {% if command %}
+        <input type="text" id="cmd" name="cmd" value="{{command}}" size="150">
+    {% else %}
+        <input type="text" id="cmd" name="cmd" size="150">
+    {% endif %}
+
 
     <br/> <br/> <br/>
 
@@ -74,7 +85,7 @@
 
     <br/>
 
-    <input type ="submit" name = "Send" value="Send" />
+
 
     {% if node_reply %}
     <p>

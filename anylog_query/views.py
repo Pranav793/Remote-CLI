@@ -40,14 +40,10 @@ for index, entry in enumerate(ANYLOG_COMMANDS):
 # ---------------------------------------------------------------------------------------
 def form_request(request):
 
-    button = request.POST.get("command")
-    if button:
-        is_send = button == "send"
-    else:
-        is_send = False
+    send = request.POST.get("Send")
 
     # Check the form is submitted or not
-    if request.method == 'POST' and is_send:
+    if request.method == 'POST' and send:
 
         # Proces the command
         command, output = process_anylog(request)
@@ -56,21 +52,14 @@ def form_request(request):
 
     else:
         # Display the html form
+        select_info = {}
+        button = request.POST.get("button")
         if button:
-            request.POST.command = "aaa"
-            user_info = AnyLogCredentials(request.POST)     # command selected on the form
-
-
             cmd_info = ANYLOG_COMMANDS[COMMAND_BY_BUTTON[button]]
             user_cmd = cmd_info["command"]
+            select_info["command"] = user_cmd           # provide selection to html
 
 
-            #user_info.fields['command'].intial=user_cmd
-            #user_info.data['command'] = user_cmd             # Command to display
-        else:
-            pass
-            #user_info = AnyLogCredentials()                 # Empty form
-        select_info = {}
         #select_info["form"] = user_info
         select_info["commands_list"] = ANYLOG_COMMANDS
 
