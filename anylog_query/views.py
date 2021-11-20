@@ -57,9 +57,15 @@ def form_request(request):
         button = request.POST.get("button")
         if button:
             add_form_value(select_info, request)
-            cmd_info = ANYLOG_COMMANDS[COMMAND_BY_BUTTON[button]]
-            user_cmd = cmd_info["command"]
+            command_id = COMMAND_BY_BUTTON[button]
+            cmd_info = ANYLOG_COMMANDS[command_id]
+            user_cmd = cmd_info["command"]              # Set the command
             select_info["command"] = user_cmd
+            rest_call = cmd_info["type"]
+            if rest_call == "get":
+                select_info["rest_call"] = rest_call        # Set Put or Get
+            else:
+                select_info["rest_call"] = None
 
         select_info["commands_list"] = ANYLOG_COMMANDS
 

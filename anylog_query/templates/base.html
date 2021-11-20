@@ -30,8 +30,18 @@
       <br/>  <br/>  <br/> <br/>
 
     <select id="rest_call" name="rest_call">
-    <option selected value="get">&nbsp;GET</option>
-    <option value="post">&nbsp;POST</option>
+
+    {% if rest_call %}
+        <option selected value="get">&nbsp;GET</option>
+    {% else %}
+        <option value="get">&nbsp;GET</option>
+    {% endif %}
+    {% if rest_call %}
+        <option  value="post">&nbsp;POST</option>
+    {% else %}
+        <option selected value="post">&nbsp;POST</option>
+    {% endif %}
+
     </select>
 
     &nbsp; &nbsp;
