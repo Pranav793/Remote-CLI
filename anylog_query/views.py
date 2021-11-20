@@ -68,6 +68,8 @@ def form_request(request):
             user_cmd = cmd_info["command"]             # Set the command
 
             if len (user_cmd) > 5 and user_cmd[:4].lower().startswith("sql "):
+                select_info["query"] = True     # Used to Flag the network bool on the page
+
                 # add dbms name and table name
                 dbms_name = request.POST.get('dbms')
                 table_name = request.POST.get('table')
@@ -76,6 +78,9 @@ def form_request(request):
                     user_cmd = user_cmd.replace("[DBMS]", dbms_name, 1)
                 if table_name:
                     user_cmd = user_cmd.replace("[TABLE]", table_name, 1)
+            else:
+                select_info["query"] = False
+
 
             select_info["command"] = user_cmd
             rest_call = cmd_info["type"]
