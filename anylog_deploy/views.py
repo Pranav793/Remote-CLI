@@ -1,4 +1,6 @@
 import os
+import re
+
 import anylog_deploy.forms as forms
 from django.http.response import HttpResponse
 from django.shortcuts import render
@@ -188,10 +190,24 @@ class FormViews:
             if networking_config.is_valid():
                 self.env_params['networking']['ip'] = request.POST.get('external_ip')
                 self.env_params['networking']['local_ip'] = request.POST.get('local_ip')
-                self.env_params['networking']['anylog_tcp_port'] = request.POST.get('anylog_tcp_port')
-                self.env_params['networking']['anylog_rest_port'] = request.POST.get('anylog_rest_port')
-                self.env_params['networking']['anylog_broker_port'] = request.POST.get('anylog_broker_port')
-                self.env_params['networking']['master_node'] = request.POST.get('master_node')
+                anylog_tcp_port = request.POST.get('anylog_tcp_port')
+                anylog_rest_port = request.POST.get('anylog_rest_port')
+                anylog_broker_port = request.POST.get('anylog_broker_port')
+                master_node = request.POST.get('master_node')
+
+                # validate Master node info & no duplicate ports
+                error_msg = ''
+                if not bool(re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:[2-9][0-9][4-9][0-9]$', master_node)):
+                    error_msg += 'Invalid format for master node (Format: IP:PORT)<br/>'
+                if anylog_tcp_port == anylog_rest_port or anylog_tcp_port ==  anylog_broker_port or anylog_rest_port == anylog_broker_port:
+                    error_msg += 'No two ports can have the same value'
+                if error_msg != '':
+                    return render(request, "network_configs.html", {'form': networking_config, 'node_reply': error_msg})
+
+                self.env_params['networking']['master_node'] = master_node
+                self.env_params['networking']['anylog_tcp_port'] = anylog_tcp_port
+                self.env_params['networking']['anylog_rest_port'] = anylog_rest_port
+                self.env_params['networking']['anylog_broker_port'] = anylog_broker_port
 
                 self.__update_params(env_params)
                 if self.env_params['general']['node_type'] in ['operator', 'single-node']:
@@ -222,13 +238,14 @@ class FormViews:
                 db_user = request.POST.get('db_user')
                 db_addr = request.POST.get('db_addr')
                 db_pass = request.POST.get('db_pass')
-                self.env_params['database']['db_user'] = '%s@%s:%s' % (db_user, db_addr, db_pass)
+                self.env_params['database']['db_user'] = '%s@%s:%s' % (db_user.lower(), db_addr, db_pass)
                 self.env_params['database']['db_port'] = request.POST.get('db_port')
 
                 self.__update_params(env_params)
+                # save to file process goes here
                 if self.env_params['general']['node_type'] == 'publisher':
                     return HttpResponseRedirect('../mqtt-configs/')
-                return render(request, "db_configs.html", {'form': db_configs})
+                return HttpResponseRedirect('../deploy-anylog/')
         else:
             db_configs = forms.DBConfigs()
             return render(request, "db_configs.html", {'form': db_configs})
@@ -317,9 +334,10 @@ class FormViews:
                 self.env_params['mqtt']['mqtt_column_timestamp'] = request.POST.get('mqtt_column_timestamp')
                 self.env_params['mqtt']['mqtt_column_value_type'] = request.POST.get('mqtt_column_value_type')
                 self.env_params['mqtt']['mqtt_column_value'] = request.POST.get('mqtt_column_value')
+
                 self.__update_params(env_params)
-                print(self.env_params)
-                return render(request, "mqtt_configs.html", {'form': mqtt_configs})
+                # save configs to file
+                return HttpResponseRedirect('../deploy-anylog/')
         else:
             mqtt_configs = forms.MqttConfigs()
             return render(request, "mqtt_configs.html", {'form': mqtt_configs})

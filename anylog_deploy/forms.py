@@ -1,4 +1,5 @@
 from django import forms
+from django.core.validators import RegexValidator
 import os
 import sys
 
@@ -79,6 +80,7 @@ class GeneralInfo(forms.Form):
 
 class NetworkingConfigs(forms.Form):
     # networking
+    master_validator = RegexValidator('{:')
     external_ip = forms.GenericIPAddressField(label='External IP Address', required=False)
     local_ip = forms.GenericIPAddressField(label='Local IP Address', required=False)
     anylog_tcp_port = forms.IntegerField(label='TCP Port Number', required=True)
