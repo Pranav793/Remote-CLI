@@ -42,7 +42,9 @@ class FormViews:
             if config_file != new-file and config_file != '' -- deploy based on config
         """
         if request.method == 'POST':
+            full_path = None
             file_config = forms.SelectConfig(request.POST)
+            print(file_config.is_valid())
             if file_config.is_valid():
                 # ask for information regarding a new device
                 if request.POST.get('new_config_file') is not None:
@@ -60,12 +62,14 @@ class FormViews:
                         return render(request, "config_file.html", {'form': file_config,
                                                                     'error': 'Failed to locate file "%s"' % full_path})
                 # get env params from file
-                self.env_params = io_config.read_configs(config_file=full_path)
-                if 'Error' in self.env_params:
-                    return render(request, "config_file.html", {'form': file_config, 'error': self.env_params})
+                if full_path is not None:
+                    self.env_params = io_config.read_configs(config_file=full_path)
+                    if 'Error' in self.env_params:
+                        return render(request, "config_file.html", {'form': file_config, 'error': self.env_params})
+                    else:
+                        return HttpResponseRedirect('deploy-anylog/')
                 else:
-                    return HttpResponseRedirect('deploy-anylog/')
-                return render(request, "config_file.html", {'form': file_config})
+                    return render(request, "config_file.html", {'form': file_config})
         else:
             file_config = forms.SelectConfig()
             return render(request, "config_file.html", {'form': file_config})
