@@ -30,6 +30,10 @@ ANYLOG_COMMANDS = [
     {'button': 'Reset REST Log',   'command': 'reset rest log', 'type': 'POST'},                    # Reset REST Log Off
     {'button': 'REST Log off', 'command': 'set rest log off', 'type': 'POST'},  # Set REST Log Off
     {'button': 'REST Log on', 'command': 'set rest log on', 'type': 'POST'},  # Set REST Log On
+    {'button': 'QUERY Count', 'command': 'sql [DBMS] SELECT count(*) from [TABLE]', 'type': 'GET'},  # Set REST Log On
+    {'button': 'QUERY Minute', 'command': 'sql [DBMS] SELECT timestamp, value FROM [TABLE] WHERE timestamp > NOW() - 1 minute', 'type': 'GET'},  # Set REST Log On
+    {'button': 'QUERY Increments', 'command': 'sql [DBMS] SELECT timestamp, value FROM pdic1000_pv WHERE timestamp > NOW() - 1 minute', 'type': 'GET'},  # Set REST Log On
+    {'button': 'QUERY Period', 'command': 'sql [DBMS] SELECT count(*) from [TABLE]', 'type': 'GET'},  # Set REST Log On
 
 ]
 
@@ -61,13 +65,25 @@ def form_request(request):
             add_form_value(select_info, request)
             command_id = COMMAND_BY_BUTTON[button]
             cmd_info = ANYLOG_COMMANDS[command_id]
-            user_cmd = cmd_info["command"]              # Set the command
+            user_cmd = cmd_info["command"]             # Set the command
+
+            if len (user_cmd) > 5 and user_cmd[:4].lower().startswith("sql "):
+                # add dbms name and table name
+                dbms_name = request.POST.get('dbms')
+                table_name = request.POST.get('table')
+
+                if dbms_name:
+                    user_cmd = user_cmd.replace("[DBMS]", dbms_name, 1)
+                if table_name:
+                    user_cmd = user_cmd.replace("[TABLE]", table_name, 1)
+
             select_info["command"] = user_cmd
             rest_call = cmd_info["type"]
             if rest_call == "GET":
                 select_info["rest_call"] = rest_call        # Set Put or Get
             else:
                 select_info["rest_call"] = None
+
 
         select_info["commands_list"] = ANYLOG_COMMANDS
 
@@ -88,8 +104,10 @@ def process_anylog(request):
     username = post_data.get('auth_usr')
     password = post_data.get('auth_pass')
     command = post_data.get('command')
+
     network = post_data.get('network')
     rest_call = post_data.get('rest_call')
+
 
     if command:
         authentication = ()
