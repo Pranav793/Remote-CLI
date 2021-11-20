@@ -4,6 +4,7 @@ from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 import anylog_deploy.anylog_conn.io_config as io_config
+import anylog_deploy.anylog_conn.deployment_process as anylog_deployment
 
 class FormViews:
     def __init__(self):
@@ -74,9 +75,32 @@ class FormViews:
             file_config = forms.SelectConfig()
             return render(request, "config_file.html", {'form': file_config})
 
+
     def deploy_anylog(self, request)->HttpResponse:
         if request.method == 'POST':
-            return HttpResponse('Hello World')
+            deployment_configs = forms.DeployAnyLog(request.POST)
+            docker_password = request.POST.get('password')
+            timezone = request.POST.get('timezone')
+            update_anylog = False
+            psql = False
+            grafana = False
+
+            if request.POST.get('update_anylog') is not None:
+                update_anylog = True
+            if request.POST.get('psql') is not None:
+                psql = True
+            if request.POST.get('grafana') is not None:
+                grafana = True
+
+            # deploy AnyLog process goes HERE
+            status = anylog_deployment.main(env_params=self.env_params, docker_password=docker_password, psql=psql,
+                                            timezone=timezone, update_anylog=update_anylog, grafana=grafana)
+            if status == 'success':
+                return render(request, "deploy_anylog.html", {'form': deployment_configs,
+                                                            'error': 'AnyLog was successfully deployed'})
+            else:
+                return render(request, "deploy_anylog.html", {'form': deployment_configs,
+                                                            'error': 'Failed to deploy AnyLog [%s]' % status})
         else:
             deployment_config = forms.DeployAnyLog()
             return render(request, "deploy_anylog.html", {'form': deployment_config})

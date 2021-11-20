@@ -55,10 +55,6 @@ class SelectConfig(forms.Form):
     preset_config_file = forms.FilePathField(label='Config File', path=CONFIG_FILE_PATH, required=False)
     external_config_file = forms.CharField(label='External Config File', required=False)
 
-class BaseInfo(forms.Form):
-    build = forms.ChoiceField(label='Build', required=True, choices=BUILDS)
-    node_type = forms.ChoiceField(label='Node Type', required=True, choices=NODE_TYPES)
-
 class DeployAnyLog(forms.Form):
     password = forms.CharField(label='Docker Password', required=False, widget=forms.PasswordInput)
     update_anylog = forms.BooleanField(label='Update AnyLog', required=False)
@@ -66,6 +62,9 @@ class DeployAnyLog(forms.Form):
     psql = forms.BooleanField(label='Deploy PostgreSQL', required=False)
     grafana = forms.BooleanField(label='Deploy Grafana', required=False)
 
+class BaseInfo(forms.Form):
+    build = forms.ChoiceField(label='Build', required=True, choices=BUILDS)
+    node_type = forms.ChoiceField(label='Node Type', required=True, choices=NODE_TYPES)
 
 class GeneralInfo(forms.Form):
     node_name = forms.CharField(label='Node Name', required=True)

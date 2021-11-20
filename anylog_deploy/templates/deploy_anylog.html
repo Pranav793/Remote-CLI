@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
-    <h1>Deploy AnyLog</h1>
+    <h1>Deploy Node</h1>
     {% load static %}
     <link rel='stylesheet' href="{% static 'css/default.css' %}">
 
@@ -9,26 +9,27 @@
     <title>User Registration Form</title>
   </head>
   <body>
-
   <form method="POST" class="post-form" >
     {% csrf_token %}
     {{ form.as_p }}
 
-
     <br/>
 
-    <button type="submit" class="save btn btn-default">Deploy</button>
-    <input type ="reset" value="Reset" />
+    <button type="submit" class="save btn btn-default">Deploy Node</button>
+    <button type="reset">Reset</button>
 
     {% if node_reply %}
     <p>
         {{ node_reply }}<br>
     </p>
-
    {% endif %}
-
   </form>
 
+  {% if error %}
+   <p>
+        {{ error }}
+   </p>
+   {% endif %}
   </body>
 
 </html>
