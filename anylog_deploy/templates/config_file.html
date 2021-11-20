@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+  <head>
+    <h1>Deploy Node</h1>
+    {% load static %}
+    <link rel='stylesheet' href="{% static 'css/default.css' %}">
+
+    <meta charset="UTF-8">
+    <title>User Registration Form</title>
+  </head>
+  <body>
+  <div align="center">Please specify a configuration file in either <b>Config File</b> or <b>External Config File</b>
+  otherwise press </div>
+  <form method="POST" class="post-form" >
+    {% csrf_token %}
+    {{ form.as_p }}
+
+
+    <br/>
+
+    <button type="submit" class="save btn btn-default">Submit</button>
+    <a href="base-configs/"><button type="submit">Deploy New Node</button></a>
+    <button type="reset">Reset</button>
+
+    {% if node_reply %}
+    <p>
+        {{ node_reply }}<br>
+    </p>
+   {% endif %}
+  </form>
+
+  {% if error %}
+   <p>
+        {{ error }}
+   </p>
+   {% endif %}
+  </body>
+
+</html>

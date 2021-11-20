@@ -1,7 +1,12 @@
 from django import forms
 import os
+import sys
 
-THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
+slash_char = '/'
+if sys.platform.startswith('win'):
+    slash_char = '\\'
+
+CONFIG_FILE_PATH = os.path.dirname(os.path.abspath(__file__)) + slash_char + 'configs'
 
 BUILDS = (
     ('', ("")),
@@ -43,13 +48,8 @@ MQTT_COLUMN_TYPES = (
 
 
 class SelectConfig(forms.Form):
-    config_files = [('', ('')), ('new-config', ('New Config'))]
-    for file in os.listdir(THIS_FOLDER + '/configs/'):
-        config_files.append((file, (file)))
-
-    config_files = tuple(config_files)
-    config_file = forms.ChoiceField(label='Config File', required=True, choices=config_files)
-
+    preset_config_file = forms.FilePathField(label='Config File', path=CONFIG_FILE_PATH, required=False)
+    external_config_file = forms.CharField(label='External Config File', required=False)
 
 class BaseInfo(forms.Form):
     build = forms.ChoiceField(label='Build', required=True, choices=BUILDS)

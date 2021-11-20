@@ -3,6 +3,28 @@ import os
 
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__)).rsplit('anylog_conn', 1)[0] + "/config/new-config.ini"
 
+def read_configs(config_file:str)->dict:
+    data = {}
+    try:
+        config = configparser.ConfigParser()
+    except Exception as e:
+        return 'Error: Unable to create config parser object (Error: %s)' % e
+
+    try:
+        config.read(config_file)
+    except Exception as e:
+        return 'Error: Failed to read config file "%s" (Error: %s)' % (config_file, e)
+
+    try:
+        for section in config.sections():
+            for key in config[section]:
+                data[key.upper()] = config[section][key].replace('"', '')
+    except Exception as e:
+        return 'Failed to extract variables from config file (Error: %s)' % e
+
+    return data
+
+
 def write_configs(config_data:dict, config_file:str=THIS_FOLDER)->str:
     """
     Write configurations to file
