@@ -1,12 +1,14 @@
+"""
+* The following provides both the forms code and views code for a deployment process that uses one single form rather
+than separated into sections.
+
+* In the HTML, when pressing "Submit" the code program currently does nothing. However, if the code will replace the
+existing format it will write the content to (config) file.
+
+* The process itself is executable when going to http://127.0.0.1:8000/anylog-deploy/full-form
+"""
+from django.shortcuts import render
 from django import forms
-import os
-import sys
-
-slash_char = '/'
-if sys.platform.startswith('win'):
-    slash_char = '\\'
-
-CONFIG_FILE_PATH = os.path.dirname(os.path.abspath(__file__)) + slash_char + 'configs'
 
 BUILDS = (
     ('', ("")),
@@ -51,23 +53,11 @@ TIMEZONE = (
     ('local', ('Local'))
 )
 
-class SelectConfig(forms.Form):
-    preset_config_file = forms.FilePathField(label='Config File', path=CONFIG_FILE_PATH, required=False)
-    external_config_file = forms.CharField(label='External Config File', required=False)
 
-class BaseInfo(forms.Form):
+class FullForm(forms.Form):
+    # general
     build = forms.ChoiceField(label='Build', required=True, choices=BUILDS)
     node_type = forms.ChoiceField(label='Node Type', required=True, choices=NODE_TYPES)
-
-class DeployAnyLog(forms.Form):
-    password = forms.CharField(label='Docker Password', required=False, widget=forms.PasswordInput)
-    update_anylog = forms.BooleanField(label='Update AnyLog', required=False)
-    timezone = forms.ChoiceField(label='Set Docker Timezone', required=False, choices=TIMEZONE)
-    psql = forms.BooleanField(label='Deploy PostgreSQL', required=False)
-    grafana = forms.BooleanField(label='Deploy Grafana', required=False)
-
-
-class GeneralInfo(forms.Form):
     node_name = forms.CharField(label='Node Name', required=True)
     company_name = forms.CharField(label='Company Name', required=True)
     location = forms.CharField(label='Location', required=False)
@@ -78,7 +68,6 @@ class GeneralInfo(forms.Form):
     password = forms.CharField(label='Authentication Password', required=False, widget=forms.PasswordInput)
     auth_type = forms.ChoiceField(label='Authentication User Type', required=False, choices=AUTHENTICATION_TYPE)
 
-class NetworkingConfigs(forms.Form):
     # networking
     external_ip = forms.GenericIPAddressField(label='External IP Address', required=False)
     local_ip = forms.GenericIPAddressField(label='Local IP Address', required=False)
@@ -87,16 +76,6 @@ class NetworkingConfigs(forms.Form):
     anylog_broker_port = forms.IntegerField(label='Broker Port Number', required=False)
     master_node = forms.CharField(label='Master Node IP:Port Information', required=True)
 
-
-class DBConfigs(forms.Form):
-    # database
-    db_type = forms.ChoiceField(label='Database Type', required=False, choices=DATABASES)
-    db_user = forms.CharField(label='Database User', required=True)
-    db_pass = forms.CharField(label='Database Password', required=True, widget=forms.PasswordInput)
-    db_addr = forms.GenericIPAddressField(label='Database Address', required=True)
-    db_port = forms.IntegerField(label='Database Port', required=True)
-
-class DBOperatorConfigs(forms.Form):
     # database
     db_type = forms.ChoiceField(label='Database Type', required=False, choices=DATABASES)
     db_user = forms.CharField(label='Database User', required=True)
@@ -114,7 +93,7 @@ class DBOperatorConfigs(forms.Form):
     partition_column = forms.CharField(label='Column to Partition By', required=False)
     partition_interval = forms.CharField(label='Partitioning Interval', required=False)
 
-class MqttConfigs(forms.Form):
+    # MQTT
     mqtt_enable = forms.BooleanField(label='Enable MQTT', required=False)
     mqtt_broker = forms.CharField(label='MQTT Broker', required=False)
     mqtt_port = forms.IntegerField(label='MQTT Broker Port', required=False)
@@ -128,8 +107,23 @@ class MqttConfigs(forms.Form):
     mqtt_column_value_type = forms.ChoiceField(label='Value Column Type', required=False, choices=MQTT_COLUMN_TYPES)
     mqtt_column_value = forms.CharField(label='Value Column', required=False)
 
-
-
-
-
-
+def full_view(request):
+    if request.method == 'POST':
+        user_info = FullForm()
+        # Check the form data are valid or not
+        if user_info.is_valid():
+            return render(request, "base_configs.html", {'form': user_info})
+            # # Proces the command
+            # # command, output = process_anylog(request)
+            #
+            # return print_network_reply(request, user_info, command, output)
+            #
+            # # print to existing screen content of data (currently DNW)
+            # # return render(request, "base_configs.html", {'form': user_info, 'node_reply': node_reply})
+            #
+            # # print to (new) screen content of data
+            # # return HttpResponse(data)
+    else:
+        # Display the html form
+        user_info = FullForm()
+        return render(request, "base_configs.html", {'form': user_info})

@@ -59,18 +59,23 @@ class FormViews:
                     if not os.path.isfile(full_path):
                         return render(request, "config_file.html", {'form': file_config,
                                                                     'error': 'Failed to locate file "%s"' % full_path})
-
                 # get env params from file
                 self.env_params = io_config.read_configs(config_file=full_path)
                 if 'Error' in self.env_params:
                     return render(request, "config_file.html", {'form': file_config, 'error': self.env_params})
                 else:
-                    print(self.env_params)
+                    return HttpResponseRedirect('deploy-anylog/')
                 return render(request, "config_file.html", {'form': file_config})
         else:
             file_config = forms.SelectConfig()
             return render(request, "config_file.html", {'form': file_config})
 
+    def deploy_anylog(self, request)->HttpResponse:
+        if request.method == 'POST':
+            return HttpResponse('Hello World')
+        else:
+            deployment_config = forms.DeployAnyLog()
+            return render(request, "deploy_anylog.html", {'form': deployment_config})
 
     def basic_config(self, request)->HttpResponse:
         """
@@ -89,7 +94,6 @@ class FormViews:
             if base_configs.is_valid():
                 self.env_params['general']['build'] = request.POST.get('build')
                 self.env_params['general']['node_type'] = request.POST.get('node_type')
-                self.docker_password = request.POST.get('password')
                 if self.env_params['general']['node_type'] == 'none' or self.env_params['general']['node_type'] == '':
                     # Deploy AnyLog of type None
                     return render(request, "base_configs.html", {'form': base_configs})
@@ -292,26 +296,4 @@ class FormViews:
     #     else:
     #         mqtt_configs = forms.MqttConfigs()
     #         return render(request, "mqtt_configs.html", {'form': mqtt_configs})
-
-def index(request):
-    if request.method == 'POST':
-        user_info = forms.AnyLogDeployment()
-        # Check the form data are valid or not
-        if user_info.is_valid():
-            return render(request, "base_configs.html", {'form': user_info})
-            # # Proces the command
-            # # command, output = process_anylog(request)
-            #
-            # return print_network_reply(request, user_info, command, output)
-            #
-            # # print to existing screen content of data (currently DNW)
-            # # return render(request, "base_configs.html", {'form': user_info, 'node_reply': node_reply})
-            #
-            # # print to (new) screen content of data
-            # # return HttpResponse(data)
-    else:
-        # Display the html form
-        user_info = forms.AnyLogDeployment()
-
-        return render(request, "base_configs.html", {'form': user_info})
 
