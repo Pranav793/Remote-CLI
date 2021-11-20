@@ -17,7 +17,7 @@ ANYLOG_COMMANDS = [
     {'button': 'Reset Error Log',   'command': 'reset error log', 'type': 'POST'},              # Set REST Log Off
     {'button': 'REST Log off',      'command': 'set rest log off', 'type': 'POST'},              # Set REST Log Off
     {'button': 'REST Log on',       'command': 'set rest log on', 'type': 'POST'},                  # Set REST Log On
-    {'button': 'Get REST',          'command': 'get rest all', 'type': 'GET'},                      # Get REST
+    {'button': 'Get REST',          'command': 'get rest', 'type': 'GET'},                          # Get REST
     {'button': 'GET REST log',      'command': 'get rest log', 'type': 'GET'},                          # GET REST log
     {'button': 'Get Streaming',     'command': 'get streaming', 'type': 'GET'},                     # Get Streaming
     {'button': 'Get Operator',      'command': 'get operator', 'type': 'GET'},                      # Get Operator
@@ -95,7 +95,7 @@ def process_anylog(request):
         if username != '' and password != '':
             authentication = (username, password)
 
-        if rest_call is "post":
+        if rest_call == "post":
             output = anylog_conn.post_cmd(conn=conn_info, command=command, authentication=authentication)
         else:
             output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network)
