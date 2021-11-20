@@ -56,7 +56,14 @@ def form_request(request):
         # Proces the command
         output = process_anylog(request)
 
-        return print_network_reply(request, output)
+        user_cmd = request.POST.get("command")
+        if len(user_cmd) > 5 and user_cmd[:4].lower()[:4:] == "sql ":
+            query_result = True
+        else:
+            query_result = False
+
+
+        return print_network_reply(request, query_result, output)
 
     else:
         # Display the html form
@@ -137,7 +144,7 @@ def process_anylog(request):
 # Option 2 - a table
 # Option 3 - text
 # -----------------------------------------------------------------------------------
-def print_network_reply(request, data):
+def print_network_reply(request, query_result, data):
 
     select_info = {}
     add_form_value(select_info, request)        # add the values of the last form to the select_info
@@ -146,8 +153,8 @@ def print_network_reply(request, data):
     select_info["commands_list"] = ANYLOG_COMMANDS
 
 
-    if data and data.startswith("Failed to"):
-        print_info = [("text", data)]       # Print the error msg
+    if query_result or (data and data.startswith("Failed to")):
+        print_info = [("text", data)]       # Print the query reply or error msg as a string
     else:
         policy, table_info, print_info, error_msg = format_message_reply(data)
         if policy:
@@ -203,7 +210,7 @@ def format_message_reply(msg_text):
     elif msg_text[0] == '[' and msg_text[-1] == ']':
         policy, error_msg = json_api.string_to_list(msg_text)
 
-    if policy or error_msg:
+    if policy:
         return [policy, None, None, error_msg]  # return the dictionary or the list
 
 
