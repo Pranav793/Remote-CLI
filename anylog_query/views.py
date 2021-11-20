@@ -14,10 +14,11 @@ ANYLOG_COMMANDS = [
     {'button': 'Node Status',       'command': 'get status', 'type': 'GET'},                        # Get Node Status
     {'button': 'Event Log',         'command': 'get event log where format=json', 'type': 'GET'},   # Get Event Log
     {'button': 'Error Log',         'command': 'get error log where format=json', 'type': 'GET'},   # Get Error Log
-    {'button': 'Reset Error',       'command': 'set rest log off', 'type': 'POST'},              # Set REST Log Off
-    {'button': 'Set REST',          'command': 'set rest log on', 'type': 'POST'},                  # Set REST Log On
+    {'button': 'Reset Error Log',   'command': 'reset error log', 'type': 'POST'},              # Set REST Log Off
+    {'button': 'REST Log off',      'command': 'set rest log off', 'type': 'POST'},              # Set REST Log Off
+    {'button': 'REST Log on',       'command': 'set rest log on', 'type': 'POST'},                  # Set REST Log On
     {'button': 'Get REST',          'command': 'get rest all', 'type': 'GET'},                      # Get REST
-    {'button': 'GET REST log',      'command': 'get rest', 'type': 'GET'},                          # GET REST log
+    {'button': 'GET REST log',      'command': 'get rest log', 'type': 'GET'},                          # GET REST log
     {'button': 'Get Streaming',     'command': 'get streaming', 'type': 'GET'},                     # Get Streaming
     {'button': 'Get Operator',      'command': 'get operator', 'type': 'GET'},                      # Get Operator
     {'button': 'Get Publisher',     'command': 'get publisher', 'type': 'GET'},                     # Get Publisher
