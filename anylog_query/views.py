@@ -154,7 +154,8 @@ def add_form_value(select_info, request):
     post_data = request.POST
     for key, value in post_data.items():
         select_info[key] = value
-
+    if  select_info["rest_call"] == "post":
+        select_info["rest_call"] = None
 # -----------------------------------------------------------------------------------
 # Based on the message reply - organize as a table or as an attrubute values list
 # -----------------------------------------------------------------------------------
