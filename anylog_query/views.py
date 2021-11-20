@@ -32,8 +32,8 @@ ANYLOG_COMMANDS = [
     {'button': 'REST Log on', 'command': 'set rest log on', 'type': 'POST'},  # Set REST Log On
     {'button': 'QUERY Count', 'command': 'sql [DBMS] SELECT count(*) from [TABLE]', 'type': 'GET'},  # Set REST Log On
     {'button': 'QUERY Minute', 'command': 'sql [DBMS] SELECT timestamp, value FROM [TABLE] WHERE timestamp > NOW() - 1 minute', 'type': 'GET'},  # Set REST Log On
-    {'button': 'QUERY Increments', 'command': 'sql [DBMS] SELECT timestamp, value FROM pdic1000_pv WHERE timestamp > NOW() - 1 minute', 'type': 'GET'},  # Set REST Log On
-    {'button': 'QUERY Period', 'command': 'sql [DBMS] SELECT count(*) from [TABLE]', 'type': 'GET'},  # Set REST Log On
+    {'button': 'QUERY Increments', 'command': 'sql [DBMS] select increments(day, 1, timestamp), min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value, count(*) as row_count from [TABLE] limit 10', 'type': 'GET'},  # Set REST Log On
+    {'button': 'QUERY Period', 'command': 'sql [DBMS] select  max(timestamp), avg(value) from [TABLE] where period ( minute, 1, NOW(), timestamp)', 'type': 'GET'},  # Set REST Log On
 
 ]
 
