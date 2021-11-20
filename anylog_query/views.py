@@ -62,7 +62,7 @@ def form_request(request):
             user_cmd = cmd_info["command"]              # Set the command
             select_info["command"] = user_cmd
             rest_call = cmd_info["type"]
-            if rest_call == "get":
+            if rest_call == "GET":
                 select_info["rest_call"] = rest_call        # Set Put or Get
             else:
                 select_info["rest_call"] = None
