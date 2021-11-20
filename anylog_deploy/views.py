@@ -134,9 +134,7 @@ class FormViews:
         General configuration
             - node name
             - company
-            - disable location
-                if set to False:
-                - location (optional)
+            - location (optional)
             - enable authentication
                 - username
                 - password
@@ -153,18 +151,21 @@ class FormViews:
             if general_config.is_valid():
                 self.env_params['general']['node_name'] = request.POST.get('node_name')
                 self.env_params['general']['comapny_name'] = request.POST.get('company_name')
+                if request.POST.get('location') != '':
+                    self.env_params['general']['location'] = request.POST.get('location')
 
-                try:
-                    authentication = request.POST.get('authentication')
-                except:
-                    authentication = None
-                if authentication is None:
-                    self.env_params['authentication']['authentication'] = 'off'
-                else:
+                self.env_params['authentication']['authentication'] = 'off'
+                if request.POST.get('authentication') is not None:
                     self.env_params['authentication']['authentication'] = 'on'
 
                 self.env_params['authentication']['username'] = request.POST.get('username')
+                if self.env_params['authentication']['authentication'] == 'on' and self.env_params['authentication']['username'] == '':
+                    self.env_params['authentication']['username'] = 'anylog'
+
                 self.env_params['authentication']['password'] = request.POST.get('password')
+                if self.env_params['authentication']['authentication'] == 'on' and self.env_params['authentication']['password'] == '':
+                    self.env_params['authentication']['password'] = 'demo'
+
                 self.env_params['authentication']['auth_type'] = request.POST.get('auth_type')
 
                 self.__update_params(env_params)
@@ -182,7 +183,7 @@ class FormViews:
             - master_node
         """
         env_params = self.env_params
-        if request.get == 'POST':
+        if request.method == 'POST':
             networking_config = forms.NetworkingConfigs(request.POST)
             if networking_config.is_valid():
                 self.env_params['networking']['ip'] = request.POST.get('external_ip')
