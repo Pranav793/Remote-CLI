@@ -14,7 +14,7 @@ def main(env_params:dict, docker_password:str, timezone:str, update_anylog:bool,
         status
     """
     status = 'success'
-
+    print(env_params)
     # docker login into AnyLog account
 
     # deploy psql
