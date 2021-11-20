@@ -14,14 +14,10 @@ ANYLOG_COMMANDS = [
     {'button': 'Node Status',       'command': 'get status', 'type': 'GET'},                        # Get Node Status
     {'button': 'Event Log',         'command': 'get event log where format=json', 'type': 'GET'},   # Get Event Log
     {'button': 'Error Log',         'command': 'get error log where format=json', 'type': 'GET'},   # Get Error Log
-    {'button': 'Reset Error Log',   'command': 'reset error log', 'type': 'POST'},              # Set REST Log Off
-    {'button': 'REST Log off',      'command': 'set rest log off', 'type': 'POST'},              # Set REST Log Off
-    {'button': 'REST Log on',       'command': 'set rest log on', 'type': 'POST'},                  # Set REST Log On
     {'button': 'Get REST',          'command': 'get rest', 'type': 'GET'},                          # Get REST
-    {'button': 'GET REST log',      'command': 'get rest log', 'type': 'GET'},                          # GET REST log
-    {'button': 'Get Streaming',     'command': 'get streaming', 'type': 'GET'},                     # Get Streaming
-    {'button': 'Get Operator',      'command': 'get operator', 'type': 'GET'},                      # Get Operator
-    {'button': 'Get Publisher',     'command': 'get publisher', 'type': 'GET'},                     # Get Publisher
+    {'button': 'Get REST log',      'command': 'get rest log', 'type': 'GET'},                          # GET REST log
+    {'button': 'Get Streaming',     'command': 'get streaming format = json', 'type': 'GET'},                     # Get Streaming
+    {'button': 'Get Operator',      'command': 'get operator format = json', 'type': 'GET'},                      # Get Operator
     {'button': 'Get Query Status',  'command': 'query status all', 'type': 'GET'},                 # Get Query Status
     {'button': 'Get Last Query Status',     'command': 'query status', 'type': 'GET'},                     # Get Last Query Status
     {'button': 'Get Rows Count',            'command': 'get rows count', 'type': 'GET'},                   # Get Rows Count
@@ -30,6 +26,11 @@ ANYLOG_COMMANDS = [
     {'button': 'Blockchain Publishers',     'command': 'blockchain get publisher', 'type': 'GET'},         # Blockchain Publishers
     {'button': 'Blockchain Queries',        'command': 'blockchain get query', 'type': 'GET'},             # Blockchain Queries
     {'button': 'Blockchain Tables',         'command': 'blockchain get table', 'type': 'GET'},             # Blockchain Tables
+    {'button': 'Reset Error Log', 'command': 'reset error log', 'type': 'POST'},  # Set REST Log Off
+    {'button': 'Reset REST Log',   'command': 'reset rest log', 'type': 'POST'},                    # Reset REST Log Off
+    {'button': 'REST Log off', 'command': 'set rest log off', 'type': 'POST'},  # Set REST Log Off
+    {'button': 'REST Log on', 'command': 'set rest log on', 'type': 'POST'},  # Set REST Log On
+
 ]
 
 COMMAND_BY_BUTTON = {}

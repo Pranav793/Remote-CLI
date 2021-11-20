@@ -63,9 +63,28 @@
     <label for="auth_pass">Auth password:</label>
     <input type="text" id="auth_pass" name="auth_pass">
 
-    <br/>
-    <br/>
-    <br/>
+
+    <br/> <br/> <br/>
+
+    <label for="dbms">DBMS:&nbsp;</label>
+
+    {% if dbms %}
+        <input type="text" id="dbms" name="dbms" value="{{dbms}}">
+    {% else %}
+        <input type="text" id="dbms" name="dbms">
+    {% endif %}
+
+     &nbsp; &nbsp;
+
+    <label for="table">Table:&nbsp;</label>
+
+    {% if dbms %}
+        <input type="text" id="table" name="table" value="{{table}}">
+    {% else %}
+        <input type="text" id="table" name="table">
+    {% endif %}
+
+    <br/> <br/> <br/>
 
     <input type ="submit" name = "Send" value="Send" style="font-face: 'Comic Sans MS'; color: whitesmoke; background-color: gray; border: 3pt ridge lightgrey" />
 
@@ -88,6 +107,7 @@
     {% else %}
         <input type="text" id="command" name="command" size="150">
     {% endif %}
+
 
 
     <br/> <br/> <br/>
