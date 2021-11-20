@@ -84,19 +84,39 @@
         <input type="text" id="table" name="table">
     {% endif %}
 
-    <br/> <br/> <br/>
+    &nbsp; &nbsp;
 
-    <input type ="submit" name = "Send" value="Send" style="font-face: 'Comic Sans MS'; color: whitesmoke; background-color: gray; border: 3pt ridge lightgrey" />
+
+    <text>Format:</text>
+    &nbsp;
+
+    <select id="format" name="format">
+
+    {% if format %}
+        <option selected value="table">&nbsp;TABLE</option>
+    {% else %}
+        <option value="format">&nbsp;TABLE</option>
+    {% endif %}
+    {% if format %}
+        <option  value="format">&nbsp;JSON</option>
+    {% else %}
+        <option selected value="format">&nbsp;JSON</option>
+    {% endif %}
+    </select>
 
     &nbsp; &nbsp;
 
     <label for="network">Network</label>
+
     {% if query %}
         <input type="checkbox" id="network" name="network" checked>
     {% else %}
         <input type="checkbox" id="network" name="network">
     {% endif %}
 
+    <br/> <br/> <br/>
+
+    <input type ="submit" name = "Send" value="Send" style="font-face: 'Comic Sans MS'; color: whitesmoke; background-color: gray; border: 3pt ridge lightgrey" />
 
      &nbsp; &nbsp;
 
