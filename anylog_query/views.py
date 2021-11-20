@@ -118,7 +118,7 @@ def process_anylog(request):
     password = post_data.get('auth_pass')
     command = post_data.get('command')
 
-    network = post_data.get('network')
+    network = post_data.get('network') == "on"
     rest_call = post_data.get('rest_call')
 
 
