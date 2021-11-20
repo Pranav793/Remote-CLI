@@ -26,14 +26,15 @@ ANYLOG_COMMANDS = [
     {'button': 'Blockchain Publishers',     'command': 'blockchain get publisher', 'type': 'GET'},         # Blockchain Publishers
     {'button': 'Blockchain Queries',        'command': 'blockchain get query', 'type': 'GET'},             # Blockchain Queries
     {'button': 'Blockchain Tables',         'command': 'blockchain get table', 'type': 'GET'},             # Blockchain Tables
-    {'button': 'Reset Error Log', 'command': 'reset error log', 'type': 'POST'},  # Set REST Log Off
-    {'button': 'Reset REST Log',   'command': 'reset rest log', 'type': 'POST'},                    # Reset REST Log Off
-    {'button': 'REST Log off', 'command': 'set rest log off', 'type': 'POST'},  # Set REST Log Off
-    {'button': 'REST Log on', 'command': 'set rest log on', 'type': 'POST'},  # Set REST Log On
-    {'button': 'QUERY Count', 'command': 'sql [DBMS] SELECT count(*) from [TABLE]', 'type': 'GET'},  # Set REST Log On
-    {'button': 'QUERY Minute', 'command': 'sql [DBMS] SELECT timestamp, value FROM [TABLE] WHERE timestamp > NOW() - 1 minute', 'type': 'GET'},  # Set REST Log On
-    {'button': 'QUERY Increments', 'command': 'sql [DBMS] select increments(day, 1, timestamp), min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value, count(*) as row_count from [TABLE] limit 10', 'type': 'GET'},  # Set REST Log On
-    {'button': 'QUERY Period', 'command': 'sql [DBMS] select  max(timestamp), avg(value) from [TABLE] where period ( minute, 1, NOW(), timestamp)', 'type': 'GET'},  # Set REST Log On
+    {'button': 'Reset Error Log','command': 'reset error log', 'type': 'POST'},  # Set REST Log Off
+    {'button': 'Reset REST Log', 'command': 'reset rest log', 'type': 'POST'},                    # Reset REST Log Off
+    {'button': 'REST Log off',  'command': 'set rest log off', 'type': 'POST'},  # Set REST Log Off
+    {'button': 'REST Log on',   'command': 'set rest log on', 'type': 'POST'},  # Set REST Log On
+    {'button': 'QUERY Count',   'command': 'sql [DBMS] SELECT count(*) from [TABLE]', 'type': 'GET'},  # Set REST Log On
+    {'button': 'QUERY Minute',  'command': 'sql [DBMS] SELECT timestamp, value FROM [TABLE] WHERE timestamp > NOW() - 1 minute', 'type': 'GET'},
+    {'button': 'QUERY Increments', 'command': 'sql [DBMS] select increments(day, 1, timestamp), min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value, count(*) as row_count from [TABLE] limit 10', 'type': 'GET'},
+    {'button': 'QUERY Period',  'command': 'sql [DBMS] select  max(timestamp), avg(value) from [TABLE] where period ( minute, 1, NOW(), timestamp)', 'type': 'GET'},
+    {'button': 'Help Get',      'command': 'help get', 'type': 'GET'},             # Blockchain Tables
 
 ]
 
