@@ -158,19 +158,25 @@ def print_network_reply(request, query_result, data):
     select_info['title'] = 'Network Command'
     select_info["commands_list"] = ANYLOG_COMMANDS
 
-
-    if query_result or (data and data.startswith("Failed to")):
-        print_info = [("text", data)]       # Print the query reply or error msg as a string
+    if not data:
+        print_info = None
+    elif data.startswith("Failed to"):
+        print_info = [("text", data)]  # Print the error msg as a string
+    elif query_result and data[:8] != "{\"Query\"":
+        print_info = [("text", data)]  # Print the error msg as a string
     else:
         policy, table_info, print_info, error_msg = format_message_reply(data)
         if policy:
-            # Reply was a JSON policy
+            # Reply was a JSON policy or a query replied in JSON
             data_list = []
             json_api.setup_print_tree(policy, data_list)
             select_info['text'] = data_list
             return render(request, 'output_tree.html', select_info)
 
-        if table_info:
+        if query_result:
+            # Failed to map the result to JSON
+            print_info = [("text", data)]  # Print the query reply as a string
+        elif table_info:
             # Reply is structured as a table
 
             if 'header' in table_info:
