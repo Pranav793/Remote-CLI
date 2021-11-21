@@ -10,7 +10,6 @@
         {% for line in text %}
             {% if line.0 == "text" %}
                 <pre>{{ line.1|safe }}</pre>
-                <br>
             {% elif line.0 == "key_val" %}
 
                     {%  if line.3 == "table_start" %}

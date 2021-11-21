@@ -313,8 +313,7 @@ def format_message_reply(msg_text):
                     if set_table:
                         data_list[-1][3] = "table_end"
                         set_table = False
-                    data_list.append("text")
-                    data_list.append(key_val[0])
+                    data_list.append(["text",entry] )
                 elif len(key_val) == 2:
                     # Set as a table in the HTML
                     data_list.append(["key_val", key_val[0], key_val[1], "table"])
