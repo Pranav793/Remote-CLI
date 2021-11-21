@@ -88,13 +88,15 @@ def form_request(request):
                     user_cmd = user_cmd.replace("[TABLE]", table_name, 1)
 
                 # Add output format
-                out_format = request.POST.get('format')
+                out_format = request.POST.get('out_format')
                 cmd_list = user_cmd.split(' ',3)
                 if len(cmd_list) > 3:
                     if out_format == "table":
                         user_cmd = user_cmd.replace(cmd_list[2], "format = table %s" % (cmd_list[2]))
+                        select_info["out_format"] = "table"  # Keep selection menue on table
                     else:
                         user_cmd = user_cmd.replace(cmd_list[2], "format = json and stat = false %s" % (cmd_list[2]))
+                        select_info["out_format"] = None        # Keep selection menue on JSON
             else:
                 select_info["network"] = False
 
@@ -204,6 +206,9 @@ def add_form_value(select_info, request):
         select_info[key] = value
     if  select_info["rest_call"] == "post":
         select_info["rest_call"] = None
+    if  select_info["out_format"] == "json":
+        select_info["out_format"] = None
+
 # -----------------------------------------------------------------------------------
 # Based on the message reply - organize as a table or as an attrubute values list
 # -----------------------------------------------------------------------------------

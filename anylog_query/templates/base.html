@@ -90,18 +90,19 @@
     <text>Format:</text>
     &nbsp;
 
-    <select id="format" name="format">
+    <select id="out_format" name="out_format">
 
-    {% if format  %}
+    {% if out_format  %}
         <option selected value="table">&nbsp;TABLE</option>
     {% else %}
         <option value="table">&nbsp;TABLE</option>
     {% endif %}
-    {% if format %}
+    {% if out_format %}
         <option  value="json">&nbsp;JSON</option>
     {% else %}
         <option selected value="json">&nbsp;JSON</option>
     {% endif %}
+
     </select>
 
     &nbsp; &nbsp;
