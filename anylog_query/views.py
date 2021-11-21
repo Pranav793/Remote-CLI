@@ -14,6 +14,8 @@ ANYLOG_COMMANDS = [
     {'button': 'Node Status',       'command': 'get status', 'type': 'GET'},                        # Get Node Status
     {'button': 'Event Log',         'command': 'get event log where format=json', 'type': 'GET'},   # Get Event Log
     {'button': 'Error Log',         'command': 'get error log where format=json', 'type': 'GET'},   # Get Error Log
+    {'button': 'Get Processes',     'command': 'get processes', 'type': 'GET'},
+    {'button': 'Get Dictionary',    'command': 'get dictionary', 'type': 'GET'},
     {'button': 'Get REST',          'command': 'get rest', 'type': 'GET'},                          # Get REST
     {'button': 'Get REST log',      'command': 'get rest log', 'type': 'GET'},                          # GET REST log
     {'button': 'Get Streaming',     'command': 'get streaming format = json', 'type': 'GET'},                     # Get Streaming
@@ -107,7 +109,8 @@ def form_request(request):
                 select_info["rest_call"] = rest_call        # Set Put or Get
             else:
                 select_info["rest_call"] = None
-
+        else:
+            select_info["rest_call"] = "GET"
 
         select_info["commands_list"] = ANYLOG_COMMANDS
 
@@ -244,7 +247,8 @@ def format_message_reply(msg_text):
     is_table = False
     for index, entry in enumerate(text_list):
         if entry and index:
-            if entry[0] == '-' and entry[-1] == '|':
+            table_struct = entry.strip()
+            if table_struct[0] == '-' and table_struct[-1] == '|':
                 # Identified a table
                 is_table = True
                 columns_list = entry.split('|')
