@@ -1,66 +1,85 @@
 import configparser
 import os
 
-THIS_FOLDER = os.path.dirname(os.path.abspath(__file__)).rsplit('anylog_conn', 1)[0] + "/config/new-config.ini"
+CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)).rsplit('anylog_conn', 1)[0], "/config/new-config.ini")
 
-def read_configs(config_file:str)->dict:
+def read_configs(config_file:str=CONFIG_FILE)->dict:
+    """
+    Read configs from file & set values wthin them for Docker env params
+    :args:
+        config_file:str - config file to read
+    :params:
+        data:dict - content from config file
+        parser:configparser.configparser.ConfigParser - configuration parser
+    :return:
+        if success return data, else return an error
+    """
     data = {}
+    if not os.path.isfile(config_file):
+        return "Error: Unable to locate file '%s'" % config_file
+
     try:
-        config = configparser.ConfigParser()
+        parser = configparser.ConfigParser()
     except Exception as e:
         return 'Error: Unable to create config parser object (Error: %s)' % e
 
     try:
-        config.read(config_file)
+        parser.read(config_file)
     except Exception as e:
-        return 'Error: Failed to read config file "%s" (Error: %s)' % (config_file, e)
+        return "Error: Failed to read config file '%s' (Error: %s)" % (config_file, e)
 
     try:
-        for section in config.sections():
-            for key in config[section]:
-                data[key.upper()] = config[section][key].replace('"', '')
+        for section in parser.sections():
+            for key in parser[section]:
+                data[key.upper()] = parser[section][key].replace('"', '')
     except Exception as e:
-        return 'Failed to extract variables from config file (Error: %s)' % e
+        return "Failed to extract variables from config file '%s' (Error: %s)" % (config_file, e)
 
     return data
 
 
-def write_configs(config_data:dict, config_file:str=THIS_FOLDER)->str:
+def write_configs(config_data:dict, config_file:str=CONFIG_FILE)->str:
     """
     Write configurations to file
     :args:
         config_data:dict - content to write to file
         config_file:str - file to write content into
+    :params:
+        parser:configparser.configparser.ConfigParser - configuration parser
+    :return:
+        error otherwise None
     """
     config_file = os.path.expandvars(os.path.expanduser(config_file))
     # create file if DNE
-    if not os.path.isfile(config_data):
+    if not os.path.isfile(config_file):
         try:
             open(config_file, 'w').close()
         except Exception as e:
             return 'Error: Unable to create file %s (Error: %s)' % (config_file, e)
+    try:
+        parser = configparser.ConfigParser()
+    except Exception as e:
+        return 'Error: Unbale to set parser for setting configs (Error: %s)' % e
 
-    if os.path.isfile(config_data):
-        try:
-            config = configparser.ConfigParser()
-        except Exception as e:
-            return 'Error: Unable to create config parser object (Error: %s)' % e
-
-        # iterate through config_data and add it to config
+    try:
         for section in config_data:
-            config.add_section(section)
-            for variable in config_data[section]:
-                config[section][variable] = config_data[section][variable]
+            parser.add_section(section)
+            for key in config_data[section]:
+                if config_data[section][key] != '' and config_data[section][key] != None:
+                    parser.set(section, key, config_data[section][key])
+    except Exception as e:
+        return 'Error: Failed to add content into file (Error: %s)' % e
 
-        # write to file - note the config overwrites the file
-        try:
-            with open(config_file, 'w') as f:
-                try:
-                    f.write(config)
-                except Exception as e:
-                    return 'Error: Unable to write config content into %s (Error: %s)' % (config_file, e)
-        except Exception as e:
-            return 'Error: Unable to open file %s in order to write configs (Error: %s)' % (config_file, e)
+    try:
+        with open(config_file, 'w') as confil:
+            try:
+                parser.write(confil)
+            except Exception as e:
+                return 'Error: Failed to write content into %s (Error: %s)' % (config_file, e)
+    except Exception as e:
+        return 'Error: Failed to open %s for content to be written (Error: %s)' % (config_file, e)
+
+    return None
 
 
 def validate_config(config:dict)->bool:

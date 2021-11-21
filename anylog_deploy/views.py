@@ -1,4 +1,5 @@
 import os
+import pkgutil
 import re
 
 import anylog_deploy.forms as forms
@@ -7,6 +8,8 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 import anylog_deploy.anylog_conn.io_config as io_config
 import anylog_deploy.anylog_conn.deployment_process as anylog_deployment
+
+CONFIG_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configs')
 
 class FormViews:
     def __init__(self):
@@ -47,7 +50,6 @@ class FormViews:
         if request.method == 'POST':
             full_path = None
             file_config = forms.SelectConfig(request.POST)
-            print(file_config.is_valid())
             if file_config.is_valid():
                 # ask for information regarding a new device
                 if request.POST.get('new_config_file') is not None:
@@ -57,54 +59,80 @@ class FormViews:
                 external_config_file = request.POST.get('external_config_file')
 
                 # extract configuration file (full path)
-                if preset_config_file is not '':
+                if preset_config_file != '':
                     full_path = os.path.expandvars(os.path.expanduser(preset_config_file))
                 elif external_config_file != '':
                     full_path = os.path.expanduser(os.path.expanduser(external_config_file))
                     if not os.path.isfile(full_path):
                         return render(request, "config_file.html", {'form': file_config,
-                                                                    'error': 'Failed to locate file "%s"' % full_path})
+                                                                    'node_reply': 'Failed to locate file "%s"' % full_path})
                 # get env params from file
                 if full_path is not None:
-                    self.env_params = io_config.read_configs(config_file=full_path)
-                    if 'Error' in self.env_params:
-                        return render(request, "config_file.html", {'form': file_config, 'error': self.env_params})
-                    else:
-                        return HttpResponseRedirect('deploy-anylog/')
-                else:
-                    return render(request, "config_file.html", {'form': file_config})
+                    self.config_file = full_path
+                return HttpResponseRedirect('deploy-anylog/')
         else:
             file_config = forms.SelectConfig()
             return render(request, "config_file.html", {'form': file_config})
 
     def deploy_anylog(self, request)->HttpResponse:
+        """
+        Deployment process for AnyLog
+            1. check if self.env_params is empty - if not create config_file (and set to self.config_file)
+            2. use self.config_file to exteact env_params
+            if request.method == POST
+                1. extract values
+                2. go into docker deployment process
+        """
+        # Write env params to file or
+        output = None
+        env_params = {}
+        if not all(x == {} for x in list(self.env_params.values())):
+            # validate node type - note self.env_params is written to file only when node_type != 'none'
+            if self.env_params['general']['node_type'] == 'none':
+                for param in self.env_params['general']:
+                    env_params[param.upper()] = self.env_params['general'][param]
+                env_params['NODE_NAME'] = 'empty-node'
+            else:
+                self.config_file = os.path.join(CONFIG_FILE_PATH, self.env_params['general']['node_name'] + '.ini')
+                output = io_config.write_configs(config_data=self.env_params, config_file=self.config_file)
+                if output is None:
+                    env_params = io_config.read_configs(config_file=self.config_file)
+        if env_params == {}:
+            env_params = io_config.read_configs(config_file=self.config_file)
+
         if request.method == 'POST':
             deployment_configs = forms.DeployAnyLog(request.POST)
-            docker_password = request.POST.get('password')
-            timezone = request.POST.get('timezone')
-            update_anylog = False
-            psql = False
-            grafana = False
+            if deployment_configs.is_valid():
+                docker_password = request.POST.get('password')
+                timezone = request.POST.get('timezone')
+                update_anylog = False
+                psql = False
+                grafana = False
 
-            if request.POST.get('update_anylog') is not None:
-                update_anylog = True
-            if request.POST.get('psql') is not None:
-                psql = True
-            if request.POST.get('grafana') is not None:
-                grafana = True
-
-            # deploy AnyLog process goes HERE
-            status = anylog_deployment.main(env_params=self.env_params, docker_password=docker_password, psql=psql,
-                                            timezone=timezone, update_anylog=update_anylog, grafana=grafana)
-            if status == 'success':
-                return render(request, "deploy_anylog.html", {'form': deployment_configs,
-                                                            'error': 'AnyLog was successfully deployed'})
+                if request.POST.get('update_anylog') is not None:
+                    update_anylog = True
+                if request.POST.get('psql') is not None:
+                    psql = True
+                if request.POST.get('grafana'):
+                    grafana = True
+            error_msg = ''
+            if output is not None:
+                error_msg += output + "<br/>"
+            if not isinstance(env_params, dict):
+                error_msg += env_params + "<br/>"
+            if error_msg != '':
+                return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': error_msg})
+            elif bool(pkgutil.find_loader('docker')) is False:
+                return render(request, 'deploy_anylog.html',
+                              {'form': deployment_configs,
+                               'node_reply': 'Unable to deploy AnyLog, missing `docker` package'})
             else:
-                return render(request, "deploy_anylog.html", {'form': deployment_configs,
-                                                            'error': 'Failed to deploy AnyLog [%s]' % status})
+                status = anylog_deployment.main(env_params=env_params, docker_password=docker_password, psql=psql,
+                                                timezone=timezone, update_anylog=update_anylog, grafana=grafana)
+                return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': status})
         else:
-            deployment_config = forms.DeployAnyLog()
-            return render(request, "deploy_anylog.html", {'form': deployment_config})
+            deployment_configs = forms.DeployAnyLog()
+            return render(request, 'deploy_anylog.html', {'form': deployment_configs})
 
     def basic_config(self, request)->HttpResponse:
         """
@@ -171,7 +199,6 @@ class FormViews:
                 self.env_params['authentication']['auth_type'] = request.POST.get('auth_type')
 
                 self.__update_params(env_params)
-                print(self.env_params)
                 return HttpResponseRedirect('../network-configs/')
         else:
             general_config = forms.GeneralInfo()
@@ -242,7 +269,7 @@ class FormViews:
                 self.env_params['database']['db_port'] = request.POST.get('db_port')
 
                 self.__update_params(env_params)
-                # save to file process goes here
+
                 if self.env_params['general']['node_type'] == 'publisher':
                     return HttpResponseRedirect('../mqtt-configs/')
                 return HttpResponseRedirect('../deploy-anylog/')
@@ -264,6 +291,7 @@ class FormViews:
         """
         env_params = self.env_params
         if request.method == 'POST':
+            error_msg = ''
             db_configs = forms.DBOperatorConfigs(request.POST)
             if db_configs.is_valid():
                 self.env_params['database']['db_type'] = request.POST.get('db_type')
@@ -272,30 +300,34 @@ class FormViews:
                 db_pass = request.POST.get('db_pass')
                 self.env_params['database']['db_user'] = '%s@%s:%s' % (db_user, db_addr, db_pass)
                 self.env_params['database']['db_port'] = request.POST.get('db_port')
-                try:
-                    self.env_params['cluster']['enable_cluster'] = request.POST.get('enable_cluster')
-                except:
-                    self.env_params['cluster']['enable_cluster'] = False
-                else:
-                    if self.env_params['cluster']['enable_cluster'] == 'on':
-                        self.env_params['cluster']['enable_cluster'] = True
-                    else:
-                        self.env_params['cluster']['enable_cluster'] = False
+                self.env_params['cluster']['enable_cluster'] = False
+                if request.POST.get('enable_cluster') is not None:
+                    self.env_params['cluster']['enable_cluster'] = True
 
                 self.env_params['cluster']['cluster_name'] = request.POST.get('cluster_name')
 
+                if self.env_params['cluster']['enable_cluster'] is True and self.env_params['cluster']['cluster_name'] == '':
+                    error_msg += 'Missing cluster name<br/>'
+
+                self.env_params['partition']['enable_partition'] = False
                 try:
-                    self.env_params['partition']['enable_partition'] = self.POST.get('enable_partition')
-                except:
-                    self.env_params['partition']['enable_partition'] = False
-                else:
-                    if self.env_params['partition']['enable_partition'] == 'on':
+                    if self.POST.get('enable_partition') is not None:
                         self.env_params['partition']['enable_partition'] = True
+                except AttributeError:
+                    pass
 
                 self.env_params['partition']['partition_column'] = request.POST.get('partition_column')
                 self.env_params['partition']['partition_interval'] = request.POST.get('partition_interval')
 
+                if self.env_params['partition']['enable_partition']  is True:
+                    if self.env_params['partition']['partition_column'] == '':
+                        error_msg += "Missing partition column<br/>"
+                    if self.env_params['partition']['partition_interval'] == '':
+                        error_msg += "Missing partitioning interval<br/>"
+
                 self.__update_params(env_params)
+                if error_msg != '':
+                    return render(request, "operator_configs.html", {'form': db_configs, 'node_reply': error_msg})
                 return HttpResponseRedirect('../mqtt-configs/')
             else:
                 return render(request, "operator_configs.html", {'form': db_configs})
@@ -306,19 +338,16 @@ class FormViews:
     def mqtt_info(self, request)->HttpResponse:
         env_params = self.env_params
         if request.method == 'POST':
+            error_msg = ''
             mqtt_configs = forms.MqttConfigs(request.POST)
             if mqtt_configs.is_valid():
-                try:
-                    self.env_params['mqtt']['mqtt_enable'] = request.POST.get('mqtt_enable')
-                except:
-                    self.env_params['mqtt']['mqtt_enable'] = False
-                else:
-                    if self.env_params['mqtt']['mqtt_enable'] == 'on':
-                        self.env_params['mqtt']['mqtt_enable'] = True
-                    else:
-                        self.env_params['mqtt']['mqtt_enable'] = False
+                self.env_params['mqtt']['mqtt_enable'] = False
+                if request.POST.get('mqtt_enable') is not None:
+                    self.env_params['mqtt']['mqtt_enable'] = True
 
                 mqtt_broker = request.POST.get('mqtt_broker')
+                if self.env_params['mqtt']['mqtt_enable'] is True and mqtt_broker == '':
+                    error_msg += 'Missing broker information<br/>'
                 mqtt_user = request.POST.get('mqtt_user')
                 if mqtt_user != '':
                     mqtt_broker = '%s@%s' % (mqtt_user, mqtt_broker)
@@ -328,7 +357,13 @@ class FormViews:
                 self.env_params['mqtt']['mqtt_conn_info'] = mqtt_broker
 
                 self.env_params['mqtt']['mqtt_port'] = request.POST.get('mqtt_port')
+                if self.env_params['mqtt']['mqtt_enable'] is True and self.env_params['mqtt']['mqtt_port'] == '':
+                    error_msg += 'Missing broker port information<br/>'
+
                 self.env_params['mqtt']['mqtt_topic_name'] = request.POST.get('mqtt_topic_name')
+                if self.env_params['mqtt']['mqtt_enable'] is True and self.env_params['mqtt']['mqtt_topic_name'] == '':
+                    error_msg += "Missing topic name - user can set topic to '*' to get all topics from broker<br/>"
+
                 self.env_params['mqtt']['mqtt_topic_dbms'] = request.POST.get('mqtt_topic_dbms')
                 self.env_params['mqtt']['mqtt_topic_table'] = request.POST.get('mqtt_topic_table')
                 self.env_params['mqtt']['mqtt_column_timestamp'] = request.POST.get('mqtt_column_timestamp')
@@ -336,7 +371,9 @@ class FormViews:
                 self.env_params['mqtt']['mqtt_column_value'] = request.POST.get('mqtt_column_value')
 
                 self.__update_params(env_params)
-                # save configs to file
+                if error_msg != '':
+                    return render(request, "mqtt_configs.html", {'form': mqtt_configs, 'node_reply': error_msg})
+
                 return HttpResponseRedirect('../deploy-anylog/')
         else:
             mqtt_configs = forms.MqttConfigs()
