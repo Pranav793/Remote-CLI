@@ -16,6 +16,7 @@ def __docker_login(docker_client:docker.client.DockerClient, password:str)->bool
         status = 'Error: Failed to log into docker (Error: %s)' % e
     return ''
 
+
 def __validate_container(docker_client:docker.client.DockerClient,
                          container_name:str)->docker.models.containers.Container:
     """
@@ -35,6 +36,7 @@ def __validate_container(docker_client:docker.client.DockerClient,
         pass
 
     return container
+
 
 def __run_container(docker_client:docker.client, image:str, container_name:str, environment:dict={},
                     volumes:dict={})->docker.models.containers.Container:
@@ -99,12 +101,13 @@ def deploy_postgres(docker_client:docker.client.DockerClient, conn_info:str, tim
     }
     volumes = {'pgdata': {'bind': '/var/lib/postgresql/data', 'mode': 'ro'}}
     if timezone == 'local' and not sys.platform.startswith('win'):
-        volumes = {'/etc/localtime': {'bind': '/etc/localtime', 'mode': 'ro'}}
+        volumes['/etc/localtime'] = {'bind': '/etc/localtime', 'mode': 'ro'}
 
     if __validate_container(docker_client=docker_client, container_name=container_name) is None:
         status = __run_container(docker_client=docker_client, image=build, container_name=container_name,
                         environment=environment, volumes=volumes)
     return status
+
 
 def deploy_grafana(docker_client:docker.client.DockerClient, timezone:str)->str:
     """
@@ -135,6 +138,7 @@ def deploy_grafana(docker_client:docker.client.DockerClient, timezone:str)->str:
                                  environment=environment, volumes=volumes)
     return status
 
+
 def update_anylog(docker_client:docker.client.DockerClient, build:str)->str:
     """
     Update AnyLog
@@ -148,8 +152,9 @@ def update_anylog(docker_client:docker.client.DockerClient, build:str)->str:
     try:
         docker_client.images.pull(repository=repo)
     except Exception as e:
-        return 'Error: Failed to pull image %s (Error: %s)' (repo, e)
+        return 'Error: Failed to pull image %s (Error: %s)' % (repo, e)
     return None
+
 
 def depeloy_anylog(docker_client:docker.client.DockerClient, timezone:str, env_params:dict)->str:
     """
@@ -175,7 +180,7 @@ def depeloy_anylog(docker_client:docker.client.DockerClient, timezone:str, env_p
         '%s-local-scripts' % container_name: '/app/AnyLog-Network/local_scripts'
     }
     if timezone == 'local' and not sys.platform.startswith('win'):
-        volumes = {'/etc/localtime': {'bind': '/etc/localtime', 'mode': 'ro'    return None
+        volumes['/etc/localtime'] = {'bind': '/etc/localtime', 'mode': 'ro'}
 
     if __validate_container(docker_client=docker_client, container_name=container_name) is None:
         status = __run_container(docker_client=docker_client, image=build, container_name=container_name,
@@ -209,8 +214,7 @@ def main(env_params:dict, docker_password:str, timezone:str, update_anylog:bool,
 
     # deploy psql
     if psql is True:
-        output = deploy_postgres(docker_client=docker_client, conn_info=env_params['database']['db_user'],
-                                 timezone=timezone)
+        output = deploy_postgres(docker_client=docker_client, conn_info=env_params['DB_USER'], timezone=timezone)
         if isinstance(output, str):
             return output
 
