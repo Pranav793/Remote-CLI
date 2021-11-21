@@ -91,7 +91,10 @@ def form_request(request):
                 out_format = request.POST.get('format')
                 cmd_list = user_cmd.split(' ',3)
                 if len(cmd_list) > 3:
-                    user_cmd = user_cmd.replace(cmd_list[2], "format = %s %s" % (out_format, cmd_list[2]))
+                    if out_format == "table":
+                        user_cmd = user_cmd.replace(cmd_list[2], "format = table %s" % (cmd_list[2]))
+                    else:
+                        user_cmd = user_cmd.replace(cmd_list[2], "format = json and stat = false %s" % (cmd_list[2]))
             else:
                 select_info["network"] = False
 
