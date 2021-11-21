@@ -286,9 +286,15 @@ def format_message_reply(msg_text):
 
     data_list = []     # Every entry holds type of text ("text" or "Url) and the text string
 
+    set_table = False
     for entry in text_list:
+
         # Setup URL Link (reply to help command + a link to the help page)
         if entry[:6] == "Link: ":
+            if set_table:
+                data_list[-1][3] = "table_end"
+                set_table = False
+
             index = entry.rfind('#')  # try to find name of help section
             if index != -1:
                 section = entry[index + 1:].replace('-', ' ')
@@ -299,9 +305,21 @@ def format_message_reply(msg_text):
             # Split text to attribiute value using colon
             if entry:
                 key_val = entry.split(':', 1)
-                key_val.insert(0, "text")
+                if len(key_val) == 1:
+                    if set_table:
+                        data_list[-1][3] = "table_end"
+                        set_table = False
+                    data_list.append("text")
+                    data_list.append(key_val[0])
+                elif len(key_val) == 2:
+                    # Set as a table in the HTML
+                    data_list.append(["key_val", key_val[0], key_val[1], "table"])
+                    if not set_table:
+                        data_list[-1][3] = "table_start"
+                        set_table = True
 
-                data_list.append(key_val)
+    if set_table:
+        data_list[-1][3] = "table_end"
 
     return [None, None, data_list, None]
 
