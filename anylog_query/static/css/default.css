@@ -45,3 +45,14 @@ ul.tree li:before {
 ul.tree li:last-child:before {
   border-left:1px solid rgb(100,100,100);
 }
+
+
+.floatleft{
+    float:left;
+    margin-left:10px;
+    margin-right:10px;
+    height: 25px;
+    width: 25px;
+    cursor: pointer;
+
+}
