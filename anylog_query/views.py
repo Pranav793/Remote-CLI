@@ -19,6 +19,7 @@ ANYLOG_COMMANDS = [
     {'button': 'Get REST',          'command': 'get rest', 'type': 'GET'},                          # Get REST
     {'button': 'Get REST log',      'command': 'get rest log', 'type': 'GET'},                          # GET REST log
     {'button': 'Get Streaming',     'command': 'get streaming format = json', 'type': 'GET'},                     # Get Streaming
+    {'button': 'Get MSG Clients',   'command': 'get msg clients', 'type': 'GET'},                     # get msg clients
     {'button': 'Get Operator',      'command': 'get operator format = json', 'type': 'GET'},                      # Get Operator
     {'button': 'Get Query Status',  'command': 'query status all', 'type': 'GET'},                 # Get Query Status
     {'button': 'Get Last Query Status',     'command': 'query status', 'type': 'GET'},                     # Get Last Query Status
@@ -291,6 +292,7 @@ def format_message_reply(msg_text):
     data_list = []     # Every entry holds type of text ("text" or "Url) and the text string
 
     set_table = False
+
     for entry in text_list:
 
         # Setup URL Link (reply to help command + a link to the help page)
@@ -308,8 +310,8 @@ def format_message_reply(msg_text):
         else:
             # Split text to attribiute value using colon
             if entry:
-                key_val = entry.split(':', 1)
-                if len(key_val) == 1:
+                key_val = entry.split(':', 2)
+                if len(key_val) == 1 or len(key_val) == 3:
                     if set_table:
                         data_list[-1][3] = "table_end"
                         set_table = False
