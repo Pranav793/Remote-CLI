@@ -9,17 +9,31 @@
 
         {% for line in text %}
             {% if line.0 == "text" %}
-                {{ line.1 }}
-            {% endif %}
-            {% if line.0 == "url" %}
+                <pre>{{ line.1|safe }}</pre>
+            {% elif line.0 == "key_val" %}
+
+                    {%  if line.3 == "table_start" %}
+                            <table border = "2">
+                    {%  endif  %}
+                    <tr>
+                    <td>{{ line.1|safe }}</td>
+                    <td>{{ line.2|safe }}</td>
+                    </tr>
+                    {%  if line.3 == "table_end"  %}
+                        </table>
+                    {%  endif  %}
+
+            {% elif line.0 == "url" %}
                 <a href="{{ line.1 }}">Link to help page</a>
                 {% if line.2 %}
                     &nbsp
-                    {{ line.2 }}
+                    <pre>{{ line.2|safe }}</pre>
                 {% endif %}
+                <br>
             {% endif %}
-        <br>
+
         {% endfor %}
+
 
     </div>
  {% endblock %}

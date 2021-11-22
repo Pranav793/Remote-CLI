@@ -1,10 +1,10 @@
 from django.shortcuts import render
 
-# Create your views here.
+import copy
 # Import necessary modules
 from django.shortcuts import render
-from anylog_query.forms import AnyLogCredentials
 from django.http import HttpResponse
+
 
 
 import anylog_query.json_api as json_api
@@ -14,13 +14,12 @@ ANYLOG_COMMANDS = [
     {'button': 'Node Status',       'command': 'get status', 'type': 'GET'},                        # Get Node Status
     {'button': 'Event Log',         'command': 'get event log where format=json', 'type': 'GET'},   # Get Event Log
     {'button': 'Error Log',         'command': 'get error log where format=json', 'type': 'GET'},   # Get Error Log
-    {'button': 'Reset Error',       'command': 'set rest log off', 'type': 'POST'},              # Set REST Log Off
-    {'button': 'Set REST',          'command': 'set rest log on', 'type': 'POST'},                  # Set REST Log On
-    {'button': 'Get REST',          'command': 'get rest all', 'type': 'GET'},                      # Get REST
-    {'button': 'GET REST log',      'command': 'get rest', 'type': 'GET'},                          # GET REST log
-    {'button': 'Get Streaming',     'command': 'get streaming', 'type': 'GET'},                     # Get Streaming
-    {'button': 'Get Operator',      'command': 'get operator', 'type': 'GET'},                      # Get Operator
-    {'button': 'Get Publisher',     'command': 'get publisher', 'type': 'GET'},                     # Get Publisher
+    {'button': 'Get Processes',     'command': 'get processes', 'type': 'GET'},
+    {'button': 'Get Dictionary',    'command': 'get dictionary', 'type': 'GET'},
+    {'button': 'Get REST',          'command': 'get rest', 'type': 'GET'},                          # Get REST
+    {'button': 'Get REST log',      'command': 'get rest log', 'type': 'GET'},                          # GET REST log
+    {'button': 'Get Streaming',     'command': 'get streaming format = json', 'type': 'GET'},                     # Get Streaming
+    {'button': 'Get Operator',      'command': 'get operator format = json', 'type': 'GET'},                      # Get Operator
     {'button': 'Get Query Status',  'command': 'query status all', 'type': 'GET'},                 # Get Query Status
     {'button': 'Get Last Query Status',     'command': 'query status', 'type': 'GET'},                     # Get Last Query Status
     {'button': 'Get Rows Count',            'command': 'get rows count', 'type': 'GET'},                   # Get Rows Count
@@ -29,6 +28,16 @@ ANYLOG_COMMANDS = [
     {'button': 'Blockchain Publishers',     'command': 'blockchain get publisher', 'type': 'GET'},         # Blockchain Publishers
     {'button': 'Blockchain Queries',        'command': 'blockchain get query', 'type': 'GET'},             # Blockchain Queries
     {'button': 'Blockchain Tables',         'command': 'blockchain get table', 'type': 'GET'},             # Blockchain Tables
+    {'button': 'Reset Error Log','command': 'reset error log', 'type': 'POST'},  # Set REST Log Off
+    {'button': 'Reset REST Log', 'command': 'reset rest log', 'type': 'POST'},                    # Reset REST Log Off
+    {'button': 'REST Log off',  'command': 'set rest log off', 'type': 'POST'},  # Set REST Log Off
+    {'button': 'REST Log on',   'command': 'set rest log on', 'type': 'POST'},  # Set REST Log On
+    {'button': 'QUERY Count',   'command': 'sql [DBMS] SELECT count(*) from [TABLE]', 'type': 'GET'},  # Set REST Log On
+    {'button': 'QUERY Minute',  'command': 'sql [DBMS] SELECT timestamp, value FROM [TABLE] WHERE timestamp > NOW() - 1 minute', 'type': 'GET'},
+    {'button': 'QUERY Increments', 'command': 'sql [DBMS] select increments(day, 1, timestamp), min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value, count(*) as row_count from [TABLE] limit 10', 'type': 'GET'},
+    {'button': 'QUERY Period',  'command': 'sql [DBMS] select  max(timestamp), avg(value) from [TABLE] where period ( minute, 1, NOW(), timestamp)', 'type': 'GET'},
+    {'button': 'Help Get',      'command': 'help get', 'type': 'GET'},             # Blockchain Tables
+
 ]
 
 COMMAND_BY_BUTTON = {}
@@ -41,44 +50,68 @@ for index, entry in enumerate(ANYLOG_COMMANDS):
 # ---------------------------------------------------------------------------------------
 def form_request(request):
 
-    button = request.POST.get("command")
-    if button:
-        is_send = button == "send"
-    else:
-        is_send = False
+    send = request.POST.get("Send")
 
     # Check the form is submitted or not
-    if request.method == 'POST' and is_send:
-        user_info = AnyLogCredentials(request.POST)
-        # Check the form data are valid or not
-        if user_info.is_valid():
-            # Proces the command
-            command, output = process_anylog(request)
+    if request.method == 'POST' and send:
 
-            return print_network_reply(request, user_info, command, output)
+        # Proces the command
+        output = process_anylog(request)
 
-            # print to existing screen content of data (currently DNW)
-            # return render(request, "base.html", {'form': user_info, 'node_reply': node_reply})
+        user_cmd = request.POST.get("command")
+        if len(user_cmd) > 5 and user_cmd[:4].lower()[:4:] == "sql ":
+            query_result = True
+        else:
+            query_result = False
 
-            # print to (new) screen content of data
-            # return HttpResponse(data)
+
+        return print_network_reply(request, query_result, output)
+
     else:
         # Display the html form
-        if button:
-            request.POST.command = "aaa"
-            user_info = AnyLogCredentials(request.POST)     # command selected on the form
-
-
-            cmd_info = ANYLOG_COMMANDS[COMMAND_BY_BUTTON[button]]
-            user_cmd = cmd_info["command"]
-
-
-            #user_info.fields['command'].intial=user_cmd
-            #user_info.data['command'] = user_cmd             # Command to display
-        else:
-            user_info = AnyLogCredentials()                 # Empty form
         select_info = {}
-        select_info["form"] = user_info
+        button = request.POST.get("button")
+        if button:
+            add_form_value(select_info, request)
+            command_id = COMMAND_BY_BUTTON[button]
+            cmd_info = ANYLOG_COMMANDS[command_id]
+            user_cmd = cmd_info["command"]             # Set the command
+
+            if len (user_cmd) > 5 and user_cmd[:4].lower().startswith("sql "):
+                select_info["network"] = True     # Used to Flag the network bool on the page
+
+                # add dbms name and table name
+                dbms_name = request.POST.get('dbms')
+                table_name = request.POST.get('table')
+
+                if dbms_name:
+                    user_cmd = user_cmd.replace("[DBMS]", dbms_name, 1)
+                if table_name:
+                    user_cmd = user_cmd.replace("[TABLE]", table_name, 1)
+
+                # Add output format
+                out_format = request.POST.get('out_format')
+                cmd_list = user_cmd.split(' ',3)
+                if len(cmd_list) > 3:
+                    if out_format == "table":
+                        user_cmd = user_cmd.replace(cmd_list[2], "format = table %s" % (cmd_list[2]))
+                        select_info["out_format"] = "table"  # Keep selection menue on table
+                    else:
+                        user_cmd = user_cmd.replace(cmd_list[2], "format = json and stat = false %s" % (cmd_list[2]))
+                        select_info["out_format"] = None        # Keep selection menue on JSON
+            else:
+                select_info["network"] = False
+
+
+            select_info["command"] = user_cmd
+            rest_call = cmd_info["type"]
+            if rest_call == "GET":
+                select_info["rest_call"] = rest_call        # Set Put or Get
+            else:
+                select_info["rest_call"] = None
+        else:
+            select_info["rest_call"] = "GET"
+
         select_info["commands_list"] = ANYLOG_COMMANDS
 
         return render(request, "base.html", select_info)
@@ -90,44 +123,32 @@ def process_anylog(request):
     :param request: The info needed to execute command to the AnyLog network
     :return: The data to display on the output form
     '''
-    authentication = ()
-    remote = False
+
+    post_data = request.POST
 
     # Get the needed info from the form
-    conn_info = request.POST.get('conn_info')
-    username = request.POST.get('username')
-    password = request.POST.get('password')
-    command = request.POST.get('command')
-    anylog_cmd = request.POST.get('anylog_cmd')
-    network = request.POST.get('network')
+    conn_info = post_data.get('connect_info')
+    username = post_data.get('auth_usr')
+    password = post_data.get('auth_pass')
+    command = post_data.get('command')
 
-    if network == 'on':
-        network = True
+    network = post_data.get('network') == "on"
+    rest_call = post_data.get('rest_call')
+
+
+    if command:
+        authentication = ()
+        if username != '' and password != '':
+            authentication = (username, password)
+
+        if rest_call == "post":
+            output = anylog_conn.post_cmd(conn=conn_info, command=command, authentication=authentication)
+        else:
+            output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network)
     else:
-        network = False
-    post = request.POST.get('post')
-    if post == 'on':
-        post = True
-    else:
-        post = False
+        output = "Mising commmand"
 
-    if anylog_cmd is not None:
-        anylog_cmd = int(anylog_cmd)
-        if ANYLOG_COMMANDS[anylog_cmd]['type'] == 'POST':
-            post = True
-
-        command = ANYLOG_COMMANDS[anylog_cmd]['command']
-
-    authentication = ()
-    if username != '' and password != '':
-        authentication = (username, password)
-
-    if post is True:
-        output = anylog_conn.post_cmd(conn=conn_info, command=command, authentication=authentication)
-    else:
-        output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network)
-
-    return [command, output]     # Data returned from AnyLog or an Error Message
+    return output     # Data returned from AnyLog or an Error Message
 
 
 
@@ -137,38 +158,59 @@ def process_anylog(request):
 # Option 2 - a table
 # Option 3 - text
 # -----------------------------------------------------------------------------------
-def print_network_reply(request, user_info, command, data):
+def print_network_reply(request, query_result, data):
 
     select_info = {}
-    select_info['form'] = user_info
+    add_form_value(select_info, request)        # add the values of the last form to the select_info
+
     select_info['title'] = 'Network Command'
-    select_info['command'] = command
     select_info["commands_list"] = ANYLOG_COMMANDS
 
+    if not data:
+        print_info = None
+    elif data.startswith("Failed to"):
+        print_info = [("text", data)]  # Print the error msg as a string
+    elif query_result and data[:8] != "{\"Query\"":
+        print_info = [("text", data)]  # Print the error msg as a string
+    else:
+        policy, table_info, print_info, error_msg = format_message_reply(data)
+        if policy:
+            # Reply was a JSON policy or a query replied in JSON
+            data_list = []
+            json_api.setup_print_tree(policy, data_list)
+            select_info['text'] = data_list
+            return render(request, 'output_tree.html', select_info)
 
-    policy, table_info, print_info, error_msg = format_message_reply(data)
-    if policy:
-        # Reply was a JSON policy
-        data_list = []
-        json_api.setup_print_tree(policy, data_list)
-        select_info['text'] = data_list
-        return render(request, 'output_tree.html', select_info)
+        if query_result:
+            # Failed to map the result to JSON
+            print_info = [("text", data)]  # Print the query reply as a string
+        elif table_info:
+            # Reply is structured as a table
 
-    if table_info:
-        # Reply is structured as a table
-
-        if 'header' in table_info:
-            select_info['header'] = table_info['header']
-        if 'table_title' in table_info:
-            select_info['table_title'] = table_info['table_title']
-        if 'rows' in table_info:
-            select_info['rows'] = table_info['rows']
-        return render(request, 'output_table.html', select_info)
+            if 'header' in table_info:
+                select_info['header'] = table_info['header']
+            if 'table_title' in table_info:
+                select_info['table_title'] = table_info['table_title']
+            if 'rows' in table_info:
+                select_info['rows'] = table_info['rows']
+            return render(request, 'output_table.html', select_info)
 
 
     select_info['text'] = print_info        # Only TEXT
 
     return render(request, 'output_cmd.html', select_info)
+
+# -----------------------------------------------------------------------------------
+# add the values of the last form to the select_info
+# -----------------------------------------------------------------------------------
+def add_form_value(select_info, request):
+    post_data = request.POST
+    for key, value in post_data.items():
+        select_info[key] = value
+    if  select_info["rest_call"] == "post":
+        select_info["rest_call"] = None
+    if  select_info["out_format"] == "json":
+        select_info["out_format"] = None
 
 # -----------------------------------------------------------------------------------
 # Based on the message reply - organize as a table or as an attrubute values list
@@ -191,7 +233,7 @@ def format_message_reply(msg_text):
     elif msg_text[0] == '[' and msg_text[-1] == ']':
         policy, error_msg = json_api.string_to_list(msg_text)
 
-    if policy or error_msg:
+    if policy:
         return [policy, None, None, error_msg]  # return the dictionary or the list
 
 
@@ -205,7 +247,8 @@ def format_message_reply(msg_text):
     is_table = False
     for index, entry in enumerate(text_list):
         if entry and index:
-            if entry[0] == '-' and entry[-1] == '|':
+            table_struct = entry.strip()
+            if table_struct[0] == '-' and table_struct[-1] == '|':
                 # Identified a table
                 is_table = True
                 columns_list = entry.split('|')
@@ -231,14 +274,14 @@ def format_message_reply(msg_text):
         table_rows = []
         for y in range(index + 1, len(text_list)): # Skip the dashed separator to the column titles
             row = text_list[y]
+            if row:
+                columns = []
+                offset = 0
+                for column_id, size in enumerate(columns_size):
+                    columns.append(row[offset:offset + size])
+                    offset += (size + 1)  # Add the field size and the separator (|)
 
-            columns = []
-            offset = 0
-            for column_id, size in enumerate(columns_size):
-                columns.append(row[offset:offset + size])
-                offset += (size + 1)  # Add the field size and the separator (|)
-
-            table_rows.append(columns)
+                table_rows.append(columns)
 
         table_data['rows'] = table_rows
         return [None, table_data, None, None]
@@ -247,9 +290,15 @@ def format_message_reply(msg_text):
 
     data_list = []     # Every entry holds type of text ("text" or "Url) and the text string
 
+    set_table = False
     for entry in text_list:
+
         # Setup URL Link (reply to help command + a link to the help page)
         if entry[:6] == "Link: ":
+            if set_table:
+                data_list[-1][3] = "table_end"
+                set_table = False
+
             index = entry.rfind('#')  # try to find name of help section
             if index != -1:
                 section = entry[index + 1:].replace('-', ' ')
@@ -260,9 +309,20 @@ def format_message_reply(msg_text):
             # Split text to attribiute value using colon
             if entry:
                 key_val = entry.split(':', 1)
-                key_val.insert(0, "text")
+                if len(key_val) == 1:
+                    if set_table:
+                        data_list[-1][3] = "table_end"
+                        set_table = False
+                    data_list.append(["text",entry] )
+                elif len(key_val) == 2:
+                    # Set as a table in the HTML
+                    data_list.append(["key_val", key_val[0], key_val[1], "table"])
+                    if not set_table:
+                        data_list[-1][3] = "table_start"
+                        set_table = True
 
-                data_list.append(key_val)
+    if set_table:
+        data_list[-1][3] = "table_end"
 
     return [None, None, data_list, None]
 

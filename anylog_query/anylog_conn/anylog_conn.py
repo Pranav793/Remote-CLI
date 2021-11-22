@@ -70,7 +70,7 @@ def post_cmd(conn:str, command:str, authentication:tuple=())->str:
         output = other.error_message(conn=conn, command_type='POST', error_type='other', error_msg=error_msg)
     else:
         if int(r.status_code) != 200:
-            output = other.error_message(conn=conn, command_type='GET', error_type='network', error_msg=r.status_code)
+            output = other.error_message(conn=conn, command_type='POST', error_type='network', error_msg=r.status_code)
         else:
             output = 'Success!'
 

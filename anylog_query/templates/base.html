@@ -3,14 +3,15 @@
 <html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
     {% load static %}
+    <link rel="icon" href="{% static 'css/anylog-logo.ico' %}">
     <link rel='stylesheet' href="{% static 'css/default.css' %}">
 
     <meta charset="UTF-8">
-    <title>User Registration Form</title>
+    <title>AnyLog</title>
 
       <style>
         input[type=button], input[type=submit], input[type=reset] {
-        background-color: #4CAF50;
+        background-color: lightslategray;
         border: none;
         color: white;
         padding: 16px 32px;
@@ -20,6 +21,9 @@
         }
       </style>
 
+
+
+
   </head>
   <body>
 
@@ -28,15 +32,118 @@
     {{ form.as_p }}
 
 
-    <br/>
+    <br/> <br/> <br/>
+
+    <select id="rest_call" name="rest_call">
+
+    {% if rest_call %}
+        <option selected value="get">&nbsp;GET</option>
+    {% else %}
+        <option value="get">&nbsp;GET</option>
+    {% endif %}
+    {% if rest_call %}
+        <option  value="post">&nbsp;POST</option>
+    {% else %}
+        <option selected value="post">&nbsp;POST</option>
+    {% endif %}
+
+    </select>
+
+    &nbsp; &nbsp;
+
+    <label for="connect_info">Connect info:</label>
+    {% if connect_info %}
+        <input type="text" id="connect_info" name="connect_info" value="{{connect_info}}">
+    {% else %}
+        <input type="text" id="connect_info" name="connect_info">
+    {% endif %}
+
+    &nbsp; &nbsp;
+
+    <label for="auth_usr">Auth user:</label>
+    <input type="text" id="auth_usr" name="auth_usr">
+
+    &nbsp; &nbsp;
+
+    <label for="auth_pass">Auth password:</label>
+    <input type="text" id="auth_pass" name="auth_pass">
+
+
+    <br/> <br/> <br/>
+
+    <label for="dbms">DBMS:&nbsp;</label>
+
+    {% if dbms %}
+        <input type="text" id="dbms" name="dbms" value="{{dbms}}">
+    {% else %}
+        <input type="text" id="dbms" name="dbms">
+    {% endif %}
+
+     &nbsp; &nbsp;
+
+    <label for="table">Table:&nbsp;</label>
+
+    {% if dbms %}
+        <input type="text" id="table" name="table" value="{{table}}">
+    {% else %}
+        <input type="text" id="table" name="table">
+    {% endif %}
+
+    &nbsp; &nbsp;
+
+    <text>Format:</text>
+    &nbsp;
+
+    <select id="out_format" name="out_format">
+
+    {% if out_format  %}
+        <option selected value="table">&nbsp;TABLE</option>
+    {% else %}
+        <option value="table">&nbsp;TABLE</option>
+    {% endif %}
+    {% if out_format %}
+        <option  value="json">&nbsp;JSON</option>
+    {% else %}
+        <option selected value="json">&nbsp;JSON</option>
+    {% endif %}
+
+    </select>
+
+    &nbsp; &nbsp;
+
+    <label for="network">Network</label>
+
+    {% if network %}
+        <input type="checkbox" id="network" name="network" checked>
+    {% else %}
+        <input type="checkbox" id="network" name="network">
+    {% endif %}
+
+    <br/> <br/> <br/>
+
+    <input type ="submit" name = "Send" value="Send" style="font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
+
+     &nbsp; &nbsp;
+
+    <label for="command">Command:&nbsp;</label>
+
+    {% if command %}
+        <input type="text" id="command" name="command" value="{{command}}" size="150">
+    {% else %}
+        <input type="text" id="command" name="command" size="150">
+    {% endif %}
+
+
+
+    <br/> <br/> <br/>
 
     {% for entry in commands_list %}
-        <input type ="submit" name = "command" value="{{entry.button}}"/>
+        <input type ="submit" name = "button" value="{{entry.button}}"/>
     {% endfor %}
 
     <br/>
 
-    <input type ="submit" name = "Send" value="Send" />
+
 
     {% if node_reply %}
     <p>
