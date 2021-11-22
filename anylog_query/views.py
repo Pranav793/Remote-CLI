@@ -274,14 +274,14 @@ def format_message_reply(msg_text):
         table_rows = []
         for y in range(index + 1, len(text_list)): # Skip the dashed separator to the column titles
             row = text_list[y]
+            if row:
+                columns = []
+                offset = 0
+                for column_id, size in enumerate(columns_size):
+                    columns.append(row[offset:offset + size])
+                    offset += (size + 1)  # Add the field size and the separator (|)
 
-            columns = []
-            offset = 0
-            for column_id, size in enumerate(columns_size):
-                columns.append(row[offset:offset + size])
-                offset += (size + 1)  # Add the field size and the separator (|)
-
-            table_rows.append(columns)
+                table_rows.append(columns)
 
         table_data['rows'] = table_rows
         return [None, table_data, None, None]
