@@ -234,3 +234,4 @@ def main(env_params:dict, docker_password:str, timezone:str, update_anylog:bool,
         return output
 
     return 'Successs'
+
