@@ -436,7 +436,7 @@ class DeployAnyLog:
 
         if self.__validate_container(container_name='postgres-db') is None:
             output = self.__run_container(image='postgres:14.0-alpine', container_name='postgres-db',
-                                          environment=environment, volumes=volumes, exception=exception)
+                                          environment=environment, volumes=volumes)
             if isinstance(output, docker.models.containers.Container):
                 status = False
 
