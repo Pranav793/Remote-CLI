@@ -63,6 +63,10 @@ def terminal_main():
     args = parser.parse_args()
 
     deploy_anylog = DeployAnyLog(timezone=args.timezone)
+    if len(deploy_anylog.error_message) > 0:
+        print(deploy_anylog.error_message[0])
+        exit(1)
+
     config_file = os.path.expandvars(os.path.expanduser(args.config_file))
     env_params = {}
 
@@ -70,9 +74,8 @@ def terminal_main():
         env_params = read_configs(config_file=config_file)
 
     if args.psql is True:
-        if deploy_anylog.deploy_postgres_container(conn_info=env_params['DB_USER'],
-                                                   db_port=env_params['DB_PORT']) is False:
-            print(deploy_anylog.error_messages)
+        deploy_anylog.deploy_postgres_container(conn_info=env_params['DB_USER'])
+
 
 if __name__ == '__main__':
     terminal_main()
