@@ -41,6 +41,13 @@ ANYLOG_COMMANDS = [
 
 ]
 
+COMMANDS_GROUPS = [
+    "All",
+    "Queries",
+    "Logs",
+    "South Bound",
+]
+
 COMMAND_BY_BUTTON = {}
 for index, entry in enumerate(ANYLOG_COMMANDS):
     COMMAND_BY_BUTTON[entry['button']] = index     # Organize commands as f(button)
@@ -114,6 +121,7 @@ def form_request(request):
             select_info["rest_call"] = "GET"
 
         select_info["commands_list"] = ANYLOG_COMMANDS
+        select_info["commands_groups"] = COMMANDS_GROUPS
 
         return render(request, "base.html", select_info)
 # ---------------------------------------------------------------------------------------
