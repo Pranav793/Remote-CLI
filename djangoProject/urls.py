@@ -20,5 +20,5 @@ from anylog_query import views as anylog_query
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('anylog-query/', anylog_query.form_request),
-    path('anylog-deploy/', include('anylog_deploy.urls')),
+    #path('anylog-deploy/', include('anylog_deploy.urls')),
 ]
