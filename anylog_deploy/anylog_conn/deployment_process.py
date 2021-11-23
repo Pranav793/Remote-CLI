@@ -74,8 +74,16 @@ def terminal_main():
         env_params = read_configs(config_file=config_file)
 
     if args.psql is True:
-        deploy_anylog.deploy_postgres_container(conn_info=env_params['DB_USER'])
+        status = deploy_anylog.deploy_postgres_container(conn_info=env_params['DB_USER'])
+        if status is True:
+            for error in deploy_anylog.error_message:
+                print(error)
+            deploy_anylog.error_message = []
 
+    if args.grafana is True:
+        if not deploy_anylog.deploy_grafana_container():
+            for error in deploy_anylog.error_message:
+                print(error)
 
 if __name__ == '__main__':
     terminal_main()

@@ -360,7 +360,7 @@ class DeployAnyLog:
 
         return status
 
-    def deploy_grafana_container(self, exception:bool=True)->bool:
+    def deploy_grafana_container(self)->bool:
         """
         Deploy a Grafana v 7.5.7 as a docker container
         :args:
@@ -387,14 +387,18 @@ class DeployAnyLog:
 
         for volume in volume_paths:
             if self.__validate_volume(volume_name=volume) is None:
-                if self.__create_volume(volume_name=volume, exception=exception) is not None:
+                output = self.__create_volume(volume_name=volume)
+                if isinstance(output, docker.models.containers.Container):
                     volumes[volume] = {'bind': volume_paths[volume], 'mode': 'rw'}
+                else:
+                    status = False
             else:
                 volumes[volume] = {'bind': volume_paths[volume], 'mode': 'rw'}
 
         if self.__validate_container(container_name='grafana') is None:
-            if not self.__run_container(image='grafana/grafana:7.5.7', container_name='grafana',
-                                        environment=environment, volumes=volumes, exception=exception):
+            output = self.__run_container(image='grafana/grafana:7.5.7', container_name='grafana',
+                                          environment=environment, volumes=volumes)
+            if not isinstance(output, docker.models.containers.Container):
                 status = False
 
         return status
