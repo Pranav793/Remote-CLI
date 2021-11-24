@@ -54,8 +54,6 @@ def django_main(config_file:str, timezone:str='utc', docker_password:str=None, u
         if status is False:
             for error in deploy_anylog.error_message:
                 errors.append(error)
-        else:
-            errors.append('AnyLog container initiated successfully')
 
     return status, errors
 
