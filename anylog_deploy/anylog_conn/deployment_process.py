@@ -3,45 +3,73 @@ import os
 from docker_calls import DeployAnyLog
 from io_config import read_configs
 
-# def django_main(env_params:dict={}, docker_password:str=None, timezone:str='utc', update_anylog:bool=False,
-#                 psql:bool=False, grafana:bool=False)->str:
-#     """
-#     Main for the deployment process being used by the Django application
-#     :args:
-#         env_params:dict - environment variables from config file
-#         docker_password:str - password for docker
-#         timezone:str - docker timezone
-#         update_anylog:bool - whether to update the AnyLog version
-#         psql:bool - whether to deploy postgres
-#         grafana:bool - whether to deploy Grafana
-#     :params:
-#         status:str - status message
-#     :return:
-#         status
-#     """
-#     status = True
-#
-#     deploy_anylog = DeployAnyLog(timezone=timezone, exception=True)
-#     if deploy_anylog.status is False:
-#         return False
-#
-#     print()
-#
-#     # if docker_password is not None:
-#     #     status = deploy_anylog.docker_login(docker_password)
 
+def django_main(config_file:str, timezone:str='utc', docker_password:str=None, update_anylog:bool=False,
+                psql:bool=False, grafana:bool=False)->(bool, list):
+    """
+    The following is the main wrapper to deploy AnyLog (and Grafana / Postgres) docker container(s) using a
+    configuration file. The method is called from within the Django App.
+    :args:
+        config_file:str - configuration file
+        timezone:str - docker timezone
+        docker_password:str -  docker password
+        update_anylog:bool - whether to update AnyLog
+        psql:bool - deploy Postgres docker container
+        grafana:bool - deploy Grafana docker container
+    :params:
+        status:bool
+        errors:list - list of error messages
+        deploy_anylog:docker_calls.DeployAnyLog - class method used to deploy docker code
 
+        env_params:dict - content from config_file
+    """
+    status = True
+    errors = []
+    env_params = {}
+    deploy_anylog = DeployAnyLog(timezone=timezone)
+
+    if len(deploy_anylog.error_message) > 0:
+        errors.append(deploy_anylog.error_message[0])
+        return False, errors
+
+    config_file = os.path.expandvars(os.path.expanduser(args.config_file))
+    if os.path.isfile(config_file):
+        env_params = read_configs(config_file=config_file)
+
+    if psql is True:
+        status = deploy_anylog.deploy_postgres_container(conn_info=env_params['DB_USER'])
+        if status is True:
+            for error in deploy_anylog.error_message:
+                errors.append(error)
+            deploy_anylog.error_message = []
+
+    if grafana is True:
+        if not deploy_anylog.deploy_grafana_container():
+            for error in deploy_anylog.error_message:
+                errors.append(error)
+
+    if status is True:
+        status = deploy_anylog.deploy_anylog_container(docker_password=docker_password, timezone=timezone,
+                                                       environment_variables=env_params, update_anylog=update_anylog)
+        if status is False:
+            for error in deploy_anylog.error_message:
+                errors.append(error)
+        else:
+            errors.append('AnyLog container initiated successfully')
+
+    return status, errors
 
 
 def terminal_main():
     """
-    The following is an extension of deployment_process.py to allow for deployment of AnyLog using a config file
-    through command line (terminal) rather than through the Django application.
+    The following is the main wrapper to deploy AnyLog (and Grafana / Postgres) docker container(s) using a
+    configuration file. Unlike `djano_main`, which is used with the Django App, this main allows to deploy via command
+    line with a preset configuration file.
     :positional arguments:
         config_file         CONFIG_FILE         configuration file with full path
     :optional arguments:
         -h, --help                              show this help message and exit
-        --timezone          TIMEZONE            docker timezone (default: utc)
+        --timezone          TIMEZONE            docker timezone (default: utc | choices: local, utc)
         --docker-password   DOCKER_PASSWORD     docker password (default: None)
         --update-anylog     UPDATE_ANYLOG       update AnyLog docker image (default: False)
         --psql              PSQL                deploy PostgreSQL docker container (default: False)
@@ -62,6 +90,7 @@ def terminal_main():
     parser.add_argument('--psql', type=bool, nargs='?', const=True, default=False, help='deploy PostgreSQL docker container')
     parser.add_argument('--grafana', type=bool, nargs='?', const=True, default=False, help='deploy Grafana docker container')
     args = parser.parse_args()
+
     status = True
     deploy_anylog = DeployAnyLog(timezone=args.timezone)
     if len(deploy_anylog.error_message) > 0:
