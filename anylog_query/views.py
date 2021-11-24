@@ -18,6 +18,7 @@ ANYLOG_COMMANDS = [
 
     {'button': 'Event Log',         'command': 'get event log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-event-log' },   # Get Event Log
     {'button': 'Error Log',         'command': 'get error log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-error-log' },   # Get Error Log
+    {'button': 'Query Log',         'command': 'get query log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-query-log' },   # Get Error Log
     {'button': 'Reset Error Log', 'command': 'reset error log', 'type': 'POST', 'group': 'logs', 'help_url' : 'blob/master/logging%20events.md#reset-the-log-data' },  # Set REST Log Off
     {'button': 'Reset REST Log', 'command': 'reset rest log', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#reset-the-log-data' },  # Reset REST Log Off
     {'button': 'REST Log off', 'command': 'set rest log off', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/anylog%20docker%20install.md' },  # Set REST Log Off
