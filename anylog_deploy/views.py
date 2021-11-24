@@ -84,20 +84,16 @@ class FormViews:
         """
         # Write env params to file or
         output = None
+        message = None
         env_params = {}
-        if not all(x == {} for x in list(self.env_params.values())):
-            # validate node type - note self.env_params is written to file only when node_type != 'none'
-            if self.env_params['general']['node_type'] == 'none':
-                for param in self.env_params['general']:
-                    env_params[param.upper()] = self.env_params['general'][param]
-                env_params['NODE_NAME'] = 'empty-node'
-            else:
-                self.config_file = os.path.join(CONFIG_FILE_PATH, self.env_params['general']['node_name'] + '.ini')
-                output = io_config.write_configs(config_data=self.env_params, config_file=self.config_file)
-                if output is None:
-                    env_params = io_config.read_configs(config_file=self.config_file)
-        if env_params == {}:
+        if self.config_file is None:
+            self.config_file = os.path.join(CONFIG_FILE_PATH, '%s.ini' % self.env_params['general']['node_name'])
+            message = io_config.write_configs(config_data=self.env_params, config_file=self.config_file)
+
+        if os.path.isfile(self.config_file):
             env_params = io_config.read_configs(config_file=self.config_file)
+        else:
+            message = 'Failed to location %s' % self.config_file
 
         if request.method == 'POST':
             deployment_configs = forms.DeployAnyLog(request.POST)
@@ -114,24 +110,17 @@ class FormViews:
                     psql = True
                 if request.POST.get('grafana'):
                     grafana = True
-            error_msg = ''
-            if output is not None:
-                error_msg += output + "<br/>"
-            if not isinstance(env_params, dict):
-                error_msg += env_params + "<br/>"
-            if error_msg != '':
-                return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': error_msg})
-            elif bool(pkgutil.find_loader('docker')) is False:
-                return render(request, 'deploy_anylog.html',
-                              {'form': deployment_configs,
-                               'node_reply': 'Unable to deploy AnyLog, missing `docker` package'})
-            else:
-                status = anylog_deployment.main(env_params=env_params, docker_password=docker_password, psql=psql,
-                                                timezone=timezone, update_anylog=update_anylog, grafana=grafana)
-                return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': status})
+
+            error_messages = anylog_deployment.django_main(config_file=self.config_file,
+                                                           docker_password=docker_password, update_anylog=update_anylog,
+                                                           psql=psql, grafana=grafana)
+            return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': error_messages})
         else:
             deployment_configs = forms.DeployAnyLog()
-            return render(request, 'deploy_anylog.html', {'form': deployment_configs})
+            if message is not None:
+                return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': message})
+            else:
+                return render(request, 'deploy_anylog.html', {'form': deployment_configs})
 
     def basic_config(self, request)->HttpResponse:
         """
@@ -151,12 +140,48 @@ class FormViews:
                 self.env_params['general']['build'] = request.POST.get('build')
                 self.env_params['general']['node_type'] = request.POST.get('node_type')
                 if self.env_params['general']['node_type'] == 'none':
-                    return HttpResponseRedirect('../deploy-anylog/')
+                    # THe reason we go to db-configs is because a user may want to deploy
+                    return HttpResponseRedirect('../empty-node-configs/')
                 else:
                     return HttpResponseRedirect('../general-configs/')
         else:
             base_configs = forms.BaseInfo()
             return render(request, "base_configs.html", {'form': base_configs})
+
+    def empty_node_info(self, request)->HttpResponse:
+        """
+        Basic configuration for an empty node
+            - db_type
+            - db credentials (db_user)
+            - db_port
+            - node_name (used for docker container name)
+        :args:
+            request:django.core.handlers.wsgi.WSGIRequest - type of request against the form
+        :redirect:
+            if node_type == publisher goto mqtt-configs/
+            else goto "root" to select config file
+        """
+        env_params = self.env_params
+        if request.method == 'POST':
+            db_configs = forms.NoneConfigs(request.POST)
+            if db_configs.is_valid():
+                self.env_params['general']['node_name'] = request.POST.get('node_name')
+                self.env_params['database']['db_type'] = request.POST.get('db_type')
+                db_conn_info = {'db_user': '', 'db_addr': '', 'db_pass': ''}
+                for option in list(db_conn_info.keys()):
+                    if request.POST.get(option) != '':
+                        db_conn_info[option] = request.POST.get(option)
+                if all(db_conn_info[key] != '' for key in list(db_conn_info.keys())):
+                    self.env_params['database']['db_user'] = '%s@%s:%s' % (db_conn_info['db_user'],
+                                                                           db_conn_info['db_addr'],
+                                                                           db_conn_info['db_pass'])
+                self.env_params['database']['db_port'] = request.POST.get('db_port')
+                self.__update_params(env_params)
+
+                return HttpResponseRedirect('../deploy-anylog/')
+        else:
+            db_configs = forms.NoneConfigs()
+            return render(request, "empty_node_configs.html", {'form': db_configs})
 
     def general_info(self, request)->HttpResponse:
         """

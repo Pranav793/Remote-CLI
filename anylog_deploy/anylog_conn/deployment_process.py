@@ -32,7 +32,7 @@ def django_main(config_file:str, timezone:str='utc', docker_password:str=None, u
         errors.append(deploy_anylog.error_message[0])
         return False, errors
 
-    config_file = os.path.expandvars(os.path.expanduser(args.config_file))
+    config_file = os.path.expandvars(os.path.expanduser(config_file))
     if os.path.isfile(config_file):
         env_params = read_configs(config_file=config_file)
 

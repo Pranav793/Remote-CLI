@@ -10,6 +10,7 @@ urlpatterns = [
     path('general-configs/', view_options.general_info, name='general-configs'),
     path('network-configs/', view_options.networking_info, name='network-configs'),
     path('db-configs/', view_options.db_info, name='db-configs'),
+    path('empty-node-configs/', view_options.empty_node_info, name='empty-node-configs'),
     path('operator-configs/', view_options.operator_info, name='operator-configs'),
     path('mqtt-configs/', view_options.mqtt_info, name='mqtt-configs'),
     path('full-form/', long_form.full_view, name='full-form'),

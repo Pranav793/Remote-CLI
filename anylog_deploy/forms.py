@@ -1,13 +1,8 @@
 from django import forms
 from django.core.validators import RegexValidator
 import os
-import sys
 
-slash_char = '/'
-if sys.platform.startswith('win'):
-    slash_char = '\\'
-
-CONFIG_FILE_PATH = os.path.dirname(os.path.abspath(__file__)) + slash_char + 'configs'
+CONFIG_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configs')
 
 BUILDS = (
     ('', ("")),
@@ -96,6 +91,15 @@ class DBConfigs(forms.Form):
     db_pass = forms.CharField(label='Database Password', required=True, widget=forms.PasswordInput)
     db_addr = forms.GenericIPAddressField(label='Database Address', required=True)
     db_port = forms.IntegerField(label='Database Port', required=True)
+
+class NoneConfigs(forms.Form):
+    # Configuration information for an empty node
+    node_name = forms.CharField(label='Node Name', required=True)
+    db_type = forms.ChoiceField(label='Database Type', required=False, choices=DATABASES)
+    db_user = forms.CharField(label='Database User', required=False)
+    db_pass = forms.CharField(label='Database Password', required=False, widget=forms.PasswordInput)
+    db_addr = forms.GenericIPAddressField(label='Database Address', required=False)
+    db_port = forms.IntegerField(label='Database Port', required=False)
 
 class DBOperatorConfigs(forms.Form):
     # database
