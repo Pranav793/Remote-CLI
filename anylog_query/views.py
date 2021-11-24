@@ -16,10 +16,10 @@ ANYLOG_COMMANDS = [
     {'button': 'Get Processes',     'command': 'get processes', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/monitoring%20nodes.md#the-get-processes-command' },
     {'button': 'Get Dictionary',    'command': 'get dictionary', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/monitoring%20nodes.md#the-get-dictionary-command' },
 
-    {'button': 'Event Log',         'command': 'get event log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/anylog%20docker%20install.md' },   # Get Event Log
-    {'button': 'Error Log',         'command': 'get error log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/anylog%20docker%20install.md' },   # Get Error Log
-    {'button': 'Reset Error Log', 'command': 'reset error log', 'type': 'POST', 'group': 'logs', 'help_url' : 'blob/master/anylog%20docker%20install.md' },  # Set REST Log Off
-    {'button': 'Reset REST Log', 'command': 'reset rest log', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/anylog%20docker%20install.md' },  # Reset REST Log Off
+    {'button': 'Event Log',         'command': 'get event log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-event-log' },   # Get Event Log
+    {'button': 'Error Log',         'command': 'get error log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-error-log' },   # Get Error Log
+    {'button': 'Reset Error Log', 'command': 'reset error log', 'type': 'POST', 'group': 'logs', 'help_url' : 'blob/master/logging%20events.md#reset-the-log-data' },  # Set REST Log Off
+    {'button': 'Reset REST Log', 'command': 'reset rest log', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#reset-the-log-data' },  # Reset REST Log Off
     {'button': 'REST Log off', 'command': 'set rest log off', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/anylog%20docker%20install.md' },  # Set REST Log Off
     {'button': 'REST Log on', 'command': 'set rest log on', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/anylog%20docker%20install.md' },  # Set REST Log On
 
@@ -42,22 +42,22 @@ ANYLOG_COMMANDS = [
     {'button': 'QUERY Count',
      'command': 'sql [DBMS] SELECT count(*) from [TABLE]', 'type': 'GET',
      'group' : 'Queries',
-     'help_url' : 'blob/master/anylog%20docker%20install.md'},  # Set REST Log On
+     'help_url' : 'blob/master/queries.md#queries'},  # Set REST Log On
 
     {'button': 'QUERY Minute',
      'command': 'sql [DBMS] SELECT timestamp, value FROM [TABLE] WHERE timestamp > NOW() - 1 minute', 'type': 'GET',
      'group' : 'Queries',
-     'help_url' : 'blob/master/anylog%20docker%20install.md'},
+     'help_url' : 'blob/master/queries.md#queries'},
 
     {'button': 'QUERY Increments',
      'command': 'sql [DBMS] select increments(day, 1, timestamp), min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value, count(*) as row_count from [TABLE] limit 10',
      'type': 'GET', 'group' : 'Queries',
-     'help_url' : 'blob/master/anylog%20docker%20install.md'},
+     'help_url' : 'blob/master/queries.md#queries'},
 
     {'button': 'QUERY Period',
      'command': 'sql [DBMS] select  max(timestamp), avg(value) from [TABLE] where period ( minute, 1, NOW(), timestamp)', 'type': 'GET',
      'group' : 'Queries',
-     'help_url' : 'blob/master/anylog%20docker%20install.md'},
+     'help_url' : 'blob/master/queries.md#queries'},
 
     {'button': 'Help Get',
      'command': 'help get',
