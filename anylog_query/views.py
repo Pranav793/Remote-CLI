@@ -153,18 +153,21 @@ def form_request(request):
                     select_info["rest_call"] = None
 
         else:
-            select_info["rest_call"] = "GET"
-
-            buttons_type = request.POST.get('cmd_type')  # These are the type of commands buttons that will be displayed
-            if buttons_type:
-                select_info["cmd_type"] = buttons_type  # These are the type of commands buttons that will be displayed
+            if request.method == 'POST':
+                # Send was not selected - keep the older selected values
+                add_form_value(select_info, request)  # add the values of the last form to the select_info
             else:
-                select_info["cmd_type"] = "Logs"  # These are the type of commands buttons that will be displayed
+                select_info["rest_call"] = "GET"
 
+                buttons_type = request.POST.get('cmd_type')  # These are the type of commands buttons that will be displayed
+                if buttons_type:
+                    select_info["cmd_type"] = buttons_type  # These are the type of commands buttons that will be displayed
+                else:
+                    select_info["cmd_type"] = "Logs"  # These are the type of commands buttons that will be displayed
+
+        # Add info which is not selected but is used by the form
         select_info["commands_list"] = ANYLOG_COMMANDS
         select_info["commands_groups"] = COMMANDS_GROUPS
-
-
 
         return render(request, "base.html", select_info)
 # ---------------------------------------------------------------------------------------
