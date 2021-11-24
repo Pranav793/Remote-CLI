@@ -25,11 +25,12 @@ ANYLOG_COMMANDS = [
     {'button': 'Streaming Log on', 'command': 'set rest log on', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-streaming-log' },  # Set REST Log On
     {'button': 'Streaming Log off', 'command': 'set rest log off', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-streaming-log' },  # Set REST Log Off
 
-    {'button': 'Get REST calls',    'command': 'get rest calls', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'master/monitoring%20calls.md#get-rest-calls'},                          # Get REST
-    {'button': 'Get REST log',      'command': 'get rest log', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                          # GET REST log
-    {'button': 'Get Streaming',     'command': 'get streaming format = json', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                     # Get Streaming
+    {'button': 'Get REST calls',    'command': 'get rest calls', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-rest-calls'},                          # Get REST
+    {'button': 'Get Streaming',     'command': 'get streaming format = json', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-streaming'},                     # Get Streaming
     {'button': 'Get MSG Clients',   'command': 'get msg clients', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                     # get msg clients
     {'button': 'Get Operator',      'command': 'get operator format = json', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                      # Get Operator
+    {'button': 'REST Server Info',  'command': 'get rest server info', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#rest-server-configuration'},
+
 
     {'button': 'Get Query Status',  'command': 'query status all', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                 # Get Query Status
     {'button': 'Get Last Query Status',     'command': 'query status', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                     # Get Last Query Status
@@ -230,6 +231,8 @@ def print_network_reply(request, query_result, data):
         print_info = [("text", data)]  # Print the error msg as a string
     elif query_result and data[:8] != "{\"Query\"":
         print_info = [("text", data)]  # Print the error msg as a string
+    if is_complex_struct(data):
+        print_info = [("text", data)]   # Keep as is
     else:
         policy, table_info, print_info, error_msg = format_message_reply(data)
         if policy:
@@ -258,6 +261,17 @@ def print_network_reply(request, query_result, data):
 
     return render(request, 'output_cmd.html', select_info)
 
+
+# -----------------------------------------------------------------------------------
+# Determine if the data is not mapped to a simple table or JSON
+# -----------------------------------------------------------------------------------
+def is_complex_struct( data ):
+    index =  data.find("\r\n\r\n")
+    if index != -1:
+        complex = True
+    else:
+        complex = False
+    return complex
 # -----------------------------------------------------------------------------------
 # add the values of the last form to the select_info
 # -----------------------------------------------------------------------------------
