@@ -47,6 +47,7 @@ def terminal_main():
         --psql              PSQL                deploy PostgreSQL docker container (default: False)
         --grafana           GRAFANA             deploy Grafana docker container (default: False)
     :params:
+        status:bool
         deploy_anylog:docker_calls.DeployAnyLog - class method used to deploy docker code
         config_file:str - full path of args.config_file
         env_params:dict - content from config_file
@@ -61,7 +62,7 @@ def terminal_main():
     parser.add_argument('--psql', type=bool, nargs='?', const=True, default=False, help='deploy PostgreSQL docker container')
     parser.add_argument('--grafana', type=bool, nargs='?', const=True, default=False, help='deploy Grafana docker container')
     args = parser.parse_args()
-
+    status = True
     deploy_anylog = DeployAnyLog(timezone=args.timezone)
     if len(deploy_anylog.error_message) > 0:
         print(deploy_anylog.error_message[0])
@@ -84,6 +85,18 @@ def terminal_main():
         if not deploy_anylog.deploy_grafana_container():
             for error in deploy_anylog.error_message:
                 print(error)
+
+    if status is True:
+        status = deploy_anylog.deploy_anylog_container(docker_password=args.docker_password,
+                                                       environment_variables=env_params, timezone=args.timezone,
+                                                       update_anylog=args.update_anylog)
+        if status is False:
+            for error in deploy_anylog.error_message:
+                print(error)
+                print('Unable to download AnyLog, thus cannot continue...')
+                exit(1)
+        else:
+            print('Successfully deployed AnyLog!')
 
 if __name__ == '__main__':
     terminal_main()

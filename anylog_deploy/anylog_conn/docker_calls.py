@@ -42,14 +42,13 @@ class DeployAnyLog:
         try:
             self.docker_client.login(username='oshadmon', password=password)
         except Exception as e:
-            if exception is True:
-                print("Failed to log into docker with password: '%s' (Error: %s)" % (password, e))
+            self.error_message.append("Failed to log into docker with password: '%s' (Error: %s)" % (password, e))
             status = False
 
         return status
 
     # Image support functions - update, validate, remove
-    def __update_image(self, image_name:str, exception:bool=True)->docker.models.images.Image:
+    def __update_image(self, image_name:str)->docker.models.images.Image:
         """
         Pull image oshadmon/anylog
         :args:
@@ -64,12 +63,11 @@ class DeployAnyLog:
         try:
             image = self.docker_client.images.pull(repository=image_name)
         except Exception as e:
-            if exception is True:
-                print('Failed to pull image %s (Error: %s)' % (image_name, e))
+            self.error_message.append('Failed to pull image %s (Error: %s)' % (image_name, e))
         else:
             image = self.__validate_image(image_name=image_name)
-            if image is None and exception is True:
-                print('Failed to pull image for an unknown reason...' % image_name)
+            if image is None:
+                self.error_message.append('Failed to pull image for an unknown reason...' % image_name)
 
         return image
 
@@ -272,91 +270,103 @@ class DeployAnyLog:
         return status
 
     # Deploy containers
-    def deploy_anylog_container(self, docker_password:str, update_image:bool=False,
-                                container_name:str='anylog-test-node', build:str='predevelop',
-                                external_ip:str=None, local_ip:str=None, server_port:int=2048, rest_port:int=2049,
-                                broker_port:int=None, authentication:str='off', auth_type:str='admin',
-                                username:str='anylog', password:str='demo', expiration:str=None,
-                                exception:bool=True)->bool:
+    def deploy_anylog_container(self, docker_password:str, environment_variables:dict={}, timezone:str='utc',
+                                update_anylog:bool=False):
         """
-        Deploy an AnyLog of type rest
+        Deploy AnyLog container
         :args:
-            docker_password:str - docker password to download AnyLog container
-            update_image:bool - whether to update the image (if exists)
-            container_name:str - name of the container
-            build:str - version of AnyLog image to download
-            server_port:int - TCP server port
-            rest_port:int - REST server port
-            authentication:str - whether to enable authentication
-            exception:bool - whether or not to print exceptions
-            # Optional configs
-            external_ip:str - IP address that's different than the default external IP
-            local_ip:str - IPs address that's different  than the default local IP
-            broker_port:int - MQTT message broker port
-            username:str - authentication username
-            password:str - authentication password
+            docker_password:str - docker password
+            environment_variables:dict - docker enviornment parms
+            timezone:str - whether to use UTC or local
+            update_anylog:bool - whether to update AnyLog
+        """
+        status = False
+        image = 'oshadmon/anylog:%s' % environment_variables['BUILD']
+        node_name = environment_variables['NODE_NAME']
+        volume_paths = {
+            '%s-anylog' % node_name: '/app/AnyLog-Network/anylog',
+            '%s-blockchain' % node_name: '/app/AnyLog-Network/blockchain',
+            '%s-data' % node_name: '/app/AnyLog-Network/data',
+            '%s-local-scripts' % node_name: '/app/AnyLog-Network/local_scripts'
+        }
+
+        """
+        # Validate image information  
+        1. Check if image exists || needs to be updated 
+        2. if not log into docker with docker_password 
+        3. update / download image
+        4. if fails at any point during this process return False
+        """
+        if self.__validate_image(image_name=image) is None or update_anylog is True:
+            if self.__docker_login(password=docker_password):
+                img = self.__update_image(image_name=image)
+                if isinstance(img, docker.models.images.Image):
+                    status = True
+            if status is False:
+                return status
+
+        volumes = {}
+        if timezone == 'local':
+            volumes = {'/etc/localtime': {'bind': '/etc/localtime', 'mode': 'ro'}}
+
+        for volume in volume_paths:
+            if self.__validate_volume(volume_name=volume) is None:
+                output = self.__create_volume(volume_name=volume)
+                if isinstance(output, docker.models.containers.Container):
+                    volumes[volume] = {'bind': volume_paths[volume], 'mode': 'rw'}
+                else:
+                    status = False
+            else:
+                volumes[volume] = {'bind': volume_paths[volume], 'mode': 'rw'}
+
+        if self.__validate_container(container_name=node_name) is None:
+            output = self.__run_container(image=image, container_name=node_name,
+                                          environment=environment_variables, volumes=volumes)
+            if isinstance(output, docker.models.containers.Container):
+                status = False
+
+        return status
+
+    def deploy_postgres_container(self, conn_info:str)->bool:
+        """
+        Deploy Postgres
+        :args:
+            conn_info:str - connection information (user@ip:passwd)
+            db_port:int - database port
+            password:str psql password correlated to user
         :params:
             status:bool
-            volume_paths:dict - key: volume_name | value: path within AnyLog
-            volumes:dict - volumes related to AnyLog
-            environment:dict - environment variables for docker based on arguments
         :return:
             status
         """
         status = True
 
         environment = {
-            'NODE_TYPE': 'rest',
-            'NODE_NAME': container_name,
-            'ANYLOG_SERVER_PORT': server_port,
-            'ANYLOG_REST_PORT': rest_port,
-            'AUTHENTICATION': authentication,
-            'AUTH_TYPE': auth_type,
-            'USERNAME': username,
-            'PASSWORD': password,
-            'EXPIRATION': expiration,
-        }
-        if external_ip is not None:
-            environment['EXTERNAL_IP'] = external_ip
-        if local_ip is not None:
-            environment['IP'] = local_ip
-        if broker_port is not None:
-            environment['ANYLOG_BROKER_PORT'] = broker_port
-
-        volume_paths = {
-            '%s-anylog' % container_name: '/app/AnyLog-Network/anylog',
-            '%s-blockchain' % container_name: '/app/AnyLog-Network/blockchain',
-            '%s-data' % container_name: '/app/AnyLog-Network/data',
-            '%s-local-scripts' % container_name: '/app/AnyLog-Network/local_scripts'
+            'POSTGRES_USER': conn_info.split('@')[0],
+            'POSTGRES_PASSWORD': conn_info.split(':')[-1]
         }
 
-        volumes = {} 
+        volume_paths = {'pgdata': '/var/lib/postgresql/data'}
+
+        volumes = {}
         if self.timezone == 'local':
             volumes = {'/etc/localtime': {'bind': '/etc/localtime', 'mode': 'ro'}}
 
-        # Prepare volumes
         for volume in volume_paths:
             if self.__validate_volume(volume_name=volume) is None:
-                if self.__create_volume(volume_name=volume, exception=exception) is not None:
+                output = self.__create_volume(volume_name=volume)
+                if isinstance(output, docker.models.containers.Container):
                     volumes[volume] = {'bind': volume_paths[volume], 'mode': 'rw'}
+                else:
+                    status = False
             else:
                 volumes[volume] = {'bind': volume_paths[volume], 'mode': 'rw'}
 
-        # login
-        if update_image is True or self.__validate_image(image_name='oshadmon/anylog:%s' % build) is None:
-            status = self.__docker_login(password=docker_password, exception=exception)
-
-        # Update image
-        if status is True and update_image is True:
-            status = self.__update_image(image_name='oshadmon/anylog:%s' % build, exception=exception)
-
-        # deploy AnyLcg container
-        if status is True:
-            if self.__validate_container(container_name=container_name) is None:
-                if not self.__run_container(image='oshadmon/anylog:%s' % build, container_name=container_name,
-                                          environment=environment, volumes=volumes, exception=exception):
-                    print('Fails') 
-                    status = False
+        if self.__validate_container(container_name='postgres-db') is None:
+            output = self.__run_container(image='postgres:14.0-alpine', container_name='postgres-db',
+                                          environment=environment, volumes=volumes)
+            if isinstance(output, docker.models.containers.Container):
+                status = False
 
         return status
 
@@ -403,47 +413,6 @@ class DeployAnyLog:
 
         return status
 
-    def deploy_postgres_container(self, conn_info:str)->bool:
-        """
-        Deploy Postgres
-        :args:
-            conn_info:str - connection information (user@ip:passwd)
-            db_port:int - database port
-            password:str psql password correlated to user
-        :params:
-            status:bool
-        :return:
-            status
-        """
-        status = True
 
-        environment = {
-            'POSTGRES_USER': conn_info.split('@')[0],
-            'POSTGRES_PASSWORD': conn_info.split(':')[-1]
-        }
-
-        volume_paths = {'pgdata': '/var/lib/postgresql/data'}
-
-        volumes = {} 
-        if self.timezone == 'local':
-            volumes = {'/etc/localtime': {'bind': '/etc/localtime', 'mode': 'ro'}}
-
-        for volume in volume_paths:
-            if self.__validate_volume(volume_name=volume) is None:
-                output = self.__create_volume(volume_name=volume)
-                if isinstance(output, docker.models.containers.Container):
-                    volumes[volume] = {'bind': volume_paths[volume], 'mode': 'rw'}
-                else:
-                    status = False
-            else:
-                volumes[volume] = {'bind': volume_paths[volume], 'mode': 'rw'}
-
-        if self.__validate_container(container_name='postgres-db') is None:
-            output = self.__run_container(image='postgres:14.0-alpine', container_name='postgres-db',
-                                          environment=environment, volumes=volumes)
-            if isinstance(output, docker.models.containers.Container):
-                status = False
-
-        return status
 
 
