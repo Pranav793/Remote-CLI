@@ -88,34 +88,6 @@ class DeployAnyLog:
 
         return image
 
-    def __remove_image(self, image_name:str, exception:bool=True)->bool:
-        """
-        Remove image from docker
-        :args:
-            image_name:str - image name with version
-            exception:bool - whether or not to print exceptions
-        :params:
-            image_obj:docker.models.images.Image - Image object
-            status:bool
-        :return:
-            status
-        """
-        status = True
-
-        try:
-            self.docker_client.images.remove(image=image_name)
-        except Exception as e:
-            status = False
-            if exception is True:
-                print('Failed to remove image %s (Error: %s)' % (image_name, e))
-        else:
-            if self.__validate_image(image_name=image_name) is not None:
-                status = False
-                if exception is True:
-                    print('Failed to remove image: %s' % image_name)
-
-        return status
-
     # Volume support functions - create, validate, remove
     def __create_volume(self, volume_name:str)->docker.models.containers.Container:
         """
@@ -157,33 +129,6 @@ class DeployAnyLog:
             pass
 
         return volume
-
-    def __remove_volume(self, volume:docker.models.volumes.Volume, exception:bool=True)->bool:
-        """
-        Remove volume
-        :args:
-            volume:docker.models.volumes.Volume - volume object
-            exception:bool - whether to print exception
-        :params:
-            status:bool - whether to print exceptions
-        :return:
-            status
-        """
-        status = True
-
-        try:
-            volume.remove()
-        except Exception as e:
-            status = False
-            if exception is True:
-                print('Failed to remove volume for container %s (Error: %s)' % (container.name, e))
-        else:
-            if self.__validate_volume(volume_name=volume) is not None:
-                status = False
-                if exception is True:
-                    print('Failed to remove volume for container %s' % container.name)
-
-        return status
 
     # Container support functions - run, validate, stop
     def __run_container(self, image:str, container_name:str, environment:dict={},
@@ -242,33 +187,6 @@ class DeployAnyLog:
 
         return container
 
-    def __stop_container(self, container:docker.models.containers.Container, exception:bool=False)->bool:
-        """
-        Stop container based on name
-        :args:
-            container:docker.models.containers.Container - container object
-            exception:bool - whether to print exception
-        :params:
-            status:bool
-        :return:
-            status
-        """
-        status = True
-
-        try:
-            container.stop()
-        except Exception as e:
-            status = False
-            if exception is True:
-                print('Failed to remove container %s (Error: %s)' % (container.name, e))
-        else:
-            if self.__validate_container(container_name=container.name) is not None:
-                status = False
-                if exception is True:
-                    print('Failed to remove container %s' % container.name)
-
-        return status
-
     # Deploy containers
     def deploy_anylog_container(self, docker_password:str, environment_variables:dict={}, timezone:str='utc',
                                 update_anylog:bool=False):
@@ -280,7 +198,7 @@ class DeployAnyLog:
             timezone:str - whether to use UTC or local
             update_anylog:bool - whether to update AnyLog
         """
-        status = False
+        status = True
         image = 'oshadmon/anylog:%s' % environment_variables['BUILD']
         node_name = environment_variables['NODE_NAME']
         volume_paths = {
@@ -300,15 +218,15 @@ class DeployAnyLog:
         if self.__validate_image(image_name=image) is None or update_anylog is True:
             if self.__docker_login(password=docker_password):
                 img = self.__update_image(image_name=image)
-                if isinstance(img, docker.models.images.Image):
-                    status = True
+                if not isinstance(img, docker.models.images.Image):
+                    status = False
             if status is False:
                 return status
 
         volumes = {}
         if timezone == 'local':
             volumes = {'/etc/localtime': {'bind': '/etc/localtime', 'mode': 'ro'}}
-
+        
         for volume in volume_paths:
             if self.__validate_volume(volume_name=volume) is None:
                 output = self.__create_volume(volume_name=volume)
@@ -318,11 +236,11 @@ class DeployAnyLog:
                     status = False
             else:
                 volumes[volume] = {'bind': volume_paths[volume], 'mode': 'rw'}
-
+        
         if self.__validate_container(container_name=node_name) is None:
             output = self.__run_container(image=image, container_name=node_name,
                                           environment=environment_variables, volumes=volumes)
-            if isinstance(output, docker.models.containers.Container):
+            if not isinstance(output, docker.models.containers.Container):
                 status = False
 
         return status
