@@ -11,6 +11,7 @@ import anylog_deploy.anylog_conn.deployment_process as anylog_deployment
 
 CONFIG_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configs')
 
+
 class FormViews:
     def __init__(self):
         self.env_params = {
@@ -39,7 +40,13 @@ class FormViews:
     def file_config(self, request)->HttpResponse:
         """
         Select file to be or to configure a new file
-            - config_file:str - config file to use for deployment
+            - preset_config_file:str - config file to use for deployment
+                from config/ directory
+            OR
+            - external_config_file:str - config file to use for deployment
+                    if unable to locate file, returns error
+            OR
+            - There's a button to setup a new configuration file
         :args:
             request:django.core.handlers.wsgi.WSGIRequest - type of request against the form
         :redirect:
@@ -51,24 +58,16 @@ class FormViews:
             full_path = None
             file_config = forms.SelectConfig(request.POST)
             if file_config.is_valid():
-                # ask for information regarding a new device
-                if request.POST.get('new_config_file') is not None:
-                    return HttpResponseRedirect('base-configs/')
-
                 preset_config_file = request.POST.get('preset_config_file')
                 external_config_file = request.POST.get('external_config_file')
-
-                # extract configuration file (full path)
                 if preset_config_file != '':
                     full_path = os.path.expandvars(os.path.expanduser(preset_config_file))
                 elif external_config_file != '':
                     full_path = os.path.expanduser(os.path.expanduser(external_config_file))
                     if not os.path.isfile(full_path):
-                        return render(request, "config_file.html", {'form': file_config,
-                                                                    'node_reply': 'Failed to locate file "%s"' % full_path})
-                # get env params from file
-                if full_path is not None:
-                    self.config_file = full_path
+                        return render(request, "config_file.html",
+                                      {'form': file_config, 'node_reply': 'Failed to locate file "%s"' % full_path})
+                self.config_file = full_path
                 return HttpResponseRedirect('deploy-anylog/')
         else:
             file_config = forms.SelectConfig()

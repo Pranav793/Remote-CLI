@@ -1,7 +1,7 @@
 import argparse
 import os
-from docker_calls import DeployAnyLog
-from io_config import read_configs
+from anylog_deploy.anylog_conn.docker_calls import DeployAnyLog
+from anylog_deploy.anylog_conn.io_config import read_configs
 
 
 def django_main(config_file:str, timezone:str='utc', docker_password:str=None, update_anylog:bool=False,
