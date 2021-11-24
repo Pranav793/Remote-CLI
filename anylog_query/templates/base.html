@@ -31,10 +31,18 @@
     {% csrf_token %}
     {{ form.as_p }}
 
+    {% load static %} <img src="{% static "css/anylog-logo.ico" %}" alt="AnyLog Network" onclick="window.location.href='https://anylog.co/'" class="floatleft"/>
+
+    <div class="networktext">
+    <text style="float: left">AnyLog Network Client</text>
+    </div>
+
+
 
     <br/> <br/> <br/>
 
     <select id="rest_call" name="rest_call">
+
 
     {% if rest_call %}
         <option selected value="get">&nbsp;GET</option>
@@ -67,6 +75,34 @@
 
     <label for="auth_pass">Auth password:</label>
     <input type="text" id="auth_pass" name="auth_pass">
+
+    &nbsp; &nbsp;
+
+    <text>Options:</text>
+
+    <!-- Print the options for buttons types: Logs, Queries, Blockchain etc.  -->
+
+    <select id="cmd_type" name="cmd_type" onchange="this.form.submit();">
+
+    {% for entry in commands_groups %}
+         {% if entry == cmd_type %}
+            <option selected value={{ entry }}>&nbsp;{{ entry }}</option>
+        {% else %}
+            <option value={{ entry }}>&nbsp;{{ entry }}</option>
+        {% endif %}
+
+    {%  endfor %}
+
+     </select>
+
+    &nbsp; &nbsp;
+    <label for="help">Help:</label>
+
+    {% if help %}
+        <input type="checkbox" id="help" name="help" checked>
+    {% else %}
+        <input type="checkbox" id="help" name="help">
+    {% endif %}
 
 
     <br/> <br/> <br/>
@@ -119,6 +155,16 @@
         <input type="checkbox" id="network" name="network">
     {% endif %}
 
+     &nbsp;
+
+     <label for="storage_nodes">Storage Nodes:</label>
+    {% if connect_info %}
+        <input type="text" id="storage_nodes" name="storage_nodes" value="{{storage_nodes}}">
+    {% else %}
+        <input type="text" id="storage_nodes" name="storage_nodes">
+    {% endif %}
+
+
     <br/> <br/> <br/>
 
     <input type ="submit" name = "Send" value="Send" style="font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
@@ -134,11 +180,16 @@
     {% endif %}
 
 
-
     <br/> <br/> <br/>
 
+    <!-- Print the buttons that satisfy the selected cmd_type  -->
+
     {% for entry in commands_list %}
-        <input type ="submit" name = "button" value="{{entry.button}}"/>
+        {% if cmd_type == "All" %}
+            <input type ="submit" name = "button" value="{{entry.button}}"/>
+        {% elif cmd_type == entry.group %}
+            <input type ="submit" name = "button" value="{{entry.button}}"/>
+        {%  endif %}
     {% endfor %}
 
     <br/>

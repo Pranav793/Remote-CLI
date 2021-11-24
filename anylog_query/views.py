@@ -4,6 +4,7 @@ import copy
 # Import necessary modules
 from django.shortcuts import render
 from django.http import HttpResponse
+import webbrowser
 
 
 
@@ -11,33 +12,70 @@ import anylog_query.json_api as json_api
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
 ANYLOG_COMMANDS = [
-    {'button': 'Node Status',       'command': 'get status', 'type': 'GET'},                        # Get Node Status
-    {'button': 'Event Log',         'command': 'get event log where format=json', 'type': 'GET'},   # Get Event Log
-    {'button': 'Error Log',         'command': 'get error log where format=json', 'type': 'GET'},   # Get Error Log
-    {'button': 'Get Processes',     'command': 'get processes', 'type': 'GET'},
-    {'button': 'Get Dictionary',    'command': 'get dictionary', 'type': 'GET'},
-    {'button': 'Get REST',          'command': 'get rest', 'type': 'GET'},                          # Get REST
-    {'button': 'Get REST log',      'command': 'get rest log', 'type': 'GET'},                          # GET REST log
-    {'button': 'Get Streaming',     'command': 'get streaming format = json', 'type': 'GET'},                     # Get Streaming
-    {'button': 'Get Operator',      'command': 'get operator format = json', 'type': 'GET'},                      # Get Operator
-    {'button': 'Get Query Status',  'command': 'query status all', 'type': 'GET'},                 # Get Query Status
-    {'button': 'Get Last Query Status',     'command': 'query status', 'type': 'GET'},                     # Get Last Query Status
-    {'button': 'Get Rows Count',            'command': 'get rows count', 'type': 'GET'},                   # Get Rows Count
-    {'button': 'Get Rows Count by Table',   'command': 'get rows count where group=table', 'type': 'GET'}, # Get Rows Count by Table
-    {'button': 'Blockchain Operators',      'command': 'blockchain get operator', 'type': 'GET'},          # Blockchain Operators
-    {'button': 'Blockchain Publishers',     'command': 'blockchain get publisher', 'type': 'GET'},         # Blockchain Publishers
-    {'button': 'Blockchain Queries',        'command': 'blockchain get query', 'type': 'GET'},             # Blockchain Queries
-    {'button': 'Blockchain Tables',         'command': 'blockchain get table', 'type': 'GET'},             # Blockchain Tables
-    {'button': 'Reset Error Log','command': 'reset error log', 'type': 'POST'},  # Set REST Log Off
-    {'button': 'Reset REST Log', 'command': 'reset rest log', 'type': 'POST'},                    # Reset REST Log Off
-    {'button': 'REST Log off',  'command': 'set rest log off', 'type': 'POST'},  # Set REST Log Off
-    {'button': 'REST Log on',   'command': 'set rest log on', 'type': 'POST'},  # Set REST Log On
-    {'button': 'QUERY Count',   'command': 'sql [DBMS] SELECT count(*) from [TABLE]', 'type': 'GET'},  # Set REST Log On
-    {'button': 'QUERY Minute',  'command': 'sql [DBMS] SELECT timestamp, value FROM [TABLE] WHERE timestamp > NOW() - 1 minute', 'type': 'GET'},
-    {'button': 'QUERY Increments', 'command': 'sql [DBMS] select increments(day, 1, timestamp), min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value, count(*) as row_count from [TABLE] limit 10', 'type': 'GET'},
-    {'button': 'QUERY Period',  'command': 'sql [DBMS] select  max(timestamp), avg(value) from [TABLE] where period ( minute, 1, NOW(), timestamp)', 'type': 'GET'},
-    {'button': 'Help Get',      'command': 'help get', 'type': 'GET'},             # Blockchain Tables
+    {'button': 'Node Status',       'command': 'get status', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/monitoring%20nodes.md#the-get-status-command' },                        # Get Node Status
+    {'button': 'Get Processes',     'command': 'get processes', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/monitoring%20nodes.md#the-get-processes-command' },
+    {'button': 'Get Dictionary',    'command': 'get dictionary', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/monitoring%20nodes.md#the-get-dictionary-command' },
 
+    {'button': 'Event Log',         'command': 'get event log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-event-log' },   # Get Event Log
+    {'button': 'Error Log',         'command': 'get error log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-error-log' },   # Get Error Log
+    {'button': 'Streaming Log',     'command': 'get streaming log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-streaming-log' },   # Get Error Log
+    {'button': 'Query Log',         'command': 'get query log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-query-log' },   # Get Error Log
+    {'button': 'Reset Error Log', 'command': 'reset error log', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#reset-the-log-data' },  # Set REST Log Off
+    {'button': 'Reset Streaming Log', 'command': 'reset streaming log', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#reset-the-log-data' },  # Reset REST Log Off
+    {'button': 'Streaming Log off', 'command': 'set rest log off', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-streaming-log' },  # Set REST Log Off
+    {'button': 'Streaming Log on', 'command': 'set rest log on', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-streaming-log' },  # Set REST Log On
+
+    {'button': 'Get REST',          'command': 'get rest', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                          # Get REST
+    {'button': 'Get REST log',      'command': 'get rest log', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                          # GET REST log
+    {'button': 'Get Streaming',     'command': 'get streaming format = json', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                     # Get Streaming
+    {'button': 'Get MSG Clients',   'command': 'get msg clients', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                     # get msg clients
+    {'button': 'Get Operator',      'command': 'get operator format = json', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                      # Get Operator
+
+    {'button': 'Get Query Status',  'command': 'query status all', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                 # Get Query Status
+    {'button': 'Get Last Query Status',     'command': 'query status', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                     # Get Last Query Status
+    {'button': 'Get Rows Count',            'command': 'get rows count', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                   # Get Rows Count
+    {'button': 'Get Rows Count by Table',   'command': 'get rows count where group=table', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'}, # Get Rows Count by Table
+
+    {'button': 'Blockchain Operators',      'command': 'blockchain get operator', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/anylog%20docker%20install.md'},          # Blockchain Operators
+    {'button': 'Blockchain Publishers',     'command': 'blockchain get publisher', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/anylog%20docker%20install.md'},         # Blockchain Publishers
+    {'button': 'Blockchain Queries',        'command': 'blockchain get query', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/anylog%20docker%20install.md'},             # Blockchain Queries
+    {'button': 'Blockchain Tables',         'command': 'blockchain get table', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/anylog%20docker%20install.md'},             # Blockchain Tables
+
+    {'button': 'QUERY Count',
+     'command': 'sql [DBMS] SELECT count(*) from [TABLE]', 'type': 'GET',
+     'group' : 'Queries',
+     'help_url' : 'blob/master/queries.md#queries'},  # Set REST Log On
+
+    {'button': 'QUERY Minute',
+     'command': 'sql [DBMS] SELECT timestamp, value FROM [TABLE] WHERE timestamp > NOW() - 1 minute', 'type': 'GET',
+     'group' : 'Queries',
+     'help_url' : 'blob/master/queries.md#queries'},
+
+    {'button': 'QUERY Increments',
+     'command': 'sql [DBMS] select increments(day, 1, timestamp), min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value, count(*) as row_count from [TABLE] limit 10',
+     'type': 'GET', 'group' : 'Queries',
+     'help_url' : 'blob/master/queries.md#queries'},
+
+    {'button': 'QUERY Period',
+     'command': 'sql [DBMS] select  max(timestamp), avg(value) from [TABLE] where period ( minute, 1, NOW(), timestamp)', 'type': 'GET',
+     'group' : 'Queries',
+     'help_url' : 'blob/master/queries.md#queries'},
+
+    {'button': 'Help Get',
+     'command': 'help get',
+     'type': 'GET',
+     'group' : 'Other'},
+]
+
+COMMANDS_GROUPS = [
+    "All",
+    "Status",
+    "Queries",
+    "Logs",
+    "Southbound",
+    "Northbound",
+    "Blockchain",
+    "Other",
 ]
 
 COMMAND_BY_BUTTON = {}
@@ -75,44 +113,63 @@ def form_request(request):
             add_form_value(select_info, request)
             command_id = COMMAND_BY_BUTTON[button]
             cmd_info = ANYLOG_COMMANDS[command_id]
-            user_cmd = cmd_info["command"]             # Set the command
 
-            if len (user_cmd) > 5 and user_cmd[:4].lower().startswith("sql "):
-                select_info["network"] = True     # Used to Flag the network bool on the page
-
-                # add dbms name and table name
-                dbms_name = request.POST.get('dbms')
-                table_name = request.POST.get('table')
-
-                if dbms_name:
-                    user_cmd = user_cmd.replace("[DBMS]", dbms_name, 1)
-                if table_name:
-                    user_cmd = user_cmd.replace("[TABLE]", table_name, 1)
-
-                # Add output format
-                out_format = request.POST.get('out_format')
-                cmd_list = user_cmd.split(' ',3)
-                if len(cmd_list) > 3:
-                    if out_format == "table":
-                        user_cmd = user_cmd.replace(cmd_list[2], "format = table %s" % (cmd_list[2]))
-                        select_info["out_format"] = "table"  # Keep selection menue on table
-                    else:
-                        user_cmd = user_cmd.replace(cmd_list[2], "format = json and stat = false %s" % (cmd_list[2]))
-                        select_info["out_format"] = None        # Keep selection menue on JSON
+            if request.POST.get("help"):
+                # Open the URL for help
+                select_info["help"] = True
+                help_url = "https://github.com/AnyLog-co/documentation/" + cmd_info["help_url"]
+                webbrowser.open(help_url)
             else:
-                select_info["network"] = False
+                user_cmd = cmd_info["command"]             # Set the command
 
+                if len (user_cmd) > 5 and user_cmd[:4].lower().startswith("sql "):
+                    select_info["network"] = True     # Used to Flag the network bool on the page
 
-            select_info["command"] = user_cmd
-            rest_call = cmd_info["type"]
-            if rest_call == "GET":
-                select_info["rest_call"] = rest_call        # Set Put or Get
-            else:
-                select_info["rest_call"] = None
+                    # add dbms name and table name
+                    dbms_name = request.POST.get('dbms')
+                    table_name = request.POST.get('table')
+
+                    if dbms_name:
+                        user_cmd = user_cmd.replace("[DBMS]", dbms_name, 1)
+                    if table_name:
+                        user_cmd = user_cmd.replace("[TABLE]", table_name, 1)
+
+                    # Add output format
+                    out_format = request.POST.get('out_format')
+                    cmd_list = user_cmd.split(' ',3)
+                    if len(cmd_list) > 3:
+                        if out_format == "table":
+                            user_cmd = user_cmd.replace(cmd_list[2], "format = table %s" % (cmd_list[2]))
+                            select_info["out_format"] = "table"  # Keep selection menue on table
+                        else:
+                            user_cmd = user_cmd.replace(cmd_list[2], "format = json and stat = false %s" % (cmd_list[2]))
+                            select_info["out_format"] = None        # Keep selection menue on JSON
+                else:
+                    select_info["network"] = False
+
+                select_info["command"] = user_cmd
+                rest_call = cmd_info["type"]
+                if rest_call == "GET":
+                    select_info["rest_call"] = rest_call        # Set Put or Get
+                else:
+                    select_info["rest_call"] = None
+
         else:
-            select_info["rest_call"] = "GET"
+            if request.method == 'POST':
+                # Send was not selected - keep the older selected values
+                add_form_value(select_info, request)  # add the values of the last form to the select_info
+            else:
+                select_info["rest_call"] = "GET"
 
+                buttons_type = request.POST.get('cmd_type')  # These are the type of commands buttons that will be displayed
+                if buttons_type:
+                    select_info["cmd_type"] = buttons_type  # These are the type of commands buttons that will be displayed
+                else:
+                    select_info["cmd_type"] = "Logs"  # These are the type of commands buttons that will be displayed
+
+        # Add info which is not selected but is used by the form
         select_info["commands_list"] = ANYLOG_COMMANDS
+        select_info["commands_groups"] = COMMANDS_GROUPS
 
         return render(request, "base.html", select_info)
 # ---------------------------------------------------------------------------------------
@@ -165,6 +222,7 @@ def print_network_reply(request, query_result, data):
 
     select_info['title'] = 'Network Command'
     select_info["commands_list"] = ANYLOG_COMMANDS
+    select_info["commands_groups"] = COMMANDS_GROUPS
 
     if not data:
         print_info = None
@@ -291,6 +349,7 @@ def format_message_reply(msg_text):
     data_list = []     # Every entry holds type of text ("text" or "Url) and the text string
 
     set_table = False
+
     for entry in text_list:
 
         # Setup URL Link (reply to help command + a link to the help page)
@@ -308,8 +367,8 @@ def format_message_reply(msg_text):
         else:
             # Split text to attribiute value using colon
             if entry:
-                key_val = entry.split(':', 1)
-                if len(key_val) == 1:
+                key_val = entry.split(':', 2)
+                if len(key_val) == 1 or len(key_val) == 3:
                     if set_table:
                         data_list[-1][3] = "table_end"
                         set_table = False
