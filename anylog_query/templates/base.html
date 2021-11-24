@@ -80,10 +80,12 @@
 
     <text>Options:</text>
 
-    <select id="commands_types" name="commands_types">
+    <!-- Print the options for buttons types: Logs, Queries, Blockchain etc.  -->
+
+    <select id="cmd_type" name="cmd_type" onchange="this.form.submit();">
 
     {% for entry in commands_groups %}
-         {% if entry == "cmd_type" %}
+         {% if entry == cmd_type %}
             <option selected value={{ entry }}>&nbsp;{{ entry }}</option>
         {% else %}
             <option value={{ entry }}>&nbsp;{{ entry }}</option>
@@ -180,8 +182,14 @@
 
     <br/> <br/> <br/>
 
+    <!-- Print the buttons that satisfy the selected cmd_type  -->
+
     {% for entry in commands_list %}
-        <input type ="submit" name = "button" value="{{entry.button}}"/>
+        {% if cmd_type == "All" %}
+            <input type ="submit" name = "button" value="{{entry.button}}"/>
+        {% elif cmd_type == entry.group %}
+            <input type ="submit" name = "button" value="{{entry.button}}"/>
+        {%  endif %}
     {% endfor %}
 
     <br/>
