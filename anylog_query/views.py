@@ -22,10 +22,10 @@ ANYLOG_COMMANDS = [
     {'button': 'Query Log',         'command': 'get query log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-query-log' },   # Get Error Log
     {'button': 'Reset Error Log', 'command': 'reset error log', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#reset-the-log-data' },  # Set REST Log Off
     {'button': 'Reset Streaming Log', 'command': 'reset streaming log', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#reset-the-log-data' },  # Reset REST Log Off
-    {'button': 'Streaming Log off', 'command': 'set rest log off', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-streaming-log' },  # Set REST Log Off
     {'button': 'Streaming Log on', 'command': 'set rest log on', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-streaming-log' },  # Set REST Log On
+    {'button': 'Streaming Log off', 'command': 'set rest log off', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-streaming-log' },  # Set REST Log Off
 
-    {'button': 'Get REST',          'command': 'get rest', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                          # Get REST
+    {'button': 'Get REST calls',    'command': 'get rest calls', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'master/monitoring%20calls.md#get-rest-calls'},                          # Get REST
     {'button': 'Get REST log',      'command': 'get rest log', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                          # GET REST log
     {'button': 'Get Streaming',     'command': 'get streaming format = json', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                     # Get Streaming
     {'button': 'Get MSG Clients',   'command': 'get msg clients', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                     # get msg clients
