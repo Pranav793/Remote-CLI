@@ -111,9 +111,14 @@ class FormViews:
                 if request.POST.get('grafana'):
                     grafana = True
 
-            error_messages = anylog_deployment.django_main(config_file=self.config_file,
-                                                           docker_password=docker_password, update_anylog=update_anylog,
-                                                           psql=psql, grafana=grafana)
+            print(env_params)
+            if env_params['NODE_TYPE'] not in ['none', 'rest', 'master', 'operator',
+                                                               'publisher', 'query']:
+                error_messages = 'Invalid node type: %s' % env_params['NODE_TYPE']
+            else:
+                error_messages = anylog_deployment.django_main(config_file=self.config_file,
+                                                               docker_password=docker_password, update_anylog=update_anylog,
+                                                               psql=psql, grafana=grafana)
             return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': error_messages})
         else:
             deployment_configs = forms.DeployAnyLog()
