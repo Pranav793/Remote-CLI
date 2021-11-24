@@ -112,7 +112,7 @@ def terminal_main():
         if not deploy_anylog.deploy_grafana_container():
             for error in deploy_anylog.error_message:
                 print(error)
-
+    
     if status is True:
         status = deploy_anylog.deploy_anylog_container(docker_password=args.docker_password,
                                                        environment_variables=env_params, timezone=args.timezone,
