@@ -32,10 +32,10 @@ ANYLOG_COMMANDS = [
     {'button': 'REST Server Info',  'command': 'get rest server info', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#rest-server-configuration'},
 
 
-    {'button': 'Get Query Status',  'command': 'query status all', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                 # Get Query Status
-    {'button': 'Get Last Query Status',     'command': 'query status', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                     # Get Last Query Status
-    {'button': 'Get Rows Count',            'command': 'get rows count', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                   # Get Rows Count
-    {'button': 'Get Rows Count by Table',   'command': 'get rows count where group=table', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'}, # Get Rows Count by Table
+    {'button': 'Queries Status',  'command': 'query status all', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/profiling%20and%20monitoring%20queries.md#command-options-for-profiling-and-monitoring-queries'},                 # Get Query Status
+    {'button': 'Get Last Query Status',     'command': 'query status', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/profiling%20and%20monitoring%20queries.md#command-options-for-profiling-and-monitoring-queries'},                     # Get Last Query Status
+    {'button': 'Get Rows Count',            'command': 'get rows count', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/monitoring%20nodes.md#monitoring-data-commands'},                   # Get Rows Count
+    {'button': 'Get Rows Count by Table',   'command': 'get rows count where group=table', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/monitoring%20nodes.md#monitoring-data-commands'}, # Get Rows Count by Table
 
     {'button': 'Blockchain Operators',      'command': 'blockchain get operator', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/anylog%20docker%20install.md'},          # Blockchain Operators
     {'button': 'Blockchain Publishers',     'command': 'blockchain get publisher', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/anylog%20docker%20install.md'},         # Blockchain Publishers
