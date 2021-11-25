@@ -37,10 +37,10 @@ ANYLOG_COMMANDS = [
     {'button': 'Get Rows Count',            'command': 'get rows count', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/monitoring%20nodes.md#monitoring-data-commands'},                   # Get Rows Count
     {'button': 'Get Rows Count by Table',   'command': 'get rows count where group=table', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/monitoring%20nodes.md#monitoring-data-commands'}, # Get Rows Count by Table
 
-    {'button': 'Blockchain Operators',      'command': 'blockchain get operator', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/anylog%20docker%20install.md'},          # Blockchain Operators
-    {'button': 'Blockchain Publishers',     'command': 'blockchain get publisher', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/anylog%20docker%20install.md'},         # Blockchain Publishers
-    {'button': 'Blockchain Queries',        'command': 'blockchain get query', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/anylog%20docker%20install.md'},             # Blockchain Queries
-    {'button': 'Blockchain Tables',         'command': 'blockchain get table', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/anylog%20docker%20install.md'},             # Blockchain Tables
+    {'button': 'Blockchain Operators',      'command': 'blockchain get operator', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},          # Blockchain Operators
+    {'button': 'Blockchain Publishers',     'command': 'blockchain get publisher', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},         # Blockchain Publishers
+    {'button': 'Blockchain Queries',        'command': 'blockchain get query', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Queries
+    {'button': 'Blockchain Tables',         'command': 'blockchain get table', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Tables
 
     {'button': 'QUERY Count',
      'command': 'sql [DBMS] SELECT count(*) from [TABLE]', 'type': 'GET',
