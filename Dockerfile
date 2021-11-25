@@ -17,6 +17,7 @@ RUN python3.8 -m pip install docker || true
 WORKDIR /app
 COPY . Django-API
 RUN chmod 775 /app
-EXPOSE 8000
+
+VOLUME /app/Django-API/anylog_deploy/configs/
 
 ENTRYPOINT python3.8 /app/Django-API/manage.py runserver ${LOCAL_CONN}
