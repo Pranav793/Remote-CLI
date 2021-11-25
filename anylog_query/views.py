@@ -28,7 +28,7 @@ ANYLOG_COMMANDS = [
     {'button': 'Get REST calls',    'command': 'get rest calls', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-rest-calls'},                          # Get REST
     {'button': 'Get Streaming',     'command': 'get streaming format = json', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-streaming'},                     # Get Streaming
     {'button': 'Get MSG Clients',   'command': 'get msg clients', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-msg-clients'},                     # get msg clients
-    {'button': 'Get Operator',      'command': 'get operator format = json', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                      # Get Operator
+    {'button': 'Get Operator',      'command': 'get operator', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-operator'},                      # Get Operator
     {'button': 'REST Server Info',  'command': 'get rest server info', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#rest-server-configuration'},
 
 
