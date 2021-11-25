@@ -119,7 +119,7 @@
 
     <label for="table">Table:&nbsp;</label>
 
-    {% if dbms %}
+    {% if table %}
         <input type="text" id="table" name="table" value="{{table}}">
     {% else %}
         <input type="text" id="table" name="table">
@@ -157,11 +157,11 @@
 
      &nbsp;
 
-     <label for="storage_nodes">Storage Nodes:</label>
-    {% if connect_info %}
-        <input type="text" id="storage_nodes" name="storage_nodes" value="{{storage_nodes}}">
+     <label for="destination">Storage Nodes:</label>
+    {% if destination %}
+        <input type="text" id="destination" name="destination" value="{{destination}}">
     {% else %}
-        <input type="text" id="storage_nodes" name="storage_nodes">
+        <input type="text" id="destination" name="destination">
     {% endif %}
 
 

@@ -193,6 +193,7 @@ def process_anylog(request):
     network = post_data.get('network') == "on"
     rest_call = post_data.get('rest_call')
 
+    destination =  post_data.get('destination')
 
     if command:
         authentication = ()
@@ -202,7 +203,7 @@ def process_anylog(request):
         if rest_call == "post":
             output = anylog_conn.post_cmd(conn=conn_info, command=command, authentication=authentication)
         else:
-            output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network)
+            output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network, dest=destination)
     else:
         output = "Mising commmand"
 

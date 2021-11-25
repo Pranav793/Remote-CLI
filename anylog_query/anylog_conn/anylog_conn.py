@@ -2,7 +2,7 @@ import requests
 import anylog_query.anylog_conn.other as other
 
 
-def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False)->str:
+def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False, dest:str = "")->str:
     """
     Execute GET request
     :args:
@@ -26,7 +26,11 @@ def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False)->
     }
 
     if remote is True:
-        headers['destination'] = 'network'
+        if dest:
+            # a comma seperated IP and Ports
+            headers['destination'] = dest
+        else:
+            headers['destination'] = 'network'
 
     try:
         r = requests.get('http://%s' % conn, headers=headers, auth=authentication, timeout=30)
