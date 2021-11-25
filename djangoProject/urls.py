@@ -16,8 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path # new
 from anylog_query import views as anylog_query
+import djangoProject.views as views
 
 urlpatterns = [
+    path('', views.home),
     path('admin/', admin.site.urls),
     path('anylog-query/', anylog_query.form_request),
     path('anylog-deploy/', include('anylog_deploy.urls')),
