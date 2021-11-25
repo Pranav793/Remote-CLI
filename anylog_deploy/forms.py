@@ -54,7 +54,7 @@ class SelectConfig(forms.Form):
 class DeployAnyLog(forms.Form):
     password = forms.CharField(label='Docker Password', required=False, widget=forms.PasswordInput)
     update_anylog = forms.BooleanField(label='Update AnyLog', required=False)
-    timezone = forms.ChoiceField(label='Set Docker Timezone', required=False, choices=TIMEZONE)
+    #timezone = forms.ChoiceField(label='Set Docker Timezone', required=False, choices=TIMEZONE)
     psql = forms.BooleanField(label='Deploy PostgreSQL', required=False)
     grafana = forms.BooleanField(label='Deploy Grafana', required=False)
 

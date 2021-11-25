@@ -83,9 +83,11 @@ class FormViews:
                 2. go into docker deployment process
         """
         # Write env params to file or
+        status = True
         output = None
         message = None
         env_params = {}
+        timezone='utc' 
         if self.config_file is None:
             self.config_file = os.path.join(CONFIG_FILE_PATH, '%s.ini' % self.env_params['general']['node_name'])
             message = io_config.write_configs(config_data=self.env_params, config_file=self.config_file)
@@ -99,7 +101,7 @@ class FormViews:
             deployment_configs = forms.DeployAnyLog(request.POST)
             if deployment_configs.is_valid():
                 docker_password = request.POST.get('password')
-                timezone = request.POST.get('timezone')
+                #timezone = request.POST.get('timezone')
                 update_anylog = False
                 psql = False
                 grafana = False
@@ -110,16 +112,24 @@ class FormViews:
                     psql = True
                 if request.POST.get('grafana'):
                     grafana = True
-
-            print(env_params)
+            print(env_params) 
             if env_params['NODE_TYPE'] not in ['none', 'rest', 'master', 'operator',
-                                                               'publisher', 'query']:
+                                                'publisher', 'query', 'single-node']:
                 error_messages = 'Invalid node type: %s' % env_params['NODE_TYPE']
             else:
-                error_messages = anylog_deployment.django_main(config_file=self.config_file,
+                status, error_messages = anylog_deployment.django_main(config_file=self.config_file,
                                                                docker_password=docker_password, update_anylog=update_anylog,
                                                                psql=psql, grafana=grafana)
-            return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': error_messages})
+
+            message = 'Successfully deployed AnyLog!' 
+            if status is False and error_messages == []: 
+                message = 'Failed to deploy AnyLog' 
+            elif isinstance(error_messages, str): 
+                message = error_messages
+            elif isinstance(error_messages, list) and len(error_messages) > 0: 
+                message = error_messages 
+            return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': message})
+
         else:
             deployment_configs = forms.DeployAnyLog()
             if message is not None:

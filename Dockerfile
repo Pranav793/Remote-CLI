@@ -1,6 +1,5 @@
 FROM ubuntu:20.04
 
-ENV IP_ADDRESS=LOCAL_IP
 RUN apt-get -y update
 RUN apt-get -y upgrade
 RUN apt-get -y install software-properties-common
@@ -20,4 +19,4 @@ COPY . Django-API
 RUN chmod 775 /app
 EXPOSE 8000
 
-ENTRYPOINT python3.8 /app/Django-API/manage.py runserver ${IP_ADDRESS}:8000
+ENTRYPOINT python3.8 /app/Django-API/manage.py runserver ${LOCAL_CONN}

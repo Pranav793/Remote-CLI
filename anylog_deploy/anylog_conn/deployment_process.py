@@ -38,11 +38,11 @@ def django_main(config_file:str, timezone:str='utc', docker_password:str=None, u
 
     if psql is True:
         status = deploy_anylog.deploy_postgres_container(conn_info=env_params['DB_USER'])
-        if status is True:
+        if status is False:
             for error in deploy_anylog.error_message:
                 errors.append(error)
             deploy_anylog.error_message = []
-
+    print(status)
     if grafana is True:
         if not deploy_anylog.deploy_grafana_container():
             for error in deploy_anylog.error_message:
