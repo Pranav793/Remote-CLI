@@ -41,6 +41,8 @@ ANYLOG_COMMANDS = [
     {'button': 'Blockchain Publishers',     'command': 'blockchain get publisher', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},         # Blockchain Publishers
     {'button': 'Blockchain Queries',        'command': 'blockchain get query', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Queries
     {'button': 'Blockchain Tables',         'command': 'blockchain get table', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Tables
+    {'button': 'Tables List',               'command': "blockchain get table bring ['table']['dbms'] ':' ['table']['name'] separator = '\\n'", 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Tables
+    {'button': 'Cluster Table',             'command': "blockchain get cluster bring ['cluster']['name'] ':' ['cluster']['table'] separator = '\\n'", 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Tables
 
     {'button': 'QUERY Count',
      'command': 'sql [DBMS] SELECT count(*) from [TABLE]', 'type': 'GET',
