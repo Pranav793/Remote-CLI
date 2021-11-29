@@ -229,7 +229,10 @@ def print_network_reply(request, query_result, data):
     select_info["commands_groups"] = COMMANDS_GROUPS
 
     if not data:
-        print_info = None
+        if query_result:
+            print_info = [("text",'{"reply" : "Empty data set"}')]
+        else:
+            print_info = None
     elif data.startswith("Failed to"):
         print_info = [("text", data)]  # Print the error msg as a string
     elif query_result and data[:8] != "{\"Query\"":
