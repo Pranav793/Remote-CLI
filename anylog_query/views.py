@@ -234,7 +234,7 @@ def print_network_reply(request, query_result, data):
         print_info = [("text", data)]  # Print the error msg as a string
     elif query_result and data[:8] != "{\"Query\"":
         print_info = [("text", data)]  # Print the error msg as a string
-    if is_complex_struct(data):
+    elif is_complex_struct(data):
         print_info = [("text", data)]   # Keep as is
     else:
         policy, table_info, print_info, error_msg = format_message_reply(data)
