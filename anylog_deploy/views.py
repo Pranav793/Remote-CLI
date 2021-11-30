@@ -140,7 +140,7 @@ class FormViews:
 
         else:
             deployment_configs = forms.DeployAnyLog()
-            if messages is not None:
+            if messages is not None and messages != [None]:
                 return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': messages})
             else:
                 return render(request, 'deploy_anylog.html', {'form': deployment_configs})

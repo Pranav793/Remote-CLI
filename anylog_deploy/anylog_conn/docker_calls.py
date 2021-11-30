@@ -220,8 +220,6 @@ class DeployAnyLog:
                 img = self.__update_image(image_name=image)
                 if not isinstance(img, docker.models.images.Image):
                     status = False
-            if status is False:
-                return status
 
         volumes = {}
         if timezone == 'local':
