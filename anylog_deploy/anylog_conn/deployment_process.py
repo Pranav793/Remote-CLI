@@ -30,6 +30,7 @@ def django_main(config_file:str, timezone:str='utc', docker_password:str=None, u
 
     if len(deploy_anylog.error_message) > 0:
         errors.append(deploy_anylog.error_message[0])
+        print(errors) 
         return False, errors
 
     config_file = os.path.expandvars(os.path.expanduser(config_file))
@@ -42,7 +43,7 @@ def django_main(config_file:str, timezone:str='utc', docker_password:str=None, u
             for error in deploy_anylog.error_message:
                 errors.append(error)
             deploy_anylog.error_message = []
-    print(status)
+
     if grafana is True:
         if not deploy_anylog.deploy_grafana_container():
             for error in deploy_anylog.error_message:
@@ -51,6 +52,7 @@ def django_main(config_file:str, timezone:str='utc', docker_password:str=None, u
     if status is True:
         status = deploy_anylog.deploy_anylog_container(docker_password=docker_password, timezone=timezone,
                                                        environment_variables=env_params, update_anylog=update_anylog)
+        print(status) 
         if status is False:
             for error in deploy_anylog.error_message:
                 errors.append(error)
