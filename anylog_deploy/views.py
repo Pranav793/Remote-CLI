@@ -88,17 +88,18 @@ class FormViews:
         # Write env params to file or
         status = True
         output = None
-        message = None
+        messages = []
         env_params = {}
         timezone='utc' 
         if self.config_file is None:
             self.config_file = os.path.join(CONFIG_FILE_PATH, '%s.ini' % self.env_params['general']['node_name'])
             message = io_config.write_configs(config_data=self.env_params, config_file=self.config_file)
+            messages.append(message) 
 
         if os.path.isfile(self.config_file):
             env_params = io_config.read_configs(config_file=self.config_file)
         else:
-            message = 'Failed to location %s' % self.config_file
+            messages.append('Failed to location %s' % self.config_file)
 
         if request.method == 'POST':
             deployment_configs = forms.DeployAnyLog(request.POST)
@@ -112,17 +113,20 @@ class FormViews:
                 if request.POST.get('update_anylog') is not None:
                     update_anylog = True
                 if request.POST.get('psql') is not None:
+                    if 'DB_USER' not in env_params:
+                        messages.append("No database credentials, setting credentials to 'anylog@127.0.0.1:demo'")
                     psql = True
                 if request.POST.get('grafana'):
                     grafana = True
 
             if env_params['NODE_TYPE'] not in ['none', 'rest', 'master', 'operator',
                                                 'publisher', 'query', 'single-node']:
-                error_messages = 'Invalid node type: %s' % env_params['NODE_TYPE']
+                messages.append('Invalid node type: %s' % env_params['NODE_TYPE'])
             else:
                 status, error_messages = anylog_deployment.django_main(config_file=self.config_file,
                                                                docker_password=docker_password, update_anylog=update_anylog,
                                                                psql=psql, grafana=grafana)
+                messages.append(error_messages) 
 
             message = 'Successfully deployed AnyLog!' 
             if status is False and error_messages == []: 
@@ -131,12 +135,13 @@ class FormViews:
                 message = error_messages
             elif isinstance(error_messages, list) and len(error_messages) > 0: 
                 message = error_messages 
-            return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': message})
+            messages.append(message)
+            return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': messages})
 
         else:
             deployment_configs = forms.DeployAnyLog()
-            if message is not None:
-                return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': message})
+            if messages is not None:
+                return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': messages})
             else:
                 return render(request, 'deploy_anylog.html', {'form': deployment_configs})
 

@@ -38,6 +38,8 @@ def django_main(config_file:str, timezone:str='utc', docker_password:str=None, u
         env_params = read_configs(config_file=config_file)
 
     if psql is True:
+        if 'DB_USER' not in env_params: 
+            env_params['DB_USER'] = 'anylog@127.0.0.1:demo' 
         status = deploy_anylog.deploy_postgres_container(conn_info=env_params['DB_USER'])
         if status is False:
             for error in deploy_anylog.error_message:
