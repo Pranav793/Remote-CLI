@@ -31,6 +31,7 @@ ANYLOG_COMMANDS = [
     {'button': 'Get MSG Clients',   'command': 'get msg clients', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-msg-clients'},                     # get msg clients
     {'button': 'Get Operator',      'command': 'get operator', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-operator'},                      # Get Operator
     {'button': 'REST Server Info',  'command': 'get rest server info', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#rest-server-configuration'},
+    {'button': 'Data Nodes', 'command': 'get data nodes', 'type': 'GET', 'group' : 'Southbound', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-data-commands"},
 
 
     {'button': 'Queries Status',  'command': 'query status all', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/profiling%20and%20monitoring%20queries.md#command-options-for-profiling-and-monitoring-queries'},                 # Get Query Status
@@ -67,6 +68,10 @@ ANYLOG_COMMANDS = [
 
     {'button': 'Help Get', 'command': 'help get', 'type': 'GET', 'group' : 'Other', 'help_url' : None},
     {'button': 'Help Blockchain', 'command': 'help blockchain', 'type': 'GET', 'group' : 'Other', 'help_url' : None},
+    {'button': 'Platform Info', 'command': 'get platform info', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
+    {'button': 'Memory Info', 'command': 'get memory info', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
+    {'button': 'CPU Info', 'command': 'get cpu info', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
+    {'button': 'Disk Info', 'command': 'get disk usage .', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
 ]
 
 COMMANDS_GROUPS = [
