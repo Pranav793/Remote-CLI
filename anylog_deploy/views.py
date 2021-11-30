@@ -60,7 +60,10 @@ class FormViews:
             if file_config.is_valid():
                 preset_config_file = request.POST.get('preset_config_file')
                 external_config_file = request.POST.get('external_config_file')
-                if preset_config_file != '':
+                if preset_config_file == external_config_file == '':
+                    file_config = forms.SelectConfig()
+                    return render(request, "config_file.html", {'form': file_config})
+                elif preset_config_file != '':
                     full_path = os.path.expandvars(os.path.expanduser(preset_config_file))
                 elif external_config_file != '':
                     full_path = os.path.expanduser(os.path.expanduser(external_config_file))
@@ -112,7 +115,7 @@ class FormViews:
                     psql = True
                 if request.POST.get('grafana'):
                     grafana = True
-            print(env_params) 
+
             if env_params['NODE_TYPE'] not in ['none', 'rest', 'master', 'operator',
                                                 'publisher', 'query', 'single-node']:
                 error_messages = 'Invalid node type: %s' % env_params['NODE_TYPE']
