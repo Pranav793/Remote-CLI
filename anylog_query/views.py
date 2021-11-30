@@ -22,24 +22,27 @@ ANYLOG_COMMANDS = [
     {'button': 'Query Log',         'command': 'get query log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-query-log' },   # Get Error Log
     {'button': 'Reset Error Log', 'command': 'reset error log', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#reset-the-log-data' },  # Set REST Log Off
     {'button': 'Reset Streaming Log', 'command': 'reset streaming log', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#reset-the-log-data' },  # Reset REST Log Off
-    {'button': 'Streaming Log off', 'command': 'set rest log off', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-streaming-log' },  # Set REST Log Off
     {'button': 'Streaming Log on', 'command': 'set rest log on', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-streaming-log' },  # Set REST Log On
+    {'button': 'Streaming Log off', 'command': 'set rest log off', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-streaming-log' },  # Set REST Log Off
 
-    {'button': 'Get REST',          'command': 'get rest', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                          # Get REST
-    {'button': 'Get REST log',      'command': 'get rest log', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                          # GET REST log
-    {'button': 'Get Streaming',     'command': 'get streaming format = json', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                     # Get Streaming
-    {'button': 'Get MSG Clients',   'command': 'get msg clients', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                     # get msg clients
-    {'button': 'Get Operator',      'command': 'get operator format = json', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                      # Get Operator
+    {'button': 'Get REST calls',    'command': 'get rest calls', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-rest-calls'},                          # Get REST
+    {'button': 'Get Streaming',     'command': 'get streaming format = json', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-streaming'},                     # Get Streaming
+    {'button': 'Get MSG Clients',   'command': 'get msg clients', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-msg-clients'},                     # get msg clients
+    {'button': 'Get Operator',      'command': 'get operator', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-operator'},                      # Get Operator
+    {'button': 'REST Server Info',  'command': 'get rest server info', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#rest-server-configuration'},
 
-    {'button': 'Get Query Status',  'command': 'query status all', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                 # Get Query Status
-    {'button': 'Get Last Query Status',     'command': 'query status', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                     # Get Last Query Status
-    {'button': 'Get Rows Count',            'command': 'get rows count', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'},                   # Get Rows Count
-    {'button': 'Get Rows Count by Table',   'command': 'get rows count where group=table', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/anylog%20docker%20install.md'}, # Get Rows Count by Table
 
-    {'button': 'Blockchain Operators',      'command': 'blockchain get operator', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/anylog%20docker%20install.md'},          # Blockchain Operators
-    {'button': 'Blockchain Publishers',     'command': 'blockchain get publisher', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/anylog%20docker%20install.md'},         # Blockchain Publishers
-    {'button': 'Blockchain Queries',        'command': 'blockchain get query', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/anylog%20docker%20install.md'},             # Blockchain Queries
-    {'button': 'Blockchain Tables',         'command': 'blockchain get table', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/anylog%20docker%20install.md'},             # Blockchain Tables
+    {'button': 'Queries Status',  'command': 'query status all', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/profiling%20and%20monitoring%20queries.md#command-options-for-profiling-and-monitoring-queries'},                 # Get Query Status
+    {'button': 'Get Last Query Status',     'command': 'query status', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/profiling%20and%20monitoring%20queries.md#command-options-for-profiling-and-monitoring-queries'},                     # Get Last Query Status
+    {'button': 'Get Rows Count',            'command': 'get rows count', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/monitoring%20nodes.md#monitoring-data-commands'},                   # Get Rows Count
+    {'button': 'Get Rows Count by Table',   'command': 'get rows count where group=table', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/monitoring%20nodes.md#monitoring-data-commands'}, # Get Rows Count by Table
+
+    {'button': 'Blockchain Operators',      'command': 'blockchain get operator', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},          # Blockchain Operators
+    {'button': 'Blockchain Publishers',     'command': 'blockchain get publisher', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},         # Blockchain Publishers
+    {'button': 'Blockchain Queries',        'command': 'blockchain get query', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Queries
+    {'button': 'Blockchain Tables',         'command': 'blockchain get table', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Tables
+    {'button': 'Tables List',               'command': "blockchain get table bring ['table']['dbms'] ':' ['table']['name'] separator = '\\n'", 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Tables
+    {'button': 'Cluster Table',             'command': "blockchain get cluster bring ['cluster']['name'] ':' ['cluster']['table'] separator = '\\n'", 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Tables
 
     {'button': 'QUERY Count',
      'command': 'sql [DBMS] SELECT count(*) from [TABLE]', 'type': 'GET',
@@ -192,6 +195,7 @@ def process_anylog(request):
     network = post_data.get('network') == "on"
     rest_call = post_data.get('rest_call')
 
+    destination =  post_data.get('destination')
 
     if command:
         authentication = ()
@@ -201,7 +205,7 @@ def process_anylog(request):
         if rest_call == "post":
             output = anylog_conn.post_cmd(conn=conn_info, command=command, authentication=authentication)
         else:
-            output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network)
+            output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network, dest=destination)
     else:
         output = "Mising commmand"
 
@@ -225,11 +229,16 @@ def print_network_reply(request, query_result, data):
     select_info["commands_groups"] = COMMANDS_GROUPS
 
     if not data:
-        print_info = None
+        if query_result:
+            print_info = [("text",'{"reply" : "Empty data set"}')]
+        else:
+            print_info = None
     elif data.startswith("Failed to"):
         print_info = [("text", data)]  # Print the error msg as a string
     elif query_result and data[:8] != "{\"Query\"":
         print_info = [("text", data)]  # Print the error msg as a string
+    elif is_complex_struct(data):
+        print_info = [("text", data)]   # Keep as is
     else:
         policy, table_info, print_info, error_msg = format_message_reply(data)
         if policy:
@@ -258,6 +267,17 @@ def print_network_reply(request, query_result, data):
 
     return render(request, 'output_cmd.html', select_info)
 
+
+# -----------------------------------------------------------------------------------
+# Determine if the data is not mapped to a simple table or JSON
+# -----------------------------------------------------------------------------------
+def is_complex_struct( data ):
+    index =  data.find("\r\n\r\n")
+    if index != -1:
+        complex = True
+    else:
+        complex = False
+    return complex
 # -----------------------------------------------------------------------------------
 # add the values of the last form to the select_info
 # -----------------------------------------------------------------------------------
