@@ -92,6 +92,7 @@ class FormViews:
         env_params = {}
         timezone='utc' 
         if self.config_file is None:
+            print(self.env_params)
             self.config_file = os.path.join(CONFIG_FILE_PATH, '%s.ini' % self.env_params['general']['node_name'])
             message = io_config.write_configs(config_data=self.env_params, config_file=self.config_file)
             messages.append(message) 
@@ -126,10 +127,11 @@ class FormViews:
                 status, error_messages = anylog_deployment.django_main(config_file=self.config_file,
                                                                docker_password=docker_password, update_anylog=update_anylog,
                                                                psql=psql, grafana=grafana)
-                messages.append(error_messages) 
+                if error_messages != []:
+                    messages.append(error_messages)
 
             message = 'Successfully deployed AnyLog!' 
-            if status is False and error_messages == []: 
+            if status is False:
                 message = 'Failed to deploy AnyLog' 
             elif isinstance(error_messages, str): 
                 message = error_messages
@@ -200,7 +202,8 @@ class FormViews:
                                                                            db_conn_info['db_pass'])
                 self.env_params['database']['db_port'] = request.POST.get('db_port')
                 self.__update_params(env_params)
-
+                self.config_file = os.path.join(CONFIG_FILE_PATH, '%s.ini' % self.env_params['general']['node_name'])
+                message = io_config.write_configs(config_data=self.env_params, config_file=self.config_file)
                 return HttpResponseRedirect('../deploy-anylog/')
         else:
             db_configs = forms.NoneConfigs()

@@ -50,12 +50,11 @@ def django_main(config_file:str, timezone:str='utc', docker_password:str=None, u
             for error in deploy_anylog.error_message:
                 errors.append(error)
 
-    if status is True:
-        status = deploy_anylog.deploy_anylog_container(docker_password=docker_password, timezone=timezone,
-                                                       environment_variables=env_params, update_anylog=update_anylog)
-        if status is False:
-            for error in deploy_anylog.error_message:
-                errors.append(error)
+    status = deploy_anylog.deploy_anylog_container(docker_password=docker_password, timezone=timezone,
+                                                   environment_variables=env_params, update_anylog=update_anylog)
+    if status is False:
+        for error in deploy_anylog.error_message:
+            errors.append(error)
 
     return status, errors
 

@@ -228,7 +228,7 @@ class DeployAnyLog:
         for volume in volume_paths:
             if self.__validate_volume(volume_name=volume) is None:
                 output = self.__create_volume(volume_name=volume)
-                if isinstance(output, docker.models.containers.Container):
+                if isinstance(output, docker.models.volumes.Volume):
                     volumes[volume] = {'bind': volume_paths[volume], 'mode': 'rw'}
                 else:
                     status = False
@@ -271,7 +271,7 @@ class DeployAnyLog:
         for volume in volume_paths:
             if self.__validate_volume(volume_name=volume) is None:
                 output = self.__create_volume(volume_name=volume)
-                if isinstance(output, docker.models.containers.Container):
+                if isinstance(output, docker.models.volumes.Volume):
                     volumes[volume] = {'bind': volume_paths[volume], 'mode': 'rw'}
                 else:
                     status = False
@@ -314,7 +314,7 @@ class DeployAnyLog:
         for volume in volume_paths:
             if self.__validate_volume(volume_name=volume) is None:
                 output = self.__create_volume(volume_name=volume)
-                if isinstance(output, docker.models.containers.Container):
+                if isinstance(output, docker.models.volumes.Volume):
                     volumes[volume] = {'bind': volume_paths[volume], 'mode': 'rw'}
                 else:
                     status = False
