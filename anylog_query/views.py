@@ -65,10 +65,8 @@ ANYLOG_COMMANDS = [
      'group' : 'Queries',
      'help_url' : 'blob/master/queries.md#queries'},
 
-    {'button': 'Help Get',
-     'command': 'help get',
-     'type': 'GET',
-     'group' : 'Other'},
+    {'button': 'Help Get', 'command': 'help get', 'type': 'GET', 'group' : 'Other', 'help_url' : None},
+    {'button': 'Help Blockchain', 'command': 'help blockchain', 'type': 'GET', 'group' : 'Other', 'help_url' : None},
 ]
 
 COMMANDS_GROUPS = [
@@ -121,7 +119,10 @@ def form_request(request):
             if request.POST.get("help"):
                 # Open the URL for help
                 select_info["help"] = True
-                help_url = "https://github.com/AnyLog-co/documentation/" + cmd_info["help_url"]
+                help_url = "https://github.com/AnyLog-co/documentation/"
+                if "help_url" in cmd_info and cmd_info["help_url"]:
+                    help_url += cmd_info["help_url"]
+
                 webbrowser.open(help_url)
             else:
                 user_cmd = cmd_info["command"]             # Set the command
