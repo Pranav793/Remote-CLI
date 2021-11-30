@@ -15,6 +15,7 @@ ANYLOG_COMMANDS = [
     {'button': 'Node Status',       'command': 'get status', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/monitoring%20nodes.md#the-get-status-command' },                        # Get Node Status
     {'button': 'Get Processes',     'command': 'get processes', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/monitoring%20nodes.md#the-get-processes-command' },
     {'button': 'Get Dictionary',    'command': 'get dictionary', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/monitoring%20nodes.md#the-get-dictionary-command' },
+    {'button': 'Get Timezone',      'command': 'get timezone info', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/anylog%20commands.md#get-command' },
 
     {'button': 'Event Log',         'command': 'get event log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-event-log' },   # Get Event Log
     {'button': 'Error Log',         'command': 'get error log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-error-log' },   # Get Error Log
@@ -142,10 +143,10 @@ def form_request(request):
                     cmd_list = user_cmd.split(' ',3)
                     if len(cmd_list) > 3:
                         if out_format == "table":
-                            user_cmd = user_cmd.replace(cmd_list[2], "format = table %s" % (cmd_list[2]))
+                            user_cmd = user_cmd.replace(cmd_list[2], "format = table and timezone = utc %s" % (cmd_list[2]))
                             select_info["out_format"] = "table"  # Keep selection menue on table
                         else:
-                            user_cmd = user_cmd.replace(cmd_list[2], "format = json and stat = false %s" % (cmd_list[2]))
+                            user_cmd = user_cmd.replace(cmd_list[2], "format = json and stat = false and timezone = utc %s" % (cmd_list[2]))
                             select_info["out_format"] = None        # Keep selection menue on JSON
                 else:
                     select_info["network"] = False
