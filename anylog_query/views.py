@@ -15,6 +15,7 @@ ANYLOG_COMMANDS = [
     {'button': 'Node Status',       'command': 'get status', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/monitoring%20nodes.md#the-get-status-command' },                        # Get Node Status
     {'button': 'Get Processes',     'command': 'get processes', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/monitoring%20nodes.md#the-get-processes-command' },
     {'button': 'Get Dictionary',    'command': 'get dictionary', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/monitoring%20nodes.md#the-get-dictionary-command' },
+    {'button': 'Get Timezone',      'command': 'get timezone info', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/anylog%20commands.md#get-command' },
 
     {'button': 'Event Log',         'command': 'get event log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-event-log' },   # Get Event Log
     {'button': 'Error Log',         'command': 'get error log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-error-log' },   # Get Error Log
@@ -30,6 +31,7 @@ ANYLOG_COMMANDS = [
     {'button': 'Get MSG Clients',   'command': 'get msg clients', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-msg-clients'},                     # get msg clients
     {'button': 'Get Operator',      'command': 'get operator', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-operator'},                      # Get Operator
     {'button': 'REST Server Info',  'command': 'get rest server info', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#rest-server-configuration'},
+    {'button': 'Data Nodes', 'command': 'get data nodes', 'type': 'GET', 'group' : 'Southbound', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-data-commands"},
 
 
     {'button': 'Queries Status',  'command': 'query status all', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/profiling%20and%20monitoring%20queries.md#command-options-for-profiling-and-monitoring-queries'},                 # Get Query Status
@@ -41,8 +43,8 @@ ANYLOG_COMMANDS = [
     {'button': 'Blockchain Publishers',     'command': 'blockchain get publisher', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},         # Blockchain Publishers
     {'button': 'Blockchain Queries',        'command': 'blockchain get query', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Queries
     {'button': 'Blockchain Tables',         'command': 'blockchain get table', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Tables
-    {'button': 'Tables List',               'command': "blockchain get table bring ['table']['dbms'] ':' ['table']['name'] separator = '\\n'", 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Tables
-    {'button': 'Cluster Table',             'command': "blockchain get cluster bring ['cluster']['name'] ':' ['cluster']['table'] separator = '\\n'", 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Tables
+    {'button': 'Tables List',               'command': "blockchain get table bring ['table']['dbms'] : ['table']['name'] separator = '\\n'", 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Tables
+    {'button': 'Cluster Table',             'command': "blockchain get cluster bring ['cluster']['name'] : ['cluster']['table'] separator = '\\n'", 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Tables
 
     {'button': 'QUERY Count',
      'command': 'sql [DBMS] SELECT count(*) from [TABLE]', 'type': 'GET',
@@ -64,10 +66,12 @@ ANYLOG_COMMANDS = [
      'group' : 'Queries',
      'help_url' : 'blob/master/queries.md#queries'},
 
-    {'button': 'Help Get',
-     'command': 'help get',
-     'type': 'GET',
-     'group' : 'Other'},
+    {'button': 'Help Get', 'command': 'help get', 'type': 'GET', 'group' : 'Other', 'help_url' : None},
+    {'button': 'Help Blockchain', 'command': 'help blockchain', 'type': 'GET', 'group' : 'Other', 'help_url' : None},
+    {'button': 'Platform Info', 'command': 'get platform info', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
+    {'button': 'Memory Info', 'command': 'get memory info', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
+    {'button': 'CPU Info', 'command': 'get cpu info', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
+    {'button': 'Disk Info', 'command': 'get disk usage .', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
 ]
 
 COMMANDS_GROUPS = [
@@ -120,7 +124,10 @@ def form_request(request):
             if request.POST.get("help"):
                 # Open the URL for help
                 select_info["help"] = True
-                help_url = "https://github.com/AnyLog-co/documentation/" + cmd_info["help_url"]
+                help_url = "https://github.com/AnyLog-co/documentation/"
+                if "help_url" in cmd_info and cmd_info["help_url"]:
+                    help_url += cmd_info["help_url"]
+
                 webbrowser.open(help_url)
             else:
                 user_cmd = cmd_info["command"]             # Set the command
@@ -142,10 +149,10 @@ def form_request(request):
                     cmd_list = user_cmd.split(' ',3)
                     if len(cmd_list) > 3:
                         if out_format == "table":
-                            user_cmd = user_cmd.replace(cmd_list[2], "format = table %s" % (cmd_list[2]))
+                            user_cmd = user_cmd.replace(cmd_list[2], "format = table and timezone = utc %s" % (cmd_list[2]))
                             select_info["out_format"] = "table"  # Keep selection menue on table
                         else:
-                            user_cmd = user_cmd.replace(cmd_list[2], "format = json and stat = false %s" % (cmd_list[2]))
+                            user_cmd = user_cmd.replace(cmd_list[2], "format = json and stat = false and timezone = utc %s" % (cmd_list[2]))
                             select_info["out_format"] = None        # Keep selection menue on JSON
                 else:
                     select_info["network"] = False
@@ -210,9 +217,6 @@ def process_anylog(request):
         output = "Mising commmand"
 
     return output     # Data returned from AnyLog or an Error Message
-
-
-
 # -----------------------------------------------------------------------------------
 # Print network reply -
 # Option 1 - a tree
