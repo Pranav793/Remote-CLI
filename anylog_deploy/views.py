@@ -230,7 +230,7 @@ class FormViews:
             general_config = forms.GeneralInfo(request.POST)
             if general_config.is_valid():
                 self.env_params['general']['node_name'] = request.POST.get('node_name')
-                self.env_params['general']['comapny_name'] = request.POST.get('company_name')
+                self.env_params['general']['company_name'] = request.POST.get('company_name')
                 if request.POST.get('location') != '':
                     self.env_params['general']['location'] = request.POST.get('location')
 
