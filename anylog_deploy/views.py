@@ -1,14 +1,12 @@
 import os
-import pkgutil
 import re
 
 import anylog_deploy.forms as forms
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-import anylog_deploy.anylog_conn.io_config as io_config
-import anylog_deploy.anylog_conn.deployment_process as anylog_deployment
-
+import anylog_api.io_config as io_config
+import anylog_api.docker_process as docker_process
 CONFIG_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configs')
 
 
@@ -87,30 +85,37 @@ class FormViews:
         """
         # Write env params to file or
         status = True
-        output = None
         messages = []
-        env_params = {}
-        timezone='utc' 
+        docker_password = None
+        update_anylog = False
+        psql = False
+        grafana = False
+        deployment_configs = forms.DeployAnyLog()
+
+        # Create config file if DNE (ie new deployment)
         if self.config_file is None:
-            print(self.env_params)
             self.config_file = os.path.join(CONFIG_FILE_PATH, '%s.ini' % self.env_params['general']['node_name'])
             message = io_config.write_configs(config_data=self.env_params, config_file=self.config_file)
-            messages.append(message) 
+            if message is not None:
+                messages.append(message)
 
+        # Read config file and set to env_params
         if os.path.isfile(self.config_file):
             env_params = io_config.read_configs(config_file=self.config_file)
         else:
             messages.append('Failed to location %s' % self.config_file)
 
-        if request.method == 'POST':
+        if 'NODE_TYPE' not in env_params:
+            messages.append('Missing NODE_TYPE in configurations')
+        elif env_params['NODE_TYPE'] not in ['none', 'rest', 'master', 'operator',
+                                                                         'publisher', 'query', 'single-node']:
+            messages.append('Invalid node type: %s' % env_params['NODE_TYPE'])
+
+        # Extract info from POST
+        if request.method == 'POST' and messages == []:
             deployment_configs = forms.DeployAnyLog(request.POST)
             if deployment_configs.is_valid():
                 docker_password = request.POST.get('password')
-                #timezone = request.POST.get('timezone')
-                update_anylog = False
-                psql = False
-                grafana = False
-
                 if request.POST.get('update_anylog') is not None:
                     update_anylog = True
                 if request.POST.get('psql') is not None:
@@ -119,33 +124,30 @@ class FormViews:
                     psql = True
                 if request.POST.get('grafana'):
                     grafana = True
+            if psql is True:
+                status, errors = docker_process.deploy_postgres(config_file=self.config_file, timezone='utc')
+                if errors is not []:
+                    for error in errors:
+                        messages.append(error)
 
-            if env_params['NODE_TYPE'] not in ['none', 'rest', 'master', 'operator',
-                                                'publisher', 'query', 'single-node']:
-                messages.append('Invalid node type: %s' % env_params['NODE_TYPE'])
-            else:
-                status, error_messages = anylog_deployment.django_main(config_file=self.config_file,
-                                                               docker_password=docker_password, update_anylog=update_anylog,
-                                                               psql=psql, grafana=grafana)
-                if error_messages != []:
-                    messages.append(error_messages)
+            if grafana is True:
+                errors = docker_process.deploy_grafana()
+                if errors is not []:
+                    for error in errors:
+                        messages.append(error)
 
-            message = 'Successfully deployed AnyLog!' 
-            if status is False:
-                message = 'Failed to deploy AnyLog' 
-            elif isinstance(error_messages, str): 
-                message = error_messages
-            elif isinstance(error_messages, list) and len(error_messages) > 0: 
-                message = error_messages 
-            messages.append(message)
-            return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': messages})
+            if status is not False:
+                status, errors = docker_process.deploy_anylog(config_file=self.config_file, docker_password=docker_password,
+                                                              timezone='utc', update_anylog=update_anylog)
+                if errors is not []:
+                    for error in errors:
+                        messages.append(error)
 
-        else:
-            deployment_configs = forms.DeployAnyLog()
-            if messages is not None and messages != [None]:
-                return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': messages})
-            else:
-                return render(request, 'deploy_anylog.html', {'form': deployment_configs})
+        return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': messages})
+        # if messages != []:
+        #     return render(request, 'deploy_anylog.html', {'form': deployment_configs, 'node_reply': messages})
+        # else:
+        #     return render(request, 'deploy_anylog.html', {'form': deployment_configs})
 
     def basic_config(self, request)->HttpResponse:
         """
@@ -234,16 +236,16 @@ class FormViews:
                 if request.POST.get('location') != '':
                     self.env_params['general']['location'] = request.POST.get('location')
 
-                self.env_params['authentication']['authentication'] = 'off'
+                self.env_params['authentication']['authentication'] = 'false'
                 if request.POST.get('authentication') is not None:
-                    self.env_params['authentication']['authentication'] = 'on'
+                    self.env_params['authentication']['authentication'] = 'true'
 
                 self.env_params['authentication']['username'] = request.POST.get('username')
-                if self.env_params['authentication']['authentication'] == 'on' and self.env_params['authentication']['username'] == '':
+                if self.env_params['authentication']['authentication'] == 'true' and self.env_params['authentication']['username'] == '':
                     self.env_params['authentication']['username'] = 'anylog'
 
                 self.env_params['authentication']['password'] = request.POST.get('password')
-                if self.env_params['authentication']['authentication'] == 'on' and self.env_params['authentication']['password'] == '':
+                if self.env_params['authentication']['authentication'] == 'true' and self.env_params['authentication']['password'] == '':
                     self.env_params['authentication']['password'] = 'demo'
 
                 self.env_params['authentication']['auth_type'] = request.POST.get('auth_type')

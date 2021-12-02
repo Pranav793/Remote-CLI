@@ -187,9 +187,8 @@ class DeployAnyLog:
 
         return container
 
-    # Deploy containers
     def deploy_anylog_container(self, docker_password:str, environment_variables:dict={}, timezone:str='utc',
-                                update_anylog:bool=False):
+                                update_anylog:bool=False)->(bool, list):
         """
         Deploy AnyLog container
         :args:
@@ -197,8 +196,18 @@ class DeployAnyLog:
             environment_variables:dict - docker enviornment parms
             timezone:str - whether to use UTC or local
             update_anylog:bool - whether to update AnyLog
+        :params:
+            status:bool
+            errors:list - error message
+            image:str  - image name
+            node_name:str from environment_variables extract NODE_NAME (used for container name)
+            volume_paths:dict - volumes
+        :return:
+            status, errors
         """
+
         status = True
+        errors = []
         image = 'oshadmon/anylog:%s' % environment_variables['BUILD']
         node_name = environment_variables['NODE_NAME']
         volume_paths = {
@@ -220,6 +229,7 @@ class DeployAnyLog:
                 img = self.__update_image(image_name=image)
                 if not isinstance(img, docker.models.images.Image):
                     status = False
+                    errors.append("Failed to locate / download image: '%s'" % image)
 
         volumes = {}
         if timezone == 'local':
@@ -232,16 +242,18 @@ class DeployAnyLog:
                     volumes[volume] = {'bind': volume_paths[volume], 'mode': 'rw'}
                 else:
                     status = False
+                    errors.append("Failed to add volume '%s'" % volume)
             else:
                 volumes[volume] = {'bind': volume_paths[volume], 'mode': 'rw'}
         
-        if self.__validate_container(container_name=node_name) is None:
+        if self.__validate_container(container_name=node_name) is None and status is True:
             output = self.__run_container(image=image, container_name=node_name,
                                           environment=environment_variables, volumes=volumes)
             if not isinstance(output, docker.models.containers.Container):
                 status = False
+                errors.append("Failed to deploy AnyLog container '%s'" % node_name)
 
-        return status
+        return status, errors
 
     def deploy_postgres_container(self, conn_info:str)->bool:
         """
@@ -281,7 +293,7 @@ class DeployAnyLog:
         if self.__validate_container(container_name='postgres-db') is None:
             output = self.__run_container(image='postgres:14.0-alpine', container_name='postgres-db',
                                           environment=environment, volumes=volumes)
-            if isinstance(output, docker.models.containers.Container):
+            if not isinstance(output, docker.models.containers.Container):
                 status = False
 
         return status
