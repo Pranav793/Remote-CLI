@@ -104,7 +104,7 @@ class FormViews:
             env_params = io_config.read_configs(config_file=self.config_file)
         else:
             messages.append('Failed to location %s' % self.config_file)
-
+        
         if 'NODE_TYPE' not in env_params:
             messages.append('Missing NODE_TYPE in configurations')
         elif env_params['NODE_TYPE'] not in ['none', 'rest', 'master', 'operator',

@@ -105,6 +105,10 @@ def validate_config(env_params:dict)->(bool, list):
             errors.append('Missing configuration param: %s' % key)
             status = False
 
+    if 'node_type' in list(config.keys()) and config['node_type'] not in ['master', 'operator', 'publisher', 'query', 'none', 'single-node']:
+        errors.append("Invalid node type '%s'" % config['node_type'])
+        status = False 
+        
     if status is False or config['node_type'] == 'none':
         return status, errors
 
@@ -121,47 +125,4 @@ def validate_config(env_params:dict)->(bool, list):
                 status = False
 
     return status, errors
-
-    # if status is False or config_keys['node']
-    #
-    # for key in ['build', 'node_type', 'node_name', 'company_name', 'master_node', 'anylog_tcp_port', 'anylog_rest_port',
-    #             'db_type', 'db_user', 'db_port']:
-    #     if key not in config:
-    #         status = False
-    #         params.append(key)
-    #
-    # # Operator params
-    # if config['node_type'] == 'operator':
-    #     if 'default_dbms' not in config:
-    #         status = False
-    #         params.append('default_dbms')
-    #     if 'enable_cluster' in config and config['enable_cluster'].lower() == 'true':
-    #         if 'cluster_name' not in config:
-    #             status = False
-    #             params.append('cluster_name')
-    #     if 'enable_parition' in config and config['enable_parition'].lower() == 'true':
-    #         for key in ['partition_column', 'partition_interval']:
-    #             if key not in config:
-    #                 status = False
-    #                 params.append(key)
-    #
-    # # MQTT required params
-    # if config['node_type'] == 'operator' or config['node_type'] == 'publisher':
-    #     if 'enable_mqtt' in config and config['enable_mqtt'].lower() == 'true':
-    #         for key in ['mqtt_conn_info', 'mqtt_port']:
-    #             if key not in config:
-    #                 status = False
-    #                 params.append(key)
-    #
-    # if ',' in config['node_type']:
-    #     for node in config['node_type'].split(','):
-    #         if node not in ['master', 'operator', 'publisher', 'query']:
-    #             print('Invalid node_type: %s' % config['node_type'])
-    #             status = False
-    # elif config['node_type'] not in ['master', 'operator', 'publisher', 'query']:
-    #     print('Invalid node_type: %s' % config['node_type'])
-    #     status = False
-    # if len(params) > 0:
-    #     print('Missing the following params in config: %s' % params)
-
 
