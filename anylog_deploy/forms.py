@@ -15,6 +15,7 @@ BUILDS = (
 NODE_TYPES = (
     ('', ("")),
     ('none', ("Empty")),
+    ('rest', ("REST")),
     ('master', ("Master")),
     ('operator', ("Operator")),
     ('publisher', ("Publisher")),

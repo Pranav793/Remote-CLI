@@ -1,5 +1,6 @@
 import os
 import re
+import time
 
 import anylog_deploy.forms as forms
 from django.http.response import HttpResponse
@@ -129,6 +130,7 @@ class FormViews:
                 if errors is not []:
                     for error in errors:
                         messages.append(error)
+                time.sleep(15)
 
             if grafana is True:
                 errors = docker_process.deploy_grafana()
