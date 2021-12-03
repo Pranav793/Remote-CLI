@@ -291,7 +291,7 @@ class FormViews:
                 self.env_params['networking']['anylog_broker_port'] = anylog_broker_port
 
                 self.__update_params(env_params)
-                if self.env_params['general']['node_type'] in ['operator', 'single-node']:
+                if self.env_params['general']['node_type'] in ['operator', 'single-node', 'rest']:
                     return HttpResponseRedirect('../operator-configs/')
                 else:
                     return HttpResponseRedirect('../db-configs/')
@@ -324,8 +324,8 @@ class FormViews:
 
                 self.__update_params(env_params)
 
-                if self.env_params['general']['node_type'] == 'publisher':
-                    return HttpResponseRedirect('../mqtt-configs/')
+                # if self.env_params['general']['node_type'] == 'publisher':
+                #     return HttpResponseRedirect('../mqtt-configs/')
                 return HttpResponseRedirect('../deploy-anylog/')
         else:
             db_configs = forms.DBConfigs()
@@ -382,7 +382,8 @@ class FormViews:
                 self.__update_params(env_params)
                 if error_msg != '':
                     return render(request, "operator_configs.html", {'form': db_configs, 'node_reply': error_msg})
-                return HttpResponseRedirect('../mqtt-configs/')
+                # return HttpResponseRedirect('../mqtt-configs/')
+                return HttpResponseRedirect('../deploy-anylog/')
             else:
                 return render(request, "operator_configs.html", {'form': db_configs})
         else:
