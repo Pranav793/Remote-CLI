@@ -125,6 +125,8 @@ class FormViews:
                     psql = True
                 if request.POST.get('grafana'):
                     grafana = True
+
+            status = True 
             if psql is True:
                 status, errors = docker_process.deploy_postgres(config_file=self.config_file, timezone='utc')
                 if errors is not []:
@@ -137,8 +139,8 @@ class FormViews:
                 if errors is not []:
                     for error in errors:
                         messages.append(error)
-
-            if status is not False:
+             
+            if status is True:
                 status, errors = docker_process.deploy_anylog(config_file=self.config_file, docker_password=docker_password,
                                                               timezone='utc', update_anylog=update_anylog)
                 if errors is not []:
