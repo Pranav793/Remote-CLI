@@ -20,7 +20,8 @@ NODE_TYPES = (
     ('operator', ("Operator")),
     ('publisher', ("Publisher")),
     ('query', ("Query")),
-    ('single-node', ("single-node"))
+    ('single-node', ("Single Node")),
+    ('single-node-publisher', ("Single Node Publisher"))
 )
 
 NODE_TYPE = None

@@ -10,6 +10,16 @@ import anylog_api.io_config as io_config
 import anylog_api.docker_process as docker_process
 CONFIG_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configs')
 
+NODE_TYPES = [
+    'none',
+    'rest',
+    'master',
+    'operator',
+    'publisher',
+    'query',
+    'single-node',
+    'single-node-publisher'
+]
 
 class FormViews:
     def __init__(self):
@@ -113,7 +123,7 @@ class FormViews:
             env_params = self.env_params
         if 'NODE_TYPE' not in env_params:
             messages.append('Missing NODE_TYPE in configurations')
-        elif env_params['NODE_TYPE'] not in ['none', 'rest', 'master', 'operator', 'publisher', 'query', 'single-node']:
+        elif env_params['NODE_TYPE'] not in NODE_TYPES:
             messages.append('Invalid node type: %s' % env_params['NODE_TYPE'])
 
         # Extract info from POST
