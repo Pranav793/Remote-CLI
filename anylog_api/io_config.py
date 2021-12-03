@@ -97,7 +97,6 @@ def validate_config(env_params:dict)->(bool, list):
     status = True
     errors = []
     config = dict((key.lower(), value) for key, value in env_params.items())
-    print(config)
 
     # Base required params
     for key in ['build', 'node_type', 'node_name']:

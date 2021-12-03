@@ -29,6 +29,7 @@ def deploy_anylog(config_file:str, docker_password:str, timezone:str='utc', upda
 
     if status is True:
         env_params = read_configs(config_file=config_file)
+        print(config_file, env_params) 
         status, error = validate_config(env_params=env_params)
         if status is False:
             for err in error:

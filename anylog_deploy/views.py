@@ -22,19 +22,6 @@ NODE_TYPES = [
 ]
 
 class FormViews:
-    def __init__(self):
-        self.env_params = {
-            'general': {},
-            'authentication': {},
-            'networking': {},
-            'database': {},
-            'cluster': {},
-            'partition': {},
-            'mqtt': {},
-
-        }
-        self.config_file = None
-
     def __update_params(self, env_params:dict):
         """
         Update env params
@@ -63,6 +50,16 @@ class FormViews:
             if config_file == new-file -- goto start asking config question s
             if config_file != new-file and config_file != '' -- deploy based on config
         """
+        self.env_params = {
+            'general': {},
+            'authentication': {},
+            'networking': {},
+            'database': {},
+            'cluster': {},
+            'partition': {},
+            'mqtt': {},
+        }
+        self.config_file = None
         if request.method == 'POST':
             full_path = None
             file_config = forms.SelectConfig(request.POST)
@@ -106,12 +103,11 @@ class FormViews:
         # Create config file if DNE (ie new deployment)
         if self.config_file is None:
             self.config_file = os.path.join(CONFIG_FILE_PATH, '%s.ini' % self.env_params['general']['node_name'])
+            print(self.env_params)
             message = io_config.write_configs(config_data=self.env_params, config_file=self.config_file)
             if message is not None:
                 messages.append(message)
                 print(messages)
-            print(self.config_file, self.env_params) 
-            exit(1) 
 
         # Read config file and set to env_params
         if os.path.isfile(self.config_file):
@@ -121,11 +117,12 @@ class FormViews:
 
         if env_params == {}: 
             env_params = self.env_params
+
         if 'NODE_TYPE' not in env_params:
             messages.append('Missing NODE_TYPE in configurations')
         elif env_params['NODE_TYPE'] not in NODE_TYPES:
             messages.append('Invalid node type: %s' % env_params['NODE_TYPE'])
-
+        
         # Extract info from POST
         if request.method == 'POST' and messages == []:
             deployment_configs = forms.DeployAnyLog(request.POST)
@@ -153,7 +150,7 @@ class FormViews:
                 if errors is not []:
                     for error in errors:
                         messages.append(error)
-             
+
             if status is True:
                 status, errors = docker_process.deploy_anylog(config_file=self.config_file, docker_password=docker_password,
                                                               timezone='utc', update_anylog=update_anylog)
