@@ -100,8 +100,6 @@ class FormViews:
             if message is not None:
                 messages.append(message)
                 print(messages)
-            print(self.config_file, self.env_params) 
-            exit(1) 
 
         # Read config file and set to env_params
         if os.path.isfile(self.config_file):
