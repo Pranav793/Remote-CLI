@@ -92,24 +92,28 @@ class FormViews:
         psql = False
         grafana = False
         deployment_configs = forms.DeployAnyLog()
-
+         
         # Create config file if DNE (ie new deployment)
         if self.config_file is None:
             self.config_file = os.path.join(CONFIG_FILE_PATH, '%s.ini' % self.env_params['general']['node_name'])
             message = io_config.write_configs(config_data=self.env_params, config_file=self.config_file)
             if message is not None:
                 messages.append(message)
+                print(messages)
+            print(self.config_file, self.env_params) 
+            exit(1) 
 
         # Read config file and set to env_params
         if os.path.isfile(self.config_file):
             env_params = io_config.read_configs(config_file=self.config_file)
         else:
             messages.append('Failed to location %s' % self.config_file)
-        
+
+        if env_params == {}: 
+            env_params = self.env_params
         if 'NODE_TYPE' not in env_params:
             messages.append('Missing NODE_TYPE in configurations')
-        elif env_params['NODE_TYPE'] not in ['none', 'rest', 'master', 'operator',
-                                                                         'publisher', 'query', 'single-node']:
+        elif env_params['NODE_TYPE'] not in ['none', 'rest', 'master', 'operator', 'publisher', 'query', 'single-node']:
             messages.append('Invalid node type: %s' % env_params['NODE_TYPE'])
 
         # Extract info from POST
@@ -125,6 +129,8 @@ class FormViews:
                     psql = True
                 if request.POST.get('grafana'):
                     grafana = True
+
+            status = True 
             if psql is True:
                 status, errors = docker_process.deploy_postgres(config_file=self.config_file, timezone='utc')
                 if errors is not []:
@@ -137,8 +143,8 @@ class FormViews:
                 if errors is not []:
                     for error in errors:
                         messages.append(error)
-
-            if status is not False:
+             
+            if status is True:
                 status, errors = docker_process.deploy_anylog(config_file=self.config_file, docker_password=docker_password,
                                                               timezone='utc', update_anylog=update_anylog)
                 if errors is not []:
@@ -288,7 +294,8 @@ class FormViews:
                 self.env_params['networking']['master_node'] = master_node
                 self.env_params['networking']['anylog_tcp_port'] = anylog_tcp_port
                 self.env_params['networking']['anylog_rest_port'] = anylog_rest_port
-                self.env_params['networking']['anylog_broker_port'] = anylog_broker_port
+                if anylog_broker_port != '': 
+                    self.env_params['networking']['anylog_broker_port'] = anylog_broker_port
 
                 self.__update_params(env_params)
                 if self.env_params['general']['node_type'] in ['operator', 'single-node', 'rest']:
