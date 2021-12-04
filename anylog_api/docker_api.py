@@ -1,19 +1,13 @@
-"""
-2. Should change to docker via Python
-    - PyPi - https://pypi.org/project/docker/
-    - GitHub: https://github.com/docker/docker-py
-    - docs: https://docker-py.readthedocs.io/en/stable/client.html
-"""
 try:
     import docker
 except Exception:
     pass
 
 
-class DeployAnyLog:
+class DeployDocker:
     def __init__(self, timezone:str='utc'):
         """
-        Connect to docker client
+        The following class is intended to provide support for deploying docker containers via Python3
         :args:
             docker_client_path:str - path to docker socket
         :params:
@@ -188,7 +182,7 @@ class DeployAnyLog:
         return container
 
     def deploy_anylog_container(self, docker_password:str, environment_variables:dict={}, timezone:str='utc',
-                                update_anylog:bool=False)->(bool, list):
+                                update_anylog:bool=False)->bool:
         """
         Deploy AnyLog container
         :args:
@@ -252,8 +246,11 @@ class DeployAnyLog:
             if not isinstance(output, docker.models.containers.Container):
                 status = False
                 errors.append("Failed to deploy AnyLog container '%s'" % node_name)
+        if errors != []:
+            for error in errors:
+                self.error_message.append(error)
 
-        return status, errors
+        return status
 
     def deploy_postgres_container(self, conn_info:str)->bool:
         """
@@ -340,7 +337,6 @@ class DeployAnyLog:
                 status = False
 
         return status
-
 
 
 
