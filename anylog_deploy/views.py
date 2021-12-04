@@ -98,6 +98,7 @@ class DeploymentViews:
             --> stay w/ message
             --> deployment_front_page.html when pressing "Start Over" button
         """
+        print(self.env_params)
         status = True
         messages = []
         base_configs = forms.BaseInfo()
