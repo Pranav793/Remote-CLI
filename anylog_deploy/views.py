@@ -82,8 +82,6 @@ class DeploymentViews:
         else:
             return HttpResponseRedirect('deploy-anylog/')
 
-
-
     def deploy_anylog(self, request)->HttpResponse:
         """
         Once user either selects a config file or completes config form(s) user select what to deploy & executes
