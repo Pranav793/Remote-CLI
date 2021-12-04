@@ -1,8 +1,8 @@
 import argparse
 import os
 import time
-import io_config
-from docker_api import DeployDocker
+import anylog_api.io_config as io_config
+from anylog_api.docker_api import DeployDocker
 
 
 def deploy_anylog_container(env_params:dict, docker_password:str, timezone:str='utc',
