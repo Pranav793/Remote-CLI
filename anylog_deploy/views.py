@@ -197,6 +197,10 @@ class DeploymentViews:
                 - password
             messages:list - list of error messages
             none_config:forms.NoneConfig - call to form questions related to node of type None
+        :redirect:
+            --> stays if missing NODE_NAME
+            --> goes to deploy-anylog/ when at least NODE_NAME is set
+
         """
         db_info = {
             'db_user': None,
