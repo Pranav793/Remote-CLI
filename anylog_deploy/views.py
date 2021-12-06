@@ -117,6 +117,8 @@ class DeploymentViews:
                 return render(request, 'deploy_anylog.html',
                               {'form': base_configs, 'node_reply': 'Failed to validate one or more params'})
 
+        print(env_params)
+        exit(1)
         # Extract values from forms
         if request.method == 'POST':
             deploy_config = forms.DeployAnyLog(request.POST)
@@ -186,6 +188,10 @@ class DeploymentViews:
     def none_configs(self, request)->HttpResponse:
         """
         Configuration options for an empty node
+            - node_name
+            - database type (optional)
+            - database credentials (optional)
+            - database port (optional)
         :HTML file:
             empty_node_configs.html
         :args:
@@ -224,8 +230,222 @@ class DeploymentViews:
 
         return render(request, 'empty_node_configs.html', {'form': none_config})
 
+    def general_configs(self, request)->HttpResponse:
+        """
+        general configuration information
+            - node_name
+            - enable authentication (optional)
+            - authentication credentials & type (optional)
+        :HTML file:
+            general_configs.html
+        :args:
+            request:django.core.handlers.wsgi.WSGIRequest - type of request against the form
+        :params:
+            general_config:forms.GeneralInfo - call to general info form
+        :redirect:
+            - if POST goto network configs
+            - else stay
+        """
+        general_config = forms.GeneralInfo()
+        if request.method == 'POST':
+            general_config = forms.GeneralInfo(request.POST)
+            if general_config.is_valid():
+                self.env_params['general']['node_name'] = request.POST.get('node_name')
+                self.env_params['general']['company_name'] = request.POST.get('company_name')
+                if request.POST.get('location') != '':
+                    self.env_params['general']['location'] = request.POST.get('location')
+                self.env_params['authentication']['authentication'] = 'false'
+                if request.POST.get('authentication') is not None:
+                    self.env_params['authentication']['authentication'] = 'true'
+                self.env_params['authentication']['username'] = request.POST.get('username')
+                self.env_params['authentication']['password'] = request.POST.get('password')
+                self.env_params['authentication']['auth_type'] = request.POST.get('auth_type')
+                if self.env_params['authentication']['authentication'] == 'true' and self.env_params['authentication']['username']  == '':
+                    self.env_params['authentication']['username'] = 'anylog'
+                if self.env_params['authentication']['authentication'] == 'true' and self.env_params['authentication']['password']  == '':
+                    self.env_params['authentication']['password'] = 'demo'
+                 return HttpResponseRedirect('../network-configs/')
+
+        return render(request, 'general_configs.html', {'form': general_config})
+
+    def network_configs(self, request)->HttpResponse:
+        """
+        network configuration information
+            - External IP (optional)
+            - Local IP (optional)
+            - TCP port
+            - REST port
+            - Broker port (optional)
+            - master_node
+        :HTML file:
+            network_configs.html
+        :args:
+            request:django.core.handlers.wsgi.WSGIRequest - type of request against the form
+        :params:
+            network_config:forms.NetworkingConfigs - call to networking configs
+            messages:list - list of error messages
+        :redirect:
+            - if POST goto network configs
+            - else stay
+        """
+        messages = []
+        network_config = forms.NetworkingConfigs()
+
+        if request.method == 'POST':
+            network_config = forms.NetworkingConfigs(request.POST)
+            if network_config.is_valid():
+                self.env_params['networking']['ip'] = request.POST.get('external_ip')
+                self.env_params['networking']['local_ip'] = request.POST.get('local_ip')
+                anylog_tcp_port = request.POST.get('anylog_tcp_port')
+                anylog_rest_port = request.POST.get('anylog_rest_port')
+                anylog_broker_port = request.POST.get('anylog_broker_port')
+                if anylog_tcp_port == anylog_rest_port or anylog_tcp_port == anylog_broker_port or anylog_rest_port == anylog_broker_port:
+                    messages.appned('No two ports can have the same value')
+                else:
+                    self.env_params['networking']['anylog_tcp_port'] = anylog_tcp_port
+                    self.env_params['networking']['anylog_rest_port'] = anylog_rest_port
+                    self.env_params['networking']['anylog_broker_port'] = anylog_broker_port
+
+                master_node = request.POST.get('master_node')
+                if not bool(re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:[2-9][0-9][4-9][0-9]$', master_node)):
+                    messages.append('Invalid format for master node (Format: IP:PORT)')
+                else:
+                    self.env_params['networking']['master_node'] = master_node
+
+                if messages is not []:
+                    return render(request, "network_configs.html", {'form': network_config, 'node_reply': messages})
+                elif self.env_params['general']['node_type'] in ['rest', 'operator', 'single-node']:
+                    return HttpResponseRedirect()
+                else:
+                    return HttpResponseRedirect()
+
+            return render(request, "network_configs.html", {'form': network_config})
+
+    def database_configs(self, request)->HttpResponse:
+        """
+        Database configuration for nodes that aren't necessarily of type operator
+            - database type
+            - database credentials
+            - databse port
+        :HTML page:
+            db_configs.html
+        :args:
+            request:django.core.handlers.wsgi.WSGIRequest - type of request against the form
+        :params:
+            database_config:forms.DBConfigs - database configuration form call
+        :redirect:
+            - if NODE_TYPE == single-node-publisher || NODE_TYPE == publisher goto mqtt-configs/
+            - if NODE_TYPE != single-node-publisher && NODE_TYPE != publisher goto deploy-anylog/
+            - else stay
+        """
+        database_config = forms.DBConfigs()
+        if request.method == 'POST':
+            database_config = forms.DBConfigs(request.POST)
+            if database_config.is_valid():
+                self.env_params['database']['db_type'] = request.POST.get('db_type')
+                self.env_params['database']['db_user'] = '%s@%s:%s' % (request.POST.get('db_user'),
+                                                                       request.POST.get('db_addr'),
+                                                                       request.POST.get('db_pass'))
+                self.env_params['database']['db_port'] = request.POST.get('db_port')
+                if self.env_params['general']['node_type'] in ['publisher', 'single-node-publisher']:
+                    return HttpResponseRedirect('../deploy-anylog/')
+                return HttpResponseRedirect('../deploy-anylog/')
+
+        return render(request, 'db_configs.html', {'form': database_config})
 
 
+    def operator_database_configs(self, request)->HttpResponse:
+        """
+        (Database) configuration for nodes that can/will run an operator process
+            - database type
+            - database credentials
+            - database port
+            - default database name
+            - enable cluster
+                - cluster name
+            - enable partition
+                - partition column (of type timestamp)
+                - partition interval
+        :HTML page:
+            operator_configs.html
+        :args:
+            request:django.core.handlers.wsgi.WSGIRequest - type of request against the form
+        :params:
+            database_config:forms.DBOperatorConfigs - database configuration form call
+            messages:list - list of error messages
+        :redirect:
+            - if NODE_TYPE == single-node-publisher || NODE_TYPE == publisher goto mqtt-configs/
+            - if NODE_TYPE != single-node-publisher && NODE_TYPE != publisher goto deploy-anylog/
+            - else stay
+        """
+        database_config = forms.DBOperatorConfigs()
+        messages = []
+        if request.method == 'POST':
+            database_config = forms.DBOperatorConfigs(request.POST)
+            if database_config.is_valid():
+                # Databasee configs
+                self.env_params['database']['db_type'] = request.POST.get('db_type')
+                self.env_params['database']['db_user'] = '%s@%s:%s' % (request.POST.get('db_user'),
+                                                                       request.POST.get('db_addr'),
+                                                                       request.POST.get('db_pass'))
+                self.env_params['database']['db_port'] = request.POST.get('db_port')
+                self.env_params['database']['default_dbms'] = request.POST.get('default_dbms').lower().replace('-', '_').replace(' ', '_')
+                if self.env_params['general']['node_type'] in ['operator', 'single-node'] and not request.POST.get('default_dbms'):
+                    messages.append('For node of type %s default database name is required' % self.env_params['general']['node_type'])
+
+                # cluster configs
+                self.env_params['cluster']['enable_cluster'] = 'false'
+                if request.POST.get('enable_cluster') is not None:
+                    self.env_params['cluster']['enable_cluster'] = 'true'
+                self.env_params['cluster']['cluster_name'] = request.POST.get('cluster_name')
+                if self.env_params['cluster']['enable_cluster'] == 'true' and not self.env_params['cluster']['cluster_name']:
+                   messages.append('An enabled cluster must have a cluster name')
+
+                # Partitions
+                self.env_params['partition']['enable_partition'] = 'false'
+                self.env_params['partition']['partition_column'] = request.POST.get('partition_column')
+                self.env_params['partition']['partition_interval'] = request.POST.get('partition_interval')
+                if request.POST.get('enable_partition') is not None:
+                    self.env_params['partition']['enable_partition'] = 'true'
+                if self.env_params['partition']['enable_partition'] == 'true' and not self.env_params['partition']['partition_column']:
+                    messages.append('An enabled cluster must have a partitioned column of type `timestamp`')
+                if self.env_params['partition']['enable_partition'] == 'true' and not self.env_params['partition']['partition_interval']:
+                    messages.append('An enabled cluster must have partitioned intervals')
+                elif self.env_params['partition']['enable_partition'] == 'true':
+                    status = False
+                    for param in ['second', 'minute', 'hour', 'day', 'month']:
+                        if param in  self.env_params['partition']['partition_interval']:
+                            status = True
+                    if status is False:
+                        messages.append('Partition interval contains an invalid period valuee')
+
+                if messages is not []:
+                    return render(request, 'operator_configs.html', {'form': database_config, 'node_reply': messages})
+                else:
+                    return HttpResponseRedirect('../deploy-anylog/')
+
+
+            return render(request, 'operator_configs.html', {'form': database_config})
+
+    # def mqtt_configs(self, request)->HttpResponse:
+    #     """
+    #     MQTT related configuration
+    #     :HTML file:
+    #         mqtt_configs.html
+    #     :args:
+    #         request:django.core.handlers.wsgi.WSGIRequest - type of request against the form
+    #     :params:
+    #         mqtt_config:forms.MqttConfigs - call to MQTT forms
+    #     """
+    #     mqtt_config = forms.MqttConfigs()
+    #
+    #     if request.method == 'POST':
+    #         mqtt_config = forms.MqttConfigs(request.POST)
+    #         if mqtt_config.is_valid():
+    #             self.env_params['mqtt']['mqtt_enable'] = 'false'
+    #             if request.POST.get('mqtt_enable') is not None:
+    #                 self.env_params['mqtt']['mqtt_enable'] = True
+    #             mqtt_broker = request.POST
 
 
 

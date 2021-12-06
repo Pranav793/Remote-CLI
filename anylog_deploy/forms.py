@@ -100,7 +100,7 @@ class NoneConfigs(forms.Form):
     db_type = forms.ChoiceField(label='Database Type', required=False, choices=DATABASES)
     db_user = forms.CharField(label='Database User', required=False)
     db_pass = forms.CharField(label='Database Password', required=False, widget=forms.PasswordInput)
-    db_addr = forms.GenericIPAddressField(label='Database Address', required=False)
+    db_addr = forms.GenericIPAddressField(label='Database Address', required=False, widget=forms.GenericIPAddressField)
     db_port = forms.IntegerField(label='Database Port', required=False)
 
 class DBOperatorConfigs(forms.Form):
@@ -108,7 +108,7 @@ class DBOperatorConfigs(forms.Form):
     db_type = forms.ChoiceField(label='Database Type', required=False, choices=DATABASES)
     db_user = forms.CharField(label='Database User', required=True)
     db_pass = forms.CharField(label='Database Password', required=True, widget=forms.PasswordInput)
-    db_addr = forms.GenericIPAddressField(label='Database Address', required=True)
+    db_addr = forms.GenericIPAddressField(label='Database Address', required=True, widget=forms.GenericIPAddressField)
     db_port = forms.IntegerField(label='Database Port', required=True)
 
     # Operator specific params
