@@ -118,7 +118,6 @@ class DeploymentViews:
                               {'form': base_configs, 'node_reply': 'Failed to validate one or more params'})
 
         print(env_params)
-        exit(1)
         # Extract values from forms
         if request.method == 'POST':
             deploy_config = forms.DeployAnyLog(request.POST)
