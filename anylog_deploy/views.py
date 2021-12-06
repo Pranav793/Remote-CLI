@@ -264,7 +264,7 @@ class DeploymentViews:
                     self.env_params['authentication']['username'] = 'anylog'
                 if self.env_params['authentication']['authentication'] == 'true' and self.env_params['authentication']['password']  == '':
                     self.env_params['authentication']['password'] = 'demo'
-                 return HttpResponseRedirect('../network-configs/')
+                return HttpResponseRedirect('../network-configs/')
 
         return render(request, 'general_configs.html', {'form': general_config})
 
