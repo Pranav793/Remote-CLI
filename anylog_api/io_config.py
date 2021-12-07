@@ -104,7 +104,7 @@ def validate_config(env_params:dict)->(bool, list):
             errors.append('Missing configuration param: %s' % key)
             status = False
 
-    if 'node_type' in list(config.keys()) and config['node_type'] not in ['master', 'operator', 'publisher', 'query', 'none', 'single-node']:
+    if 'node_type' in list(config.keys()) and config['node_type'] not in ['none', 'rest', 'master', 'operator', 'publisher', 'query', 'single-node', 'single-node-publisher']:
         errors.append("Invalid node type '%s'" % config['node_type'])
         status = False 
         
