@@ -427,25 +427,48 @@ class DeploymentViews:
 
             return render(request, 'operator_configs.html', {'form': database_config})
 
-    # def mqtt_configs(self, request)->HttpResponse:
-    #     """
-    #     MQTT related configuration
-    #     :HTML file:
-    #         mqtt_configs.html
-    #     :args:
-    #         request:django.core.handlers.wsgi.WSGIRequest - type of request against the form
-    #     :params:
-    #         mqtt_config:forms.MqttConfigs - call to MQTT forms
-    #     """
-    #     mqtt_config = forms.MqttConfigs()
-    #
-    #     if request.method == 'POST':
-    #         mqtt_config = forms.MqttConfigs(request.POST)
-    #         if mqtt_config.is_valid():
-    #             self.env_params['mqtt']['mqtt_enable'] = 'false'
-    #             if request.POST.get('mqtt_enable') is not None:
-    #                 self.env_params['mqtt']['mqtt_enable'] = True
-    #             mqtt_broker = request.POST
+    def mqtt_configs(self, request)->HttpResponse:
+        """
+        MQTT related configuration
+        :HTML file:
+            mqtt_configs.html
+        :args:
+            request:django.core.handlers.wsgi.WSGIRequest - type of request against the form
+        :params:
+            mqtt_config:forms.MqttConfigs - call to MQTT forms
+        :redirect:
+            --> deploy-anylog
+            --> stay if something is expcected but is missing
+        """
+        mqtt_config = forms.MqttConfigs()
+
+        if request.method == 'POST':
+            mqtt_config = forms.MqttConfigs(request.POST)
+            if mqtt_config.is_valid():
+                self.env_params['mqtt']['mqtt_enable'] = 'false'
+                if request.POST.get('mqtt_enable') is not None:
+                    self.env_params['mqtt']['mqtt_enable'] = True
+
+                # connection information for MQTT
+                self.env_params['mqtt']['broker'] = request.POST.get('mqtt_broker')
+                self.env_params['mqtt']['mqtt_port'] = request.POST.get('mqtt_port')
+                self.env_params['mqtt']['mqtt_user'] = request.POST.get('mqtt_user')
+                self.env_params['mqtt']['mqtt_password'] = request.POST.get('mqtt_pass')
+                self.env_params['mqtt']['mqtt_log'] = 'false'
+                if request.POST.get('mqtt_log') is not None:
+                    self.env_params['mqtt']['mqtt_log'] = 'true'
+
+                # MQTT topic variables
+                self.env_params['mqtt']['mqtt_topic_name'] = request.POST.get('mqtt_topic_name')
+                self.env_params['mqtt']['mqtt_topic_dbms'] = request.POST.get('mqtt_topic_dbms')
+                self.env_params['mqtt']['mqtt_topic_table'] = request.POST.get('mqtt_topic_table')
+                self.env_params['mqtt']['mqtt_column_timestamp'] = request.POST.get('mqtt_column_timestamp')
+                self.env_params['mqtt']['mqtt_column_value_type'] = request.POST.get('mqtt_column_value_type')
+                self.env_params['mqtt']['mqtt_column_value'] = request.POST.get('mqtt_column_value')
+
+                return HttpResponseRedirect('../deploy-anylog/')
+
+            return render(request, 'mqtt_configs.html', {'form': mqtt_config})
 
 
 
