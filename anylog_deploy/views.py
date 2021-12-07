@@ -412,11 +412,11 @@ class DeploymentViews:
                             status = True
                     if status is False:
                         messages.append('Partition interval contains an invalid period valuee')
-
-                if messages is not []:
-                    return render(request, 'operator_configs.html', {'form': database_config, 'node_reply': messages})
-                else:
-                    return HttpResponseRedirect('../deploy-anylog/')
+                  
+                #if messages is not []:
+                #    return render(request, 'operator_configs.html', {'form': database_config, 'node_reply': messages})
+                #else:
+                return HttpResponseRedirect('../deploy-anylog/')
 
 
         return render(request, 'operator_configs.html', {'form': database_config})
