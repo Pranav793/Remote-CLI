@@ -413,10 +413,11 @@ class DeploymentViews:
                     if status is False:
                         messages.append('Partition interval contains an invalid period valuee')
 
-                if messages is not []:
-                    return render(request, 'operator_configs.html', {'form': database_config, 'node_reply': messages})
-                else:
-                    return HttpResponseRedirect('../mqtt-configs/')
+            if len(messages) > 0:
+                print(messages)
+                return render(request, 'operator_configs.html', {'form': database_config, 'node_reply': messages})
+            else:
+                return HttpResponseRedirect('../mqtt-configs/')
 
         return render(request, 'operator_configs.html', {'form': database_config})
 
@@ -434,7 +435,6 @@ class DeploymentViews:
             --> stay if something is expcected but is missing
         """
         mqtt_config = forms.MqttConfigs()
-
         if request.method == 'POST':
             mqtt_config = forms.MqttConfigs(request.POST)
             if mqtt_config.is_valid():
@@ -461,7 +461,7 @@ class DeploymentViews:
 
                 return HttpResponseRedirect('../deploy-anylog/')
 
-            return render(request, 'mqtt_configs.html', {'form': mqtt_config})
+        return render(request, 'mqtt_configs.html', {'form': mqtt_config})
 
 
 
