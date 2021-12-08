@@ -12,6 +12,6 @@ urlpatterns = [
     path('network-configs/', view_options.network_configs, name='network-configs'),
     path('generic-database-configs/', view_options.database_configs, name='generic-database-configs'),
     path('operator-database-configs/', view_options.operator_database_configs, name='operator-database-configs'),
-    # path('mqtt-configs/', view_options.mqtt_configs, name='mqtt-configs/'),
+    path('mqtt-configs/', view_options.mqtt_configs, name='mqtt-configs/'),
     path('full-form/', long_form.full_view, name='full-form'),
 ]

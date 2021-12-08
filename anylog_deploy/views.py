@@ -117,8 +117,6 @@ class DeploymentViews:
                 return render(request, 'deploy_anylog.html',
                               {'form': base_configs, 'node_reply': 'Failed to validate one or more params'})
 
-        print(env_params)
-        exit(1)
         # Extract values from forms
         if request.method == 'POST':
             deploy_config = forms.DeployAnyLog(request.POST)
@@ -348,7 +346,7 @@ class DeploymentViews:
                                                                        request.POST.get('db_pass'))
                 self.env_params['database']['db_port'] = request.POST.get('db_port')
                 if self.env_params['general']['node_type'] in ['publisher', 'single-node-publisher']:
-                    return HttpResponseRedirect('../deploy-anylog/')
+                    return HttpResponseRedirect('../mqtt-configs/')
                 return HttpResponseRedirect('../deploy-anylog/')
 
         return render(request, 'db_configs.html', {'form': database_config})
@@ -414,7 +412,7 @@ class DeploymentViews:
                 elif self.env_params['partition']['enable_partition'] == 'true':
                     status = False
                     for param in ['second', 'minute', 'hour', 'day', 'month']:
-                        if param in  self.env_params['partition']['partition_interval']:
+                        if param in self.env_params['partition']['partition_interval']:
                             status = True
                     if status is False:
                         messages.append('Partition interval contains an invalid period valuee')
@@ -422,7 +420,7 @@ class DeploymentViews:
                 if messages is not []:
                     return render(request, 'operator_configs.html', {'form': database_config, 'node_reply': messages})
                 else:
-                    return HttpResponseRedirect('../deploy-anylog/')
+                    return HttpResponseRedirect('../mqtt-configs/')
 
 
             return render(request, 'operator_configs.html', {'form': database_config})
