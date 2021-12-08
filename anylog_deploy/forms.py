@@ -152,7 +152,7 @@ class DBOperatorConfigs(forms.Form):
     db_type = forms.ChoiceField(label='Database Type', required=False, choices=DATABASES)
     db_user = forms.CharField(label='Database User', required=True)
     db_pass = forms.CharField(label='Database Password', required=True, widget=forms.PasswordInput)
-    db_addr = forms.GenericIPAddressField(label='Database Address', required=True, widget=forms.GenericIPAddressField)
+    db_addr = forms.GenericIPAddressField(label='Database Address', required=True)
     db_port = forms.IntegerField(label='Database Port', required=True)
 
     # Operator specific params

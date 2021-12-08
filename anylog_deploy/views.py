@@ -244,7 +244,6 @@ class DeploymentViews:
             - if POST goto network configs
             - else stay
         """
-        general_config = forms.GeneralInfo()
         if request.method == 'POST':
             general_config = forms.GeneralInfo(request.POST)
             if general_config.is_valid():
@@ -263,8 +262,9 @@ class DeploymentViews:
                 if self.env_params['authentication']['authentication'] == 'true' and self.env_params['authentication']['password']  == '':
                     self.env_params['authentication']['password'] = 'demo'
                 return HttpResponseRedirect('../network-configs/')
-
-        return render(request, 'general_configs.html', {'form': general_config})
+        else:
+            general_config = forms.GeneralInfo()
+            return render(request, 'general_configs.html', {'form': general_config})
 
     def network_configs(self, request)->HttpResponse:
         """
@@ -286,9 +286,7 @@ class DeploymentViews:
             - if POST goto network configs
             - else stay
         """
-        messages = []
         network_config = forms.NetworkingConfigs()
-
         if request.method == 'POST':
             network_config = forms.NetworkingConfigs(request.POST)
             if network_config.is_valid():
@@ -298,7 +296,7 @@ class DeploymentViews:
                 anylog_rest_port = request.POST.get('anylog_rest_port')
                 anylog_broker_port = request.POST.get('anylog_broker_port')
                 if anylog_tcp_port == anylog_rest_port or anylog_tcp_port == anylog_broker_port or anylog_rest_port == anylog_broker_port:
-                    messages.appned('No two ports can have the same value')
+                    return render(request, "network_configs.html", {'form': network_config, 'node_reply': 'No two ports can have the same value'})
                 else:
                     self.env_params['networking']['anylog_tcp_port'] = anylog_tcp_port
                     self.env_params['networking']['anylog_rest_port'] = anylog_rest_port
@@ -306,18 +304,16 @@ class DeploymentViews:
 
                 master_node = request.POST.get('master_node')
                 if not bool(re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:[2-9][0-9][4-9][0-9]$', master_node)):
-                    messages.append('Invalid format for master node (Format: IP:PORT)')
+                    return render(request, "network_configs.html", {'form': network_config, 'node_reply': 'Invalid format for master node (Format: IP:PORT)'})
                 else:
                     self.env_params['networking']['master_node'] = master_node
-
-                if messages is not []:
-                    return render(request, "network_configs.html", {'form': network_config, 'node_reply': messages})
-                elif self.env_params['general']['node_type'] in ['rest', 'operator', 'single-node']:
-                    return HttpResponseRedirect()
+               
+                if self.env_params['general']['node_type'] in ['rest', 'operator', 'single-node']:
+                    return HttpResponseRedirect('../operator-database-configs/')
                 else:
-                    return HttpResponseRedirect()
+                    return HttpResponseRedirect('../generic-database-configs/')
 
-            return render(request, "network_configs.html", {'form': network_config})
+        return render(request, "network_configs.html", {'form': network_config})
 
     def database_configs(self, request)->HttpResponse:
         """
@@ -422,8 +418,7 @@ class DeploymentViews:
                 else:
                     return HttpResponseRedirect('../mqtt-configs/')
 
-
-            return render(request, 'operator_configs.html', {'form': database_config})
+        return render(request, 'operator_configs.html', {'form': database_config})
 
     def mqtt_configs(self, request)->HttpResponse:
         """
