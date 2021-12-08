@@ -1,6 +1,6 @@
 # AnyLog Django Connection
 
-The following is intended to provide support for connecting a third-party application to AnyLog using Django.
+The Django-API package provides an array of Django-based applications to communicate with AnyLog. 
 
 ### Requirements
 * Python3
@@ -14,9 +14,9 @@ cd $HOME/Django-API
 python3 $HOME/Django-API/manage.py ${IP}:${PORT}
 ```
 
+
 ## AnyLog Deployment
-Directory [anylog_deploy](anylog_deploy) provides the ability to deploy a new AnyLog node or an AnyLog node based on 
-existing configs. The code currently supports the following node types: 
+Directory [anylog_deploy](anylog_deploy) provides the ability to utilze 
 
 * Empty -  clean node with nothing on it
 * REST - node with a TCP/REST and authentication configuration, but no other processes running on it
