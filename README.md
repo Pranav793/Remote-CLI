@@ -1,16 +1,31 @@
 # AnyLog Django Connection
 
-The following is intended to provide support for connecting a third-party application to AnyLog using Django.
+The Django-API package provides an array of Django-based applications to communicate with AnyLog. 
 
-## Requirements
+### Requirements
 * Python3
   * [docker](https://pypi.org/project/docker/) - used to deploy AnyLog
   * [django](https://pypi.org/project/Django/)
   * [requests](https://pypi.org/project/requests/)
 
+### Deployment
+```
+cd $HOME/Django-API
+python3 $HOME/Django-API/manage.py ${IP}:${PORT}
+```
+
 
 ## AnyLog Deployment
-Directory [anylog_deploy](anylog_deploy) provides the ability to deploy an AnyLog node. 
+Directory [anylog_deploy](anylog_deploy) provides the ability to utilze 
+
+* Empty -  clean node with nothing on it
+* REST - node with a TCP/REST and authentication configuration, but no other processes running on it
+* Master - notary node that manages and shares the content in blockchain 
+* Operator - node containing data that comes in from device(s) 
+* Publisher - node responsible for distributing the data 
+* Query - node dedicated for querying data, though all nodes can query data
+* Single-Node -  A node containing both _master_ and _operator_ process respectively
+* Single-Node-Publisher -  A node containing both _master_ and _publisher_ process respectively
 
 ### Process
 1. User selects whether to use an existing config file or create a new file
@@ -24,6 +39,7 @@ Directory [anylog_deploy](anylog_deploy) provides the ability to deploy an AnyLo
 4. Repeat step 1 
 5. Based on configuration, ask for information regarding deployment options
 6. Deploy node
+
 
 ## AnyLog Query
 Directory [anylog_query](anylog_query) provides the ability to query against an AnyLog instance.
