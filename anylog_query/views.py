@@ -72,6 +72,7 @@ ANYLOG_COMMANDS = [
     {'button': 'Memory Info', 'command': 'get memory info', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
     {'button': 'CPU Info', 'command': 'get cpu info', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
     {'button': 'Disk Info', 'command': 'get disk usage .', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
+    {'button': 'Timezone Info', 'command': 'get timezone info', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
 ]
 
 COMMANDS_GROUPS = [
@@ -194,15 +195,15 @@ def process_anylog(request):
     post_data = request.POST
 
     # Get the needed info from the form
-    conn_info = post_data.get('connect_info')
-    username = post_data.get('auth_usr')
-    password = post_data.get('auth_pass')
-    command = post_data.get('command')
+    conn_info = post_data.get('connect_info').strip()
+    username = post_data.get('auth_usr').strip()
+    password = post_data.get('auth_pass').strip()
+    command = post_data.get('command').strip()
 
     network = post_data.get('network') == "on"
     rest_call = post_data.get('rest_call')
 
-    destination =  post_data.get('destination')
+    destination =  post_data.get('destination').strip()
 
     if command:
         authentication = ()
