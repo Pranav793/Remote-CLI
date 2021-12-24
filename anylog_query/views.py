@@ -73,6 +73,7 @@ ANYLOG_COMMANDS = [
     {'button': 'CPU Info', 'command': 'get cpu info', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
     {'button': 'Disk Info', 'command': 'get disk usage .', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
     {'button': 'Timezone Info', 'command': 'get timezone info', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
+    {'button': 'Date Time', 'command': 'get datetime pt now()', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/queries.md#get-datetime-command"},
 ]
 
 COMMANDS_GROUPS = [
