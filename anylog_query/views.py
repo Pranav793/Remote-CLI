@@ -145,16 +145,27 @@ def form_request(request):
                     if table_name:
                         user_cmd = user_cmd.replace("[TABLE]", table_name, 1)
 
+                    timezone = request.POST.get('timezone')
+
+
                     # Add output format
                     out_format = request.POST.get('out_format')
                     cmd_list = user_cmd.split(' ',3)
                     if len(cmd_list) > 3:
                         if out_format == "table":
-                            user_cmd = user_cmd.replace(cmd_list[2], "format = table and timezone = utc %s" % (cmd_list[2]))
+                            sql_instruct = "format = table "
                             select_info["out_format"] = "table"  # Keep selection menue on table
                         else:
-                            user_cmd = user_cmd.replace(cmd_list[2], "format = json and stat = false and timezone = utc %s" % (cmd_list[2]))
+                            sql_instruct = "format = json "
                             select_info["out_format"] = None        # Keep selection menue on JSON
+
+                        if timezone:
+                            sql_instruct += "and timezone = %s " % timezone
+                            select_info["timezone"] = timezone
+                        else:
+                            select_info["timezone"] = None
+
+                        user_cmd = user_cmd.replace(cmd_list[2], sql_instruct + cmd_list[2])
                 else:
                     select_info["network"] = False
 

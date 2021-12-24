@@ -125,6 +125,17 @@
         <input type="text" id="table" name="table">
     {% endif %}
 
+       &nbsp; &nbsp;
+
+    <label for="timezone">Timezone:&nbsp;</label>
+
+    {% if timezone %}
+        <input type="text" id="timezone" name="timezone" value="{{timezone}}">
+    {% else %}
+        <input type="text" id="timezone" name="timezone">
+    {% endif %}
+
+
     &nbsp; &nbsp;
 
     <text>Format:</text>
