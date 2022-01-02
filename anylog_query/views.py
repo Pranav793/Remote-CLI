@@ -106,7 +106,7 @@ def form_request(request):
         output = process_anylog(request)
 
         user_cmd = request.POST.get("command")
-        if len(user_cmd) > 5 and user_cmd[:4].lower()[:4:] == "sql ":
+        if len(user_cmd) > 5 and user_cmd.strip()[:4].lower() == "sql ":
             query_result = True
         else:
             query_result = False
