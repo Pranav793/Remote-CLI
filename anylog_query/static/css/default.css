@@ -61,3 +61,12 @@ ul.tree li:last-child:before {
   font-size: 20px;
   padding-left: 20px;
 }
+
+@keyframes blink {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1
+  }
+}
