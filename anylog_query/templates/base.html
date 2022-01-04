@@ -178,7 +178,7 @@
 
     <br/> <br/> <br/>
 
-    <input type ="submit" name = "Send" value="Send" style="font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
+    <input type ="submit" name = "Send" id="Send" value="Send" onclick="spin1();" style="font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
 
      &nbsp; &nbsp;
 
@@ -215,6 +215,15 @@
    {% endif %}
 
   </form>
+
+  <script>
+    	function spin1()
+        {
+            document.getElementById("Send").style.color = "black";
+            document.getElementById("Send").value = "Processing ...";
+        }
+  </script>
+
 
   </body>
 
