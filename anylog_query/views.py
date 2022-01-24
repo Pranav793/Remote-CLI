@@ -12,9 +12,9 @@ from djangoProject.settings import BASE_DIR
 import anylog_query.json_api as json_api
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
-data, error_msg = json_api.load_json(str(BASE_DIR) + "/anylog_query/static/json/commands.json")
+data, error_msg_ = json_api.load_json(str(BASE_DIR) + "/anylog_query/static/json/commands.json")
 
-if not error_msg:
+if not error_msg_:
     ANYLOG_COMMANDS = data["commands"]
 else:
     ANYLOG_COMMANDS = None
@@ -84,6 +84,32 @@ ANYLOG_COMMANDS = [
     {'button': 'Date Time', 'command': 'get datetime pt now()', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/queries.md#get-datetime-command"},
 ]
 '''
+must_have_keys = [      # These keys are tested in each coimmand in the JSON file
+    'button',
+    'command',
+    'type',
+    'group',
+    'help_url'
+]
+
+COMMANDS_GROUPS = ["All"]
+if ANYLOG_COMMANDS:
+    for command in ANYLOG_COMMANDS:
+        for key in must_have_keys:
+            # test all keys exists
+            if not key in command:
+                error_msg_ = "Missing key in JSON file: %s command: %s" % (key, str(command))
+                break
+            if key == "group":
+                value = command[key]
+                if not value in COMMANDS_GROUPS:
+                    COMMANDS_GROUPS.append(command[key])
+        if error_msg_:
+            break
+
+
+
+'''
 COMMANDS_GROUPS = [
     "All",
     "Status",
@@ -94,6 +120,7 @@ COMMANDS_GROUPS = [
     "Blockchain",
     "Other",
 ]
+'''
 
 COMMAND_BY_BUTTON = {}
 for index, entry in enumerate(ANYLOG_COMMANDS):
