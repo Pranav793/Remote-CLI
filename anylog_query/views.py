@@ -225,6 +225,14 @@ def print_network_reply(request, query_result, data):
     elif data.startswith("Failed to"):
         print_info = [("text", data)]  # Print the error msg as a string
     elif query_result and data[:8] != "{\"Query\"":
+        policy, error_msg = json_api.string_to_json(data)
+        if policy:
+            # Show as JSON
+            data_list = []
+            json_api.setup_print_tree(policy, data_list)
+            select_info['text'] = data_list
+            return render(request, 'output_tree.html', select_info)
+
         print_info = [("text", data)]  # Print the error msg as a string
     elif is_complex_struct(data):
         print_info = [("text", data)]   # Keep as is
