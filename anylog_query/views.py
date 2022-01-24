@@ -6,11 +6,19 @@ from django.shortcuts import render
 from django.http import HttpResponse
 import webbrowser
 
+from djangoProject.settings import BASE_DIR
 
 
 import anylog_query.json_api as json_api
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
+data, error_msg = json_api.load_json(str(BASE_DIR) + "/anylog_query/static/json/commands.json")
+
+if not error_msg:
+    ANYLOG_COMMANDS = data["commands"]
+else:
+    ANYLOG_COMMANDS = None
+'''
 ANYLOG_COMMANDS = [
     {'button': 'Node Status',       'command': 'get status', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/monitoring%20nodes.md#the-get-status-command' },                        # Get Node Status
     {'button': 'Get Processes',     'command': 'get processes', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/monitoring%20nodes.md#the-get-processes-command' },
@@ -75,7 +83,7 @@ ANYLOG_COMMANDS = [
     {'button': 'Timezone Info', 'command': 'get timezone info', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
     {'button': 'Date Time', 'command': 'get datetime pt now()', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/queries.md#get-datetime-command"},
 ]
-
+'''
 COMMANDS_GROUPS = [
     "All",
     "Status",

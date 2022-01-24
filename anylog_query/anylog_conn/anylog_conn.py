@@ -38,7 +38,10 @@ def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False, d
         results = other.error_message(conn=conn, command_type='GET', error_type='other', error_msg=error_msg)
     else:
         if int(r.status_code) != 200:
-            results = other.error_message(conn=conn, command_type='GET', error_type='network', error_msg=r.status_code)
+            try:
+                results = r.reason        # results = r.json()
+            except Exception as error_msg:
+                results = other.error_message(conn=conn, command_type='GET', error_type='network', error_msg=r.status_code)
         else:
             try:
                 results = r.text        # results = r.json()

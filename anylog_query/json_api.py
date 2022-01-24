@@ -155,8 +155,21 @@ def set_edge(key, value, print_struct):
     new_entry = TreeEntry(False, False, False, key, value)
     print_struct.append(new_entry)
 
+# ------------------------------------------------------------------------
+# The process to load a JSON file that maintanins the GUI view of the data/metadata
+# ------------------------------------------------------------------------
+def load_json(file_name):
 
-
-
-
-
+    try:
+        f = open(file_name)
+        data = json.load(f)
+    except JSONDecodeError as e:
+        data = None
+        error_msg = "AnyLog: Config File format error - line: {} column: {} message: {}".format(e.lineno, e.colno, e.msg)
+    except:
+        errno, value = sys.exc_info()[:2]
+        error_msg = "AnyLog: Failed to load file: '%s' with error: %s" % (file_name, str(value))
+        data = None
+    else:
+        error_msg = None
+    return [data, error_msg]
