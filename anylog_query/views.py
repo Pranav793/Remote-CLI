@@ -1,6 +1,9 @@
+import sys
+import os
 from django.shortcuts import render
 
 import copy
+
 # Import necessary modules
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -12,78 +15,15 @@ from djangoProject.settings import BASE_DIR
 import anylog_query.json_api as json_api
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
-data, error_msg_ = json_api.load_json(str(BASE_DIR) + "/anylog_query/static/json/commands.json")
+json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "commands.json")
 
-if not error_msg_:
+data, error_msg = json_api.load_json(json_file)
+
+if not error_msg:
     ANYLOG_COMMANDS = data["commands"]
 else:
-    ANYLOG_COMMANDS = None
-'''
-ANYLOG_COMMANDS = [
-    {'button': 'Node Status',       'command': 'get status', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/monitoring%20nodes.md#the-get-status-command' },                        # Get Node Status
-    {'button': 'Get Processes',     'command': 'get processes', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/monitoring%20nodes.md#the-get-processes-command' },
-    {'button': 'Get Dictionary',    'command': 'get dictionary', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/monitoring%20nodes.md#the-get-dictionary-command' },
-    {'button': 'Get Timezone',      'command': 'get timezone info', 'type': 'GET', 'group' : 'Status', 'help_url' : 'blob/master/anylog%20commands.md#get-command' },
+    sys.exit('Failed to load commands file from: %s\r\nError: %s\r\n' % (json_file, error_msg))
 
-    {'button': 'Event Log',         'command': 'get event log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-event-log' },   # Get Event Log
-    {'button': 'Error Log',         'command': 'get error log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-error-log' },   # Get Error Log
-    {'button': 'Streaming Log',     'command': 'get streaming log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-streaming-log' },   # Get Error Log
-    {'button': 'Query Log',         'command': 'get query log where format=json', 'type': 'GET', 'group' : 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-query-log' },   # Get Error Log
-    {'button': 'Reset Error Log', 'command': 'reset error log', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#reset-the-log-data' },  # Set REST Log Off
-    {'button': 'Reset Streaming Log', 'command': 'reset streaming log', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#reset-the-log-data' },  # Reset REST Log Off
-    {'button': 'Streaming Log on', 'command': 'set rest log on', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-streaming-log' },  # Set REST Log On
-    {'button': 'Streaming Log off', 'command': 'set rest log off', 'type': 'POST', 'group': 'Logs', 'help_url' : 'blob/master/logging%20events.md#the-streaming-log' },  # Set REST Log Off
-
-    {'button': 'Get REST calls',    'command': 'get rest calls', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-rest-calls'},                          # Get REST
-    {'button': 'Get Streaming',     'command': 'get streaming format = json', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-streaming'},                     # Get Streaming
-    {'button': 'Get MSG Clients',   'command': 'get msg clients', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-msg-clients'},                     # get msg clients
-    {'button': 'Get Operator',      'command': 'get operator', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#get-operator'},                      # Get Operator
-    {'button': 'REST Server Info',  'command': 'get rest server info', 'type': 'GET', 'group' : 'Southbound', 'help_url' : 'blob/master/monitoring%20calls.md#rest-server-configuration'},
-    {'button': 'Data Nodes', 'command': 'get data nodes', 'type': 'GET', 'group' : 'Southbound', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-data-commands"},
-
-
-    {'button': 'Queries Status',  'command': 'query status all', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/profiling%20and%20monitoring%20queries.md#command-options-for-profiling-and-monitoring-queries'},                 # Get Query Status
-    {'button': 'Get Last Query Status',     'command': 'query status', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/profiling%20and%20monitoring%20queries.md#command-options-for-profiling-and-monitoring-queries'},                     # Get Last Query Status
-    {'button': 'Get Rows Count',            'command': 'get rows count', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/monitoring%20nodes.md#monitoring-data-commands'},                   # Get Rows Count
-    {'button': 'Get Rows Count by Table',   'command': 'get rows count where group=table', 'type': 'GET', 'group' : 'Northbound', 'help_url' : 'blob/master/monitoring%20nodes.md#monitoring-data-commands'}, # Get Rows Count by Table
-
-    {'button': 'Blockchain Operators',      'command': 'blockchain get operator', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},          # Blockchain Operators
-    {'button': 'Blockchain Publishers',     'command': 'blockchain get publisher', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},         # Blockchain Publishers
-    {'button': 'Blockchain Queries',        'command': 'blockchain get query', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Queries
-    {'button': 'Blockchain Tables',         'command': 'blockchain get table', 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Tables
-    {'button': 'Tables List',               'command': "blockchain get table bring ['table']['dbms'] : ['table']['name'] separator = '\\n'", 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Tables
-    {'button': 'Cluster Table',             'command': "blockchain get cluster bring ['cluster']['name'] : ['cluster']['table'] separator = '\\n'", 'type': 'GET', 'group' : 'Blockchain', 'help_url' : 'blob/master/blockchain%20commands.md'},             # Blockchain Tables
-
-    {'button': 'QUERY Count',
-     'command': 'sql [DBMS] SELECT count(*) from [TABLE]', 'type': 'GET',
-     'group' : 'Queries',
-     'help_url' : 'blob/master/queries.md#queries'},  # Set REST Log On
-
-    {'button': 'QUERY Minute',
-     'command': 'sql [DBMS] SELECT timestamp, value FROM [TABLE] WHERE timestamp > NOW() - 1 minute', 'type': 'GET',
-     'group' : 'Queries',
-     'help_url' : 'blob/master/queries.md#queries'},
-
-    {'button': 'QUERY Increments',
-     'command': 'sql [DBMS] select increments(day, 1, timestamp), min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value, count(*) as row_count from [TABLE] limit 10',
-     'type': 'GET', 'group' : 'Queries',
-     'help_url' : 'blob/master/queries.md#queries'},
-
-    {'button': 'QUERY Period',
-     'command': 'sql [DBMS] select  max(timestamp), avg(value) from [TABLE] where period ( minute, 1, NOW(), timestamp)', 'type': 'GET',
-     'group' : 'Queries',
-     'help_url' : 'blob/master/queries.md#queries'},
-
-    {'button': 'Help Get', 'command': 'help get', 'type': 'GET', 'group' : 'Other', 'help_url' : None},
-    {'button': 'Help Blockchain', 'command': 'help blockchain', 'type': 'GET', 'group' : 'Other', 'help_url' : None},
-    {'button': 'Platform Info', 'command': 'get platform info', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
-    {'button': 'Memory Info', 'command': 'get memory info', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
-    {'button': 'CPU Info', 'command': 'get cpu info', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
-    {'button': 'Disk Info', 'command': 'get disk usage .', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
-    {'button': 'Timezone Info', 'command': 'get timezone info', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
-    {'button': 'Date Time', 'command': 'get datetime pt now()', 'type': 'GET', 'group' : 'Other', 'help_url' : "blob/master/queries.md#get-datetime-command"},
-]
-'''
 must_have_keys = [      # These keys are tested in each coimmand in the JSON file
     'button',
     'command',
@@ -98,15 +38,12 @@ if ANYLOG_COMMANDS:
         for key in must_have_keys:
             # test all keys exists
             if not key in command:
-                error_msg_ = "Missing key in JSON file: %s command: %s" % (key, str(command))
-                break
+                if key != "help_url":
+                    sys.exit("Missing key: '%s' in commands.json file at entry: %s" % (key, str(command)))
             if key == "group":
                 value = command[key]
                 if not value in COMMANDS_GROUPS:
                     COMMANDS_GROUPS.append(command[key])
-        if error_msg_:
-            break
-
 
 
 '''
