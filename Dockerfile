@@ -13,4 +13,8 @@ RUN python3.9 -m pip install django
 RUN python3.9 -m pip install requests
 RUN apt-get -y update
 
+WORKDIR $ANYLOG_ROOT_DIR
+COPY . Remote-CLI
+RUN chmod 775 $ANYLOG_ROOT_DIR
+
 ENTRYPOINT python3.9 /app/Remote-CLI/manage.py ${NODE_CONN}
