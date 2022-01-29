@@ -22,5 +22,5 @@ commands include, but not limited to:
 ### Deployment
 ```
 cd $HOME/Django-API
-python3 $HOME/Django-API/manage.py ${IP}:${PORT}
+python3 $HOME/Django-API/manage.py runserver ${IP}:${PORT}
 ```
