@@ -33,7 +33,7 @@ def string_to_json( data_str ):
 
     try:
         #json_struct = data_str.json()
-        json_struct = json.loads(data_str, encoding="utf8")
+        json_struct = json.loads(data_str)
     except ValueError as err:
         error_msg = "Failed to map string to JSON: %s" % str(err)
         json_struct = None
