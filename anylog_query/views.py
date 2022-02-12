@@ -422,7 +422,23 @@ def format_message_reply(msg_text):
 # Load config file from local directory
 # -----------------------------------------------------------------------------------
 def config_load_file(request):
-    pass
+
+    post_data = request.POST
+
+    # Get the needed info from the form
+    conn_info = post_data.get('connect_info').strip()
+    username = post_data.get('auth_usr').strip()
+    password = post_data.get('auth_pass').strip()
+
+    file_name = post_data.get('file_name').strip()
+
+    command = "get script %s" % file_name
+
+    authentication = ()
+    if username != '' and password != '':
+        authentication = (username, password)
+
+    output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=False,  dest="")
 
 
 # -----------------------------------------------------------------------------------
