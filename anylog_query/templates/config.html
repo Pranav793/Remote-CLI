@@ -9,6 +9,19 @@
     <meta charset="UTF-8">
     <title>AnyLog</title>
 
+    <style>
+        input[type=button], input[type=submit], input[type=reset]{
+        background-color: lightslategray;
+        border: none;
+        color: white;
+        padding: 16px 32px;
+        text-decoration: none;
+        margin: 4px 2px;
+        cursor: pointer;
+        }
+    </style>
+
+
   </head>
   <body>
 
@@ -24,13 +37,15 @@
 
   <input type ="submit" name = "Client" id="Client" value="Client" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
 
+  <input type="hidden" id="Form" name="Form" value="Config">
 
     <br/> <br/> <br/>
 
 
   <div>
    <label for="file">AnyLog Config File: </label>
-   <input type="file" id="file" name="file" accept=".al">
+   <input type="file" id="file" name="file" accept=".al"  >
+       <td><button onclick="loadFileAsText()">Load Selected File</button><td>
 
 
    <input type ="submit" name = "Load" id="Load" value="Load" style=""/>
