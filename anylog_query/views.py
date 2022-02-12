@@ -82,11 +82,6 @@ def form_request(request):
             return config_load_file(request)       # Load config file from local directory
         if request.POST.get("Save"):
             return config_save_file()       # Save config file on local directory
-        if request.POST.get("Transfer"):
-            return config_transfer_file()   # Transfer config file to node
-        if request.POST.get("Get"):
-            return config_get_file()   # Get config file from node
-
 
     client = request.POST.get("Client")     # Client has value if we change config to client
 
@@ -436,14 +431,3 @@ def config_load_file(request):
 def config_save_file():
     pass
 
-# -----------------------------------------------------------------------------------
-# Transfer config file to node
-# -----------------------------------------------------------------------------------
-def config_transfer_file():
-    pass
-
-# -----------------------------------------------------------------------------------
-# Get config file from node
-# -----------------------------------------------------------------------------------
-def config_get_file():
-    pass

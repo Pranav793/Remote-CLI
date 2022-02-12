@@ -43,12 +43,40 @@
 
 
   <div>
-   <label for="file">AnyLog Config File: </label>
-   <input type="file" id="file" name="file" accept=".al"  >
-       <td><button onclick="loadFileAsText()">Load Selected File</button><td>
 
 
-   <input type ="submit" name = "Load" id="Load" value="Load" style=""/>
+      <select id="file_name" name="file_name">
+        <option selected value="autoexec"> Autoexec </option>
+        <option value="operator"> Operator </option>
+        <option value="publishe">Publisher</option>
+        <option value="query"> Query </option>
+        <option value="master"> Master </option>
+    </select>
+
+         &nbsp;  &nbsp;
+
+
+     <label for="connect_info">Connect info:</label>
+    {% if connect_info %}
+        <input type="text" id="connect_info" name="connect_info" value="{{connect_info}}">
+    {% else %}
+        <input type="text" id="connect_info" name="connect_info">
+    {% endif %}
+
+    &nbsp; &nbsp;
+
+    <label for="auth_usr">Auth user:</label>
+    <input type="text" id="auth_usr" name="auth_usr">
+
+    &nbsp; &nbsp;
+
+    <label for="auth_pass">Auth password:</label>
+    <input type="text" id="auth_pass" name="auth_pass">
+
+    &nbsp; &nbsp;
+
+
+  <input type ="submit" name = "Load" id="Load" value="Load" style=""/>
 
       &nbsp;  &nbsp;
 
@@ -56,15 +84,11 @@
 
       &nbsp;  &nbsp;
 
-   <label for="new_file">File name:&nbsp;</label>
-   <input type="text" id="new_file" name="new_file"> .al
-
  </div>
 
 
 
   </form>
-
 
 
   </body>
