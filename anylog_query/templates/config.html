@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+  <head>
+    {% load static %}
+    <link rel="icon" href="{% static 'css/anylog-logo.ico' %}">
+    <link rel='stylesheet' href="{% static 'css/default.css' %}">
+
+    <meta charset="UTF-8">
+    <title>AnyLog</title>
+
+  </head>
+  <body>
+
+  <form method="POST" class="post-form" >
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    {% load static %} <img src="{% static "css/anylog-logo.ico" %}" alt="AnyLog Network" onclick="window.location.href='https://anylog.co/'" class="floatleft"/>
+
+    <div class="networktext">
+    <text style="float: left">AnyLog Network Client</text>
+    </div>
+
+  <input type ="submit" name = "Client" id="Client" value="Client" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
+
+
+    <br/> <br/> <br/>
+
+
+  <div>
+   <label for="file">AnyLog Config File: </label>
+   <input type="file" id="file" name="file" accept=".al">
+
+
+   <input type ="submit" name = "Load" id="Load" value="Load" style=""/>
+
+      &nbsp;  &nbsp;
+
+   <input type ="submit" name = "Save" id="Save" value="Save" style=""/>
+
+      &nbsp;  &nbsp;
+
+   <label for="new_file">File name:&nbsp;</label>
+   <input type="text" id="new_file" name="new_file"> .al
+
+ </div>
+
+
+
+  </form>
+
+
+
+  </body>
+
+</html>

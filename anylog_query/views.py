@@ -69,10 +69,18 @@ for index, entry in enumerate(ANYLOG_COMMANDS):
 # ---------------------------------------------------------------------------------------
 def form_request(request):
 
+
+    config = request.POST.get("Config")
+    if config:
+        # go to the config page
+        return render(request, "config.html", None)
+
+    client = request.POST.get("Client")     # Client has value if we change config to client
+
     send = request.POST.get("Send")
 
     # Check the form is submitted or not
-    if request.method == 'POST' and send:
+    if not client and request.method == 'POST' and send:
 
         # Proces the command
         output = process_anylog(request)
@@ -150,7 +158,7 @@ def form_request(request):
                     select_info["rest_call"] = None
 
         else:
-            if request.method == 'POST':
+            if not client and request.method == 'POST':
                 # Send was not selected - keep the older selected values
                 add_form_value(select_info, request)  # add the values of the last form to the select_info
             else:
