@@ -505,14 +505,32 @@ def get_updated_config(operation, update_id, request):
 
     config_list = []
     index = 0
+    row_added = 0
+    insert_below = False
     while True:
+
+        if update_id == str(index):
+            if operation == "delete":
+                index += 1
+                row_added = -1
+                continue
+            if operation == "insert_above":
+                config_list.append({"index": index, "row": ""}) # insert new row
+                row_added = 1
+            if operation == "insert_below":
+                insert_below = True
 
         key = "new_row.%s" % index
         if not key in post_info:
             break
 
         new_row = post_info[key]
-        config_list.append({"index": index, "row": new_row})
+        config_list.append({"index": index + row_added, "row": new_row})
         index = index + 1
+
+        if insert_below:
+            config_list.append({"index": index, "row": ""})  # insert new row
+            row_added = 1
+            insert_below = False
 
     return config_list
