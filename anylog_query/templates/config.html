@@ -47,8 +47,11 @@
 
       <select id="file_name" name="file_name">
 
-        <option selected value="autoexec"> Autoexec </option>
-
+        {% if autoexec %}
+            <option selected value="autoexec"> Autoexec </option>
+        {% else %}
+            <option value="autoexec"> Autoexec </option>
+          {% endif %}
           {% if oeprator %}
             <option selected value="operator"> Operator </option>
           {% else %}

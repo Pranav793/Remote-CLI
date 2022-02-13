@@ -80,10 +80,10 @@ def form_request(request):
     if form == "Config":
         select_info = {}
 
-        file_name = request.post.get('file_name')
+        file_name = request.POST.get('file_name')
         if file_name:
             select_info["file_name"] = file_name.strip()        # will get the name of the config file at the node config dir
-        connect_info = request.post.get('connect_info')
+        connect_info = request.POST.get('connect_info')
         if connect_info:
             select_info["connect_info"] = connect_info.strip()
 
