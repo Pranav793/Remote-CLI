@@ -46,9 +46,15 @@
 
 
       <select id="file_name" name="file_name">
+
         <option selected value="autoexec"> Autoexec </option>
-        <option value="operator"> Operator </option>
-        <option value="publishe">Publisher</option>
+
+          {% if oeprator %}
+            <option selected value="operator"> Operator </option>
+          {% else %}
+            <option value="operator"> Operator </option>
+          {% endif %}
+        <option value="publisher">Publisher</option>
         <option value="query"> Query </option>
         <option value="master"> Master </option>
     </select>

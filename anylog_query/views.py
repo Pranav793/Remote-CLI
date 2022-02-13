@@ -78,10 +78,21 @@ def form_request(request):
         return render(request, "config.html", None)
 
     if form == "Config":
+        select_info = {}
+
+        file_name = request.post.get('file_name')
+        if file_name:
+            select_info["file_name"] = file_name.strip()        # will get the name of the config file at the node config dir
+        connect_info = request.post.get('connect_info')
+        if connect_info:
+            select_info["connect_info"] = connect_info.strip()
+
         if request.POST.get("Load"):
-            return config_load_file(request)       # Load config file from local directory
+            reply = config_load_file(request)       # Load config file from local directory
+            return render(request, "config.html", select_info)
         if request.POST.get("Save"):
-            return config_save_file()       # Save config file on local directory
+            reply = config_save_file()       # Save config file on local directory
+            return render(request, "config.html", select_info)
 
     client = request.POST.get("Client")     # Client has value if we change config to client
 
@@ -439,6 +450,11 @@ def config_load_file(request):
         authentication = (username, password)
 
     output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=False,  dest="")
+    if output:
+        config_list = output.split("\r\n")
+    else:
+        config_list = None
+    return config_list
 
 
 # -----------------------------------------------------------------------------------
