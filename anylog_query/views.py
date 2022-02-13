@@ -504,7 +504,9 @@ def config_save_file(request, file_rows):
     password = post_data.get('auth_pass').strip()
     file_name = post_data.get('file_name').strip()
 
-    file_data = ("set script %s " % (file_name.lower())) + "\r\n".join([str(item["row"]) for item in file_rows])
+    # Note 1 - the \r is used to take the info as one word in the network node
+    # Note 2 - This command is passed in the message body as the header will not take file data with \r\n
+    file_data = ("set script autoexec \r%s" % "\n".join([str(item["row"]) for item in file_rows]))
 
     command = "body"        # The command is passed in the message body
 
