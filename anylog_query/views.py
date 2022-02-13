@@ -99,6 +99,7 @@ def form_request(request):
 
         if request.POST.get("Load"):
             reply = config_load_file(request)       # Load config file from local directory
+            select_info["conf_file"] = reply
             return render(request, "config.html", select_info)
         if request.POST.get("Save"):
             reply = config_save_file()       # Save config file on local directory
@@ -461,7 +462,11 @@ def config_load_file(request):
 
     output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=False,  dest="")
     if output:
-        config_list = output.split("\r\n")
+        file_rows = output.split("\r\n")
+        # organize each roow with id
+        config_list = []
+        for index, row in enumerate(file_rows):
+            config_list.append({"index" : index, "row" : row})
     else:
         config_list = None
     return config_list
