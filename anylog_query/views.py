@@ -101,7 +101,9 @@ def form_request(request):
             select_info["conf_file"] = reply
             return render(request, "config.html", select_info)
         if request.POST.get("Save"):
-            reply = config_save_file()       # Save config file on local directory
+            reply = get_updated_config("none", -1, request)
+            select_info["conf_file"] = reply
+            node_result = config_save_file(request, reply)       # Save config file on local directory
             return render(request, "config.html", select_info)
         update_id = request.POST.get("update")
         if update_id:
@@ -492,10 +494,27 @@ def config_load_file(request):
 # -----------------------------------------------------------------------------------
 # Save config file on local directory
 # -----------------------------------------------------------------------------------
-def config_save_file():
-    pass
+def config_save_file(request, file_rows):
 
+    post_data = request.POST
 
+    # Get the needed info from the form
+    conn_info = post_data.get('connect_info').strip()
+    username = post_data.get('auth_usr').strip()
+    password = post_data.get('auth_pass').strip()
+    file_name = post_data.get('file_name').strip()
+
+    file_data = ("set script %s " % (file_name.lower())) + "\r\n".join([str(item["row"]) for item in file_rows])
+
+    command = "body"        # The command is passed in the message body
+
+    authentication = ()
+    if username != '' and password != '':
+        authentication = (username, password)
+
+    output = anylog_conn.post_cmd(conn=conn_info, command=command, authentication=authentication, msg_data=file_data)
+
+    return output
 # -----------------------------------------------------------------------------------
 # Update the config file based on the user request
 # -----------------------------------------------------------------------------------
