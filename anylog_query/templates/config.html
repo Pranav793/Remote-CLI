@@ -93,9 +93,9 @@
 
         {% for entry in conf_file %}
         <tr>
-                <td><input type="text" id="new_row.{{entry.index}}" name="new_row.{{entry.index}}" size="150" value="{{entry.row}}"></td>
+                <td><input type="text" id="new_row" name="new_row.{{entry.index}}" size="150" value="{{entry.row}}"></td>
 
-                <td><input type ="submit" name = "Update" id="Update" value="Update" style=""/></td>
+                <td><input type ="submit" name = "Update.{{entry.index}}" id="Update" value="Update" style=""/></td>
                 <td><input type ="submit" name = "Delete" id="Delete" value="Delete" style=""/></td>
                 <td><input type ="submit" name = "Insert" id="Insert" value="Insert" style=""/></td>
         </tr>
