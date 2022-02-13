@@ -511,7 +511,8 @@ def get_updated_config(operation, update_id, request):
         if not key in post_info:
             break
 
-        new_row = post_info["key"]
+        new_row = post_info[key]
         config_list.append({"index": index, "row": new_row})
+        index = index + 1
 
     return config_list
