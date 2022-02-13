@@ -105,20 +105,17 @@ def form_request(request):
             select_info["conf_file"] = reply
             node_result = config_save_file(request, reply)       # Save config file on local directory
             return render(request, "config.html", select_info)
-        update_id = request.POST.get("update")
+
+        update_id = request.POST.get("delete")
         if update_id:
-            reply = get_updated_config("update", update_id, request)
+            reply = get_updated_config("delete", update_id, request)
         else:
-            update_id = request.POST.get("delete")
+            update_id = request.POST.get("insert_above")
             if update_id:
-                reply = get_updated_config("delete", update_id, request)
+                reply = get_updated_config("insert_above", update_id, request)
             else:
-                update_id = request.POST.get("insert_above")
-                if update_id:
-                    reply = get_updated_config("insert_above", update_id, request)
-                else:
-                    update_id = request.POST.get("insert_below")
-                    reply = get_updated_config("insert_below", update_id, request)
+                update_id = request.POST.get("insert_below")
+                reply = get_updated_config("insert_below", update_id, request)
         if update_id:
             # Goto the webpage with the update
             select_info["conf_file"] = reply

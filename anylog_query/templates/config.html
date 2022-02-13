@@ -80,25 +80,24 @@
     &nbsp; &nbsp;
 
 
-  <input type ="submit" name = "Load" id="Load" value="Load" style=""/>
+    <input type ="submit" name = "Load" id="Load" value="Load" style=""/>
 
       &nbsp;  &nbsp;
 
-   <input type ="submit" name = "Save" id="Save" value="Save" style="" onclick="return confirm('Replace config file (filename: \'autoexec.al\')')"/>
+    <input type ="submit" name = "Save" id="Save" value="Save" style="" onclick="return confirm('Replace config file (filename: \'autoexec.al\')')"/>
 
       &nbsp;  &nbsp;
+    <br/><br/>
 
-
-     <table border="1" class="table-cmd">
+    <table border="8" frame="HSIDES" rules="NONE">
 
         {% for entry in conf_file %}
         <tr>
                 <td><input type="text" id="new_row" name="new_row.{{entry.index}}" size="150" value="{{entry.row}}"></td>
 
-                <td><button type ="submit" name = "update" id="update" value="{{entry.index}}" >Update</button></td>
                 <td><button type ="submit" name = "delete" id="delete" value="{{entry.index}}" >Delete</button></td>
-                <td><button type ="submit" name = "insert_above" id="insert_above" value="{{entry.index}}" >Insert Above</button></td>
-                <td><button type ="submit" name = "insert_below" id="insert_below" value="{{entry.index}}" >Insert Below</button></td>
+                <td><button type ="submit" name = "insert_above" id="insert_above" value="{{entry.index}}" >Above</button></td>
+                <td><button type ="submit" name = "insert_below" id="insert_below" value="{{entry.index}}" >Below</button></td>
 
         </tr>
         {% endfor %}
