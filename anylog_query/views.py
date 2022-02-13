@@ -63,7 +63,13 @@ COMMAND_BY_BUTTON = {}
 for index, entry in enumerate(ANYLOG_COMMANDS):
     COMMAND_BY_BUTTON[entry['button']] = index     # Organize commands as f(button)
 
-
+conf_file_names = [
+    "Autoexec",
+    "Operator",
+    "Publisher",
+    "Query",
+    "Master"
+]
 # ---------------------------------------------------------------------------------------
 # GET / POST  AnyLog command form
 # ---------------------------------------------------------------------------------------
@@ -75,14 +81,18 @@ def form_request(request):
 
     if config:
         # go to the config page
-        return render(request, "config.html", None)
+        select_info = {}
+        select_info["conf_file_names"] = conf_file_names
+        select_info["file_name"] = "Autoexec"
+        return render(request, "config.html", select_info)
 
     if form == "Config":
         select_info = {}
+        select_info["conf_file_names"] = conf_file_names
 
         file_name = request.POST.get('file_name')
         if file_name:
-            select_info["file_name"] = file_name.strip()        # will get the name of the config file at the node config dir
+            select_info["file_name"] = file_name        # will get the name of the config file at the node config dir
         connect_info = request.POST.get('connect_info')
         if connect_info:
             select_info["connect_info"] = connect_info.strip()

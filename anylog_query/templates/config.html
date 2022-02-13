@@ -43,24 +43,19 @@
 
 
   <div>
+    <select id="file_name" name="file_name">
 
-
-      <select id="file_name" name="file_name">
-
-        {% if autoexec %}
-            <option selected value="autoexec"> Autoexec </option>
+    {% for entry in conf_file_names %}
+         {% if entry == file_name %}
+            <option selected value={{ entry }}>&nbsp;{{ entry }}</option>
         {% else %}
-            <option value="autoexec"> Autoexec </option>
-          {% endif %}
-          {% if oeprator %}
-            <option selected value="operator"> Operator </option>
-          {% else %}
-            <option value="operator"> Operator </option>
-          {% endif %}
-        <option value="publisher">Publisher</option>
-        <option value="query"> Query </option>
-        <option value="master"> Master </option>
-    </select>
+            <option value={{ entry }}>&nbsp;{{ entry }}</option>
+        {% endif %}
+
+    {%  endfor %}
+
+     </select>
+
 
          &nbsp;  &nbsp;
 
