@@ -75,7 +75,6 @@ conf_file_names = [
 # ---------------------------------------------------------------------------------------
 def form_request(request):
 
-
     form = request.POST.get("Form")         # The form used
     config = request.POST.get("Config")
 
@@ -103,6 +102,24 @@ def form_request(request):
             return render(request, "config.html", select_info)
         if request.POST.get("Save"):
             reply = config_save_file()       # Save config file on local directory
+            return render(request, "config.html", select_info)
+        update_id = request.POST.get("update")
+        if update_id:
+            reply = get_updated_config("update", update_id, request)
+        else:
+            update_id = request.POST.get("delete")
+            if update_id:
+                reply = get_updated_config("delete", update_id, request)
+            else:
+                update_id = request.POST.get("insert_above")
+                if update_id:
+                    reply = get_updated_config("insert_above", update_id, request)
+                else:
+                    update_id = request.POST.get("insert_below")
+                    reply = get_updated_config("insert_below", update_id, request)
+        if update_id:
+            # Goto the webpage with the update
+            select_info["conf_file"] = reply
             return render(request, "config.html", select_info)
 
     client = request.POST.get("Client")     # Client has value if we change config to client
@@ -478,3 +495,23 @@ def config_load_file(request):
 def config_save_file():
     pass
 
+
+# -----------------------------------------------------------------------------------
+# Update the config file based on the user request
+# -----------------------------------------------------------------------------------
+def get_updated_config(operation, update_id, request):
+
+    post_info = request.POST
+
+    config_list = []
+    index = 0
+    while True:
+
+        key = "new_row.%s" % index
+        if not key in post_info:
+            break
+
+        new_row = post_info["key"]
+        config_list.append({"index": index, "row": new_row})
+
+    return config_list
