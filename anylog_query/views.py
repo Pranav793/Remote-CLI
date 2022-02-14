@@ -68,7 +68,8 @@ conf_file_names = [
     "Operator",
     "Publisher",
     "Query",
-    "Master"
+    "Master",
+    "Standalone"
 ]
 # ---------------------------------------------------------------------------------------
 # GET / POST  AnyLog command form
