@@ -52,7 +52,7 @@ def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False, d
 
 
 
-def post_cmd(conn:str, command:str, authentication:tuple=())->str:
+def post_cmd(conn:str, command:str, authentication:tuple=(), msg_data:str = None)->str:
     """
     Execute POST command
     :args:
@@ -67,12 +67,12 @@ def post_cmd(conn:str, command:str, authentication:tuple=())->str:
     """
 
     headers = {
-        'command': command,
-        'User-Agent': 'AnyLog/1.23'
+        'User-Agent': 'AnyLog/1.23',
+        "command" : command
     }
 
     try:
-        r = requests.post('http://%s' % conn, headers=headers, auth=authentication)
+        r = requests.post('http://%s' % conn, headers=headers, data=msg_data, auth=authentication)
     except Exception as error_msg:
         output = other.error_message(conn=conn, command_type='POST', error_type='other', error_msg=error_msg)
     else:
