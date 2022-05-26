@@ -315,7 +315,7 @@ def print_network_reply(request, query_result, data):
             return render(request, 'output_table.html', select_info)
 
 
-    select_info['text'] = print_info        # Only TEXT
+    select_info['text'] = [("text", data)]        # Only TEXT
 
     return render(request, 'output_cmd.html', select_info)
 
