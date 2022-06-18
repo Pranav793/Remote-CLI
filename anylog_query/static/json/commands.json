@@ -32,8 +32,8 @@
       {"button": "Blockchain Publishers",     "command": "blockchain get publisher", "type": "GET", "group" : "Blockchain", "help_url" : "blob/master/blockchain%20commands.md"},
       {"button": "Blockchain Queries",        "command": "blockchain get query", "type": "GET", "group" : "Blockchain", "help_url" : "blob/master/blockchain%20commands.md"},
       {"button": "Blockchain Tables",         "command": "blockchain get table", "type": "GET", "group" : "Blockchain", "help_url" : "blob/master/blockchain%20commands.md"},
-      {"button": "Tables List",               "command": "blockchain get table bring [table][dbms] : [table][name] separator = \n", "type": "GET", "group" : "Blockchain", "help_url" : "blob/master/blockchain%20commands.md"},
-      {"button": "Cluster Table",             "command": "blockchain get cluster bring [cluster][name] : [cluster][table] separator =  \n", "type": "GET", "group" : "Blockchain", "help_url" : "blob/master/blockchain%20commands.md"},
+      {"button": "Tables List",               "command": "blockchain get table bring.table.sort [table][dbms] [table][name]", "type": "GET", "group" : "Blockchain", "help_url" : "blob/master/blockchain%20commands.md"},
+      {"button": "Cluster Table",             "command": "blockchain get cluster bring.table.sort [cluster][name] [cluster][table]", "type": "GET", "group" : "Blockchain", "help_url" : "blob/master/blockchain%20commands.md"},
 
       {"button": "QUERY Count",
        "command": "sql [DBMS] SELECT count(*) from [TABLE]", "type": "GET",
