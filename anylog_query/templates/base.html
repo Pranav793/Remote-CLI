@@ -21,11 +21,10 @@
         }
       </style>
 
-
-
-
   </head>
   <body>
+
+
 
   <form method="POST" class="post-form" >
     {% csrf_token %}
@@ -37,11 +36,13 @@
     <text style="float: left">AnyLog Network Client</text>
     </div>
 
+   <input type ="submit" name = "dummy" id="dummy" value="dummy" style="background:transparent; border:none; color:transparent; height:1px; width:1px" />
+
   <input type ="submit" name = "Config" id="Config" value="Config" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
 
   <input type="hidden" id="Form" name="Form" value="Client">
 
-    <br/> <br/> <br/>
+    <br/> <br/>
 
     <select id="rest_call" name="rest_call">
 
@@ -180,14 +181,14 @@
 
     <br/> <br/> <br/>
 
-    <input type ="submit" name = "Send" id="Send" value="Send" onclick="spin1();" style="font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
+    <input type ="submit" name = "Send" id="Send" value="Send"  onclick="spin1();" style="font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey"/>
 
      &nbsp; &nbsp;
 
     <label for="command">Command:</label>
 
     {% if command %}
-        <input type="text" id="command" name="command" value="{{command}}" size="150">
+        <input type="text" id="command" name="command" value="{{command}}" size="150" onkeypress="disableEnter()" >
     {% else %}
         <input type="text" id="command" name="command" size="150">
     {% endif %}
@@ -228,6 +229,7 @@
             document.getElementById("Send").style.animation = "blink 2s infinite alternate";
         }
   </script>
+
 
 
   </body>
