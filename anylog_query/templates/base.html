@@ -21,11 +21,10 @@
         }
       </style>
 
-
-
-
   </head>
   <body>
+
+
 
   <form method="POST" class="post-form" >
     {% csrf_token %}
@@ -37,9 +36,13 @@
     <text style="float: left">AnyLog Network Client</text>
     </div>
 
+   <input type ="submit" name = "dummy" id="dummy" value="dummy" style="background:transparent; border:none; color:transparent; height:1px; width:1px" />
 
+  <input type ="submit" name = "Config" id="Config" value="Config" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
 
-    <br/> <br/> <br/>
+  <input type="hidden" id="Form" name="Form" value="Client">
+
+    <br/> <br/>
 
     <select id="rest_call" name="rest_call">
 
@@ -107,7 +110,7 @@
 
     <br/> <br/> <br/>
 
-    <label for="dbms">DBMS:&nbsp;</label>
+    <label for="dbms">DBMS:</label>
 
     {% if dbms %}
         <input type="text" id="dbms" name="dbms" value="{{dbms}}">
@@ -117,7 +120,7 @@
 
      &nbsp; &nbsp;
 
-    <label for="table">Table:&nbsp;</label>
+    <label for="table">Table:</label>
 
     {% if table %}
         <input type="text" id="table" name="table" value="{{table}}">
@@ -127,12 +130,12 @@
 
        &nbsp; &nbsp;
 
-    <label for="timezone">Timezone:&nbsp;</label>
+    <label for="timezone">Timezone:</label>
 
     {% if timezone %}
-        <input type="text" id="timezone" name="timezone" value="{{timezone}}">
+        <input type="text" id="timezone" name="timezone" value="{{timezone}}" size="4">
     {% else %}
-        <input type="text" id="timezone" name="timezone">
+        <input type="text" id="timezone" name="timezone" size="4">
     {% endif %}
 
 
@@ -158,7 +161,7 @@
 
     &nbsp; &nbsp;
 
-    <label for="network">Network</label>
+    <label for="network">Network:</label>
 
     {% if network %}
         <input type="checkbox" id="network" name="network" checked>
@@ -168,24 +171,24 @@
 
      &nbsp;
 
-     <label for="destination">Storage Nodes:</label>
+     <label for="destination">Nodes:</label>
     {% if destination %}
-        <input type="text" id="destination" name="destination" value="{{destination}}">
+        <input type="text" id="destination" name="destination" value="{{destination}}"  size="44">
     {% else %}
-        <input type="text" id="destination" name="destination">
+        <input type="text" id="destination" name="destination" size="44">
     {% endif %}
 
 
     <br/> <br/> <br/>
 
-    <input type ="submit" name = "Send" id="Send" value="Send" onclick="spin1();" style="font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
+    <input type ="submit" name = "Send" id="Send" value="Send"  onclick="spin1();" style="font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey"/>
 
      &nbsp; &nbsp;
 
-    <label for="command">Command:&nbsp;</label>
+    <label for="command">Command:</label>
 
     {% if command %}
-        <input type="text" id="command" name="command" value="{{command}}" size="150">
+        <input type="text" id="command" name="command" value="{{command}}" size="150" onkeypress="disableEnter()" >
     {% else %}
         <input type="text" id="command" name="command" size="150">
     {% endif %}
@@ -226,6 +229,7 @@
             document.getElementById("Send").style.animation = "blink 2s infinite alternate";
         }
   </script>
+
 
 
   </body>

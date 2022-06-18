@@ -63,16 +63,71 @@ COMMAND_BY_BUTTON = {}
 for index, entry in enumerate(ANYLOG_COMMANDS):
     COMMAND_BY_BUTTON[entry['button']] = index     # Organize commands as f(button)
 
-
+conf_file_names = [
+    "Autoexec",
+    "Operator",
+    "Publisher",
+    "Query",
+    "Master",
+    "Standalone"
+]
 # ---------------------------------------------------------------------------------------
 # GET / POST  AnyLog command form
 # ---------------------------------------------------------------------------------------
 def form_request(request):
 
+    form = request.POST.get("Form")         # The form used
+    config = request.POST.get("Config")
+
+    if config:
+        # go to the config page
+        select_info = {}
+        select_info["conf_file_names"] = conf_file_names
+        select_info["file_name"] = "Autoexec"
+        return render(request, "config.html", select_info)
+
+    if form == "Config":
+        select_info = {}
+        select_info["conf_file_names"] = conf_file_names
+
+        file_name = request.POST.get('file_name')
+        if file_name:
+            select_info["file_name"] = file_name        # will get the name of the config file at the node config dir
+        connect_info = request.POST.get('connect_info')
+        if connect_info:
+            select_info["connect_info"] = connect_info.strip()
+
+        if request.POST.get("Load"):
+            reply = config_load_file(request)       # Load config file from local directory
+            select_info["conf_file"] = reply
+            return render(request, "config.html", select_info)
+        if request.POST.get("Save"):
+            reply = get_updated_config("none", -1, request)
+            select_info["conf_file"] = reply
+            node_result = config_save_file(request, reply)       # Save config file on local directory
+            return render(request, "config.html", select_info)
+
+        update_id = request.POST.get("delete")
+        if update_id:
+            reply = get_updated_config("delete", update_id, request)
+        else:
+            update_id = request.POST.get("insert_above")
+            if update_id:
+                reply = get_updated_config("insert_above", update_id, request)
+            else:
+                update_id = request.POST.get("insert_below")
+                reply = get_updated_config("insert_below", update_id, request)
+        if update_id:
+            # Goto the webpage with the update
+            select_info["conf_file"] = reply
+            return render(request, "config.html", select_info)
+
+    client = request.POST.get("Client")     # Client has value if we change config to client
+
     send = request.POST.get("Send")
 
     # Check the form is submitted or not
-    if request.method == 'POST' and send:
+    if not client and request.method == 'POST' and send:
 
         # Proces the command
         output = process_anylog(request)
@@ -150,7 +205,7 @@ def form_request(request):
                     select_info["rest_call"] = None
 
         else:
-            if request.method == 'POST':
+            if not client and request.method == 'POST':
                 # Send was not selected - keep the older selected values
                 add_form_value(select_info, request)  # add the values of the last form to the select_info
             else:
@@ -260,7 +315,7 @@ def print_network_reply(request, query_result, data):
             return render(request, 'output_table.html', select_info)
 
 
-    select_info['text'] = print_info        # Only TEXT
+    select_info['text'] = [("text", data)]        # Only TEXT
 
     return render(request, 'output_cmd.html', select_info)
 
@@ -402,3 +457,99 @@ def format_message_reply(msg_text):
 
     return [None, None, data_list, None]
 
+# -----------------------------------------------------------------------------------
+# Load config file from local directory
+# -----------------------------------------------------------------------------------
+def config_load_file(request):
+
+    post_data = request.POST
+
+    # Get the needed info from the form
+    conn_info = post_data.get('connect_info').strip()
+    username = post_data.get('auth_usr').strip()
+    password = post_data.get('auth_pass').strip()
+
+    file_name = post_data.get('file_name').strip()
+
+    command = "get script %s" % file_name
+
+    authentication = ()
+    if username != '' and password != '':
+        authentication = (username, password)
+
+    output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=False,  dest="")
+    if output:
+        file_rows = output.split("\r\n")
+        # organize each roow with id
+        config_list = []
+        for index, row in enumerate(file_rows):
+            config_list.append({"index" : index, "row" : row})
+    else:
+        config_list = None
+    return config_list
+
+
+# -----------------------------------------------------------------------------------
+# Save config file on local directory
+# -----------------------------------------------------------------------------------
+def config_save_file(request, file_rows):
+
+    post_data = request.POST
+
+    # Get the needed info from the form
+    conn_info = post_data.get('connect_info').strip()
+    username = post_data.get('auth_usr').strip()
+    password = post_data.get('auth_pass').strip()
+    file_name = post_data.get('file_name').strip()
+
+    # Note 1 - the \r is used to take the info as one word in the network node
+    # Note 2 - This command is passed in the message body as the header will not take file data with \r\n
+    file_data = ("set script autoexec \r%s" % "\n".join([str(item["row"]) for item in file_rows]))
+
+    command = "body"        # The command is passed in the message body
+
+    authentication = ()
+    if username != '' and password != '':
+        authentication = (username, password)
+
+    output = anylog_conn.post_cmd(conn=conn_info, command=command, authentication=authentication, msg_data=file_data)
+
+    return output
+# -----------------------------------------------------------------------------------
+# Update the config file based on the user request
+# -----------------------------------------------------------------------------------
+def get_updated_config(operation, update_id, request):
+
+    post_info = request.POST
+
+    config_list = []
+    index = 0
+    row_added = 0
+    insert_below = False
+    while True:
+
+        if update_id == str(index):
+            if operation == "delete":
+                index += 1
+                row_added = -1
+                continue
+            if operation == "insert_above":
+                config_list.append({"index": index, "row": ""}) # insert new row
+                row_added = 1
+            if operation == "insert_below":
+                insert_below = True
+
+        key = "new_row.%s" % index
+        if not key in post_info:
+            break
+
+        new_row = post_info[key]
+        config_list.append({"index": index + row_added, "row": new_row})
+        index = index + 1
+
+        if insert_below:
+            config_list.append({"index": index, "row": ""})  # insert new row
+            row_added = 1
+            insert_below = False
+
+    return config_list
