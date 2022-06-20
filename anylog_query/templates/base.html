@@ -98,6 +98,28 @@
 
      </select>
 
+   &nbsp;
+   &nbsp;
+
+   <label for="network">Subset:</label>
+
+    {% if subset %}
+        <input type="checkbox" id="subset" name="subset" checked>
+    {% else %}
+        <input type="checkbox" id="subset" name="subset">
+    {% endif %}
+
+   &nbsp;
+   &nbsp;
+
+    <label for="timeout">Timeout:</label>
+    {% if timeout %}
+        <input type="text" id="timeout" name="timeout" value="{{timeout}}"  size="2">
+    {% else %}
+        <input type="text" id="timeout" name="timeout" size="2">
+    {% endif %}
+
+
     &nbsp; &nbsp;
     <label for="help">Help:</label>
 
@@ -173,9 +195,9 @@
 
      <label for="destination">Nodes:</label>
     {% if destination %}
-        <input type="text" id="destination" name="destination" value="{{destination}}"  size="44">
+        <input type="text" id="destination" name="destination" value="{{destination}}"  size="60">
     {% else %}
-        <input type="text" id="destination" name="destination" size="44">
+        <input type="text" id="destination" name="destination" size="60">
     {% endif %}
 
 
@@ -188,9 +210,9 @@
     <label for="command">Command:</label>
 
     {% if command %}
-        <input type="text" id="command" name="command" value="{{command}}" size="150" onkeypress="disableEnter()" >
+        <input type="text" id="command" name="command" value="{{command}}" size="166" onkeypress="disableEnter()" >
     {% else %}
-        <input type="text" id="command" name="command" size="150">
+        <input type="text" id="command" name="command" size="166">
     {% endif %}
 
 

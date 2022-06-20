@@ -174,6 +174,8 @@ def form_request(request):
                         user_cmd = user_cmd.replace("[TABLE]", table_name, 1)
 
                     timezone = request.POST.get('timezone')
+                    timeout = request.POST.get('timeout')   # Change default timeout
+                    subset = request.POST.get('subset')     # Returns reply even if not oll nodes replied
 
 
                     # Add output format
@@ -192,6 +194,11 @@ def form_request(request):
                             select_info["timezone"] = timezone
                         else:
                             select_info["timezone"] = None
+
+                        if timeout:
+                            select_info["timeout"] = timeout
+                        else:
+                            select_info["timeout"] = None
 
                         user_cmd = user_cmd.replace(cmd_list[2], sql_instruct + cmd_list[2])
                 else:
@@ -239,6 +246,9 @@ def process_anylog(request):
     password = post_data.get('auth_pass').strip()
     command = post_data.get('command').strip()
 
+    timeout = request.POST.get('timeout').strip()  # Change default timeout
+    subset = request.POST.get('subset') == "on"  # Returns reply even if not oll nodes replied
+
     network = post_data.get('network') == "on"
     rest_call = post_data.get('rest_call')
 
@@ -252,7 +262,7 @@ def process_anylog(request):
         if rest_call == "post":
             output = anylog_conn.post_cmd(conn=conn_info, command=command, authentication=authentication)
         else:
-            output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network, dest=destination)
+            output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network, dest=destination, timeout=timeout, subset=subset)
     else:
         output = "Mising commmand"
 
@@ -477,7 +487,7 @@ def config_load_file(request):
     if username != '' and password != '':
         authentication = (username, password)
 
-    output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=False,  dest="")
+    output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=False,  dest="", timeout="", subset=False)
     if output:
         file_rows = output.split("\r\n")
         # organize each roow with id
