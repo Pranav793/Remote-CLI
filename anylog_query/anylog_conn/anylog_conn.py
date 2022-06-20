@@ -36,7 +36,7 @@ def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False, d
         headers['timeout'] = timeout        # Change default timeout
 
     if subset:
-        headers['subset'] = subset          # Return info even if not all replied
+        headers['subset'] = str(subset)          # Return info even if not all replied
 
     try:
         r = requests.get('http://%s' % conn, headers=headers, auth=authentication, timeout=30)

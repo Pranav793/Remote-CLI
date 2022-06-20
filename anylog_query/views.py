@@ -174,9 +174,6 @@ def form_request(request):
                         user_cmd = user_cmd.replace("[TABLE]", table_name, 1)
 
                     timezone = request.POST.get('timezone')
-                    timeout = request.POST.get('timeout')   # Change default timeout
-                    subset = request.POST.get('subset')     # Returns reply even if not oll nodes replied
-
 
                     # Add output format
                     out_format = request.POST.get('out_format')
@@ -194,11 +191,6 @@ def form_request(request):
                             select_info["timezone"] = timezone
                         else:
                             select_info["timezone"] = None
-
-                        if timeout:
-                            select_info["timeout"] = timeout
-                        else:
-                            select_info["timeout"] = None
 
                         user_cmd = user_cmd.replace(cmd_list[2], sql_instruct + cmd_list[2])
                 else:
@@ -247,7 +239,7 @@ def process_anylog(request):
     command = post_data.get('command').strip()
 
     timeout = request.POST.get('timeout').strip()  # Change default timeout
-    subset = request.POST.get('subset') == "on"  # Returns reply even if not oll nodes replied
+    subset = request.POST.get('subset') == "on" # Returns reply even if not oll nodes replied
 
     network = post_data.get('network') == "on"
     rest_call = post_data.get('rest_call')
