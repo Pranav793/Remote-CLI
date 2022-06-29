@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+  <head>
+    {% load static %}
+    <link rel="icon" href="{% static 'css/anylog-logo.ico' %}">
+    <link rel='stylesheet' href="{% static 'css/default.css' %}">
+
+    <meta charset="UTF-8">
+    <title>AnyLog</title>
+
+    <style>
+        input[type=button], input[type=submit], input[type=reset]{
+        background-color: lightslategray;
+        border: none;
+        color: white;
+        padding: 16px 32px;
+        text-decoration: none;
+        margin: 4px 2px;
+        cursor: pointer;
+        }
+    </style>
+
+
+  </head>
+  <body>
+
+  <form method="POST" class="post-form" >
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    {% load static %} <img src="{% static "css/anylog-logo.ico" %}" alt="AnyLog Network" onclick="window.location.href='https://anylog.co/'" class="floatleft"/>
+
+    <div class="networktext">
+    <text style="float: left">AnyLog Network Client</text>
+    </div>
+
+  <input type ="submit" name = "Client" id="Client" value="Client" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
+
+  <input type="hidden" id="Form" name="Form" value="Config">
+
+    <br/> <br/> <br/>
+
+
+  <div>
+    <select id="file_name" name="file_name">
+
+    {% for entry in conf_file_names %}
+         {% if entry == file_name %}
+            <option selected value={{ entry }}>&nbsp;{{ entry }}</option>
+        {% else %}
+            <option value={{ entry }}>&nbsp;{{ entry }}</option>
+        {% endif %}
+
+    {%  endfor %}
+
+     </select>
+
+
+         &nbsp;  &nbsp;
+
+
+     <label for="connect_info">Connect info:</label>
+    {% if connect_info %}
+        <input type="text" id="connect_info" name="connect_info" value="{{connect_info}}">
+    {% else %}
+        <input type="text" id="connect_info" name="connect_info">
+    {% endif %}
+
+    &nbsp; &nbsp;
+
+    <label for="auth_usr">Auth user:</label>
+    <input type="text" id="auth_usr" name="auth_usr">
+
+    &nbsp; &nbsp;
+
+    <label for="auth_pass">Auth password:</label>
+    <input type="text" id="auth_pass" name="auth_pass">
+
+    &nbsp; &nbsp;
+
+
+    <input type ="submit" name = "Load" id="Load" value="Load" style=""/>
+
+      &nbsp;  &nbsp;
+
+    <input type ="submit" name = "Save" id="Save" value="Save" style="" onclick="return confirm('Replace config file (filename: \'autoexec.al\')')"/>
+
+      &nbsp;  &nbsp;
+    <br/><br/>
+
+    <table border="8" frame="HSIDES" rules="NONE">
+
+        {% for entry in conf_file %}
+        <tr>
+                <td><input type="text" id="new_row" name="new_row.{{entry.index}}" size="150" value="{{entry.row}}"></td>
+
+                <td><button type ="submit" name = "delete" id="delete" value="{{entry.index}}" >Delete</button></td>
+                <td><button type ="submit" name = "insert_above" id="insert_above" value="{{entry.index}}" >Above</button></td>
+                <td><button type ="submit" name = "insert_below" id="insert_below" value="{{entry.index}}" >Below</button></td>
+
+        </tr>
+        {% endfor %}
+
+    </table>
+
+
+ </div>
+
+
+
+  </form>
+
+
+  </body>
+
+</html>
+

@@ -2,7 +2,7 @@ import requests
 import anylog_query.anylog_conn.other as other
 
 
-def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False, dest:str = "")->str:
+def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False, dest:str = "", timeout:str="", subset:bool=False)->str:
     """
     Execute GET request
     :args:
@@ -32,6 +32,12 @@ def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False, d
         else:
             headers['destination'] = 'network'
 
+    if timeout:
+        headers['timeout'] = timeout        # Change default timeout
+
+    if subset:
+        headers['subset'] = str(subset)          # Return info even if not all replied
+
     try:
         r = requests.get('http://%s' % conn, headers=headers, auth=authentication, timeout=30)
     except Exception as error_msg:
@@ -52,7 +58,7 @@ def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False, d
 
 
 
-def post_cmd(conn:str, command:str, authentication:tuple=())->str:
+def post_cmd(conn:str, command:str, authentication:tuple=(), msg_data:str = None)->str:
     """
     Execute POST command
     :args:
@@ -67,12 +73,12 @@ def post_cmd(conn:str, command:str, authentication:tuple=())->str:
     """
 
     headers = {
-        'command': command,
-        'User-Agent': 'AnyLog/1.23'
+        'User-Agent': 'AnyLog/1.23',
+        "command" : command
     }
 
     try:
-        r = requests.post('http://%s' % conn, headers=headers, auth=authentication)
+        r = requests.post('http://%s' % conn, headers=headers, data=msg_data, auth=authentication)
     except Exception as error_msg:
         output = other.error_message(conn=conn, command_type='POST', error_type='other', error_msg=error_msg)
     else:
