@@ -3,6 +3,8 @@ FROM ubuntu:20.04
 # declare params
 ENV ANYLOG_ROOT_DIR=/app
 ENV DEBIAN_FRONTEND=noninteractive
+ENV CONN_IP=0.0.0.0 
+ENV CLI_PORT=8000 
 
 RUN apt-get -y update
 RUN apt-get -y upgrade
