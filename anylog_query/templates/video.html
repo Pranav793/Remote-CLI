@@ -42,40 +42,21 @@
     <br/> <br/> <br/>
 
 
-  <div>
-    <select id="file_name" name="file_name">
-
-    {% for entry in conf_file_names %}
-         {% if entry == file_name %}
-            <option selected value={{ entry }}>&nbsp;{{ entry }}</option>
-        {% else %}
-            <option value={{ entry }}>&nbsp;{{ entry }}</option>
-        {% endif %}
-
-    {%  endfor %}
-
-     </select>
-
-
+    <div>
 
     <video width="320" height="240" controls>
-      <source src="{% static "video/files.10_seconds.0.mp4" %}" type="video/mp4">
+      <source src="{% static "video/current/files.10_seconds.0.mp4" %}" type="video/mp4">
       Your browser does not support the video tag.
     </video>
 
 
-    &nbsp; &nbsp;
-
-    &nbsp; &nbsp;
+   <br/>
 
 
-    &nbsp; &nbsp;
+   <input type ="submit" name = "Watch" id="Load" value="Load" style=""/>
 
 
-    <input type ="submit" name = "Watch" id="Load" value="Load" style=""/>
-
-
- </div>
+   </div>
 
 
 
