@@ -1,5 +1,6 @@
 import sys
 import os
+from pathlib import Path
 from django.shortcuts import render
 
 import copy
@@ -77,6 +78,24 @@ conf_file_names = [
 def form_request(request):
 
     form = request.POST.get("Form")         # The form used
+
+    video = request.POST.get("Video")
+
+    if video:
+        # go to the config page
+
+
+        file_path = Path("D:/Node/AnyLog-Network/data/video/files.10_seconds.0.mp4")
+
+        select_info = {}
+        select_info["file_path"] = file_path
+        return render(request, "video.html", select_info)
+
+    if form == "Video":
+        #Process the Video file
+        select_info = {}
+        return render(request, "video.html", select_info)
+
     config = request.POST.get("Config")
 
     if config:
