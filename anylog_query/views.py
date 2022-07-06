@@ -84,7 +84,7 @@ def form_request(request):
     client_button = request.POST.get("Client")  # Clientbutton was selected
 
 
-    if video_button or form == "Video":
+    if video_button or (form == "Video" and not client_button and not config_button):
         # Either the Video Button was selected (on a different form) or the Video Page is processed.
         return video_processes(request, video_button)
 
@@ -95,7 +95,7 @@ def form_request(request):
         select_info["file_name"] = "Autoexec"
         return render(request, "config.html", select_info)
 
-    if form == "Config":
+    if form == "Config" and not client_button:
 
         select_info = {}
         select_info["conf_file_names"] = conf_file_names
