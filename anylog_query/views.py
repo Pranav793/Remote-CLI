@@ -79,33 +79,24 @@ def form_request(request):
 
     form = request.POST.get("Form")         # The form used
 
-    video = request.POST.get("Video")
+    video_button = request.POST.get("Video")    # The Video button was selected
 
-    if video:
-        # go to the config page
+    if video_button or form == "Video":
+        # Either the Video Button was selected (on a different form) or the Video Page is processed.
+        return video_processes(request, video_button)
 
 
-        file_path = Path("D:/Node/AnyLog-Network/data/video/files.10_seconds.0.mp4")
+    config_button = request.POST.get("Config")
 
-        select_info = {}
-        select_info["file_path"] = file_path
-        return render(request, "video.html", select_info)
-
-    if form == "Video":
-        #Process the Video file
-        select_info = {}
-        return render(request, "video.html", select_info)
-
-    config = request.POST.get("Config")
-
-    if config:
-        # go to the config page
+    if config_button:
+        # config button was selected - go to the config page
         select_info = {}
         select_info["conf_file_names"] = conf_file_names
         select_info["file_name"] = "Autoexec"
         return render(request, "config.html", select_info)
 
     if form == "Config":
+
         select_info = {}
         select_info["conf_file_names"] = conf_file_names
 
@@ -142,6 +133,27 @@ def form_request(request):
             return render(request, "config.html", select_info)
 
     return client_processes(request)    # Client processes - the main form interacting with the network
+
+# ---------------------------------------------------------------------------------------
+# Client processes - the main form interacting with the network
+# ---------------------------------------------------------------------------------------
+def video_processes(request, video_button):
+
+    if video_button:
+        # video_button was selected - go to the video page
+
+        file_path = Path("D:/Node/AnyLog-Network/data/video/files.10_seconds.0.mp4")
+
+        select_info = {}
+        select_info["file_path"] = file_path
+        return render(request, "video.html", select_info)
+
+
+    #Process the Video page
+
+    select_info = {}
+    return render(request, "video.html", select_info)
+
 
 # ---------------------------------------------------------------------------------------
 # Client processes - the main form interacting with the network
