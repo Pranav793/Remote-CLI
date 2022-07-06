@@ -80,13 +80,13 @@ def form_request(request):
     form = request.POST.get("Form")         # The form used
 
     video_button = request.POST.get("Video")    # The Video button was selected
+    config_button = request.POST.get("Config")  # The Config button was selected
+    client_button = request.POST.get("Client")  # Clientbutton was selected
+
 
     if video_button or form == "Video":
         # Either the Video Button was selected (on a different form) or the Video Page is processed.
         return video_processes(request, video_button)
-
-
-    config_button = request.POST.get("Config")
 
     if config_button:
         # config button was selected - go to the config page
@@ -132,7 +132,7 @@ def form_request(request):
             select_info["conf_file"] = reply
             return render(request, "config.html", select_info)
 
-    return client_processes(request)    # Client processes - the main form interacting with the network
+    return client_processes(request, client_button)    # Client processes - the main form interacting with the network
 
 # ---------------------------------------------------------------------------------------
 # Client processes - the main form interacting with the network
@@ -158,13 +158,12 @@ def video_processes(request, video_button):
 # ---------------------------------------------------------------------------------------
 # Client processes - the main form interacting with the network
 # ---------------------------------------------------------------------------------------
-def client_processes(request):
-    client = request.POST.get("Client")     # Client has value if we change config to client
+def client_processes(request, client_button):
 
     send_button = request.POST.get("Send")
 
     # Check the form is submitted or not
-    if not client and request.method == 'POST' and send_button:
+    if not client_button and request.method == 'POST' and send_button:
         # SEND THE COMMAND TO DESTINATION NODE
 
         # Proces the command
@@ -187,7 +186,7 @@ def client_processes(request):
             select_info = command_button_selected(request, command_button)
         else:
             select_info = {}
-            if not client and request.method == 'POST':
+            if not client_button and request.method == 'POST':
                 # Send was not selected - keep the older selected values
                 add_form_value(select_info, request)  # add the values of the last form to the select_info
             else:
