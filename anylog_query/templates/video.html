@@ -56,8 +56,19 @@
 
    <br/>
 
+    <input type ="submit" name = "Search" id="Search" value="Search"  onclick="spin1();" style="font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey"/>
 
-   <input type ="submit" name = "Watch" id="Load" value="Load" style=""/>
+     &nbsp; &nbsp;
+
+    <label for="command">Command:</label>
+
+    {% if command %}
+        <input type="text" id="command" name="command" value="{{command}}" size="166" onkeypress="disableEnter()" >
+    {% else %}
+        <input type="text" id="command" name="command" size="166">
+    {% endif %}
+
+
 
 
    </div>
