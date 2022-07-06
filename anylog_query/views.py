@@ -1,5 +1,6 @@
 import sys
 import os
+from pathlib import Path
 from django.shortcuts import render
 
 import copy
@@ -77,16 +78,25 @@ conf_file_names = [
 def form_request(request):
 
     form = request.POST.get("Form")         # The form used
-    config = request.POST.get("Config")
 
-    if config:
-        # go to the config page
+    video_button = request.POST.get("Video")    # The Video button was selected
+    config_button = request.POST.get("Config")  # The Config button was selected
+    client_button = request.POST.get("Client")  # Clientbutton was selected
+
+
+    if video_button or (form == "Video" and not client_button and not config_button):
+        # Either the Video Button was selected (on a different form) or the Video Page is processed.
+        return video_processes(request, video_button)
+
+    if config_button:
+        # config button was selected - go to the config page
         select_info = {}
         select_info["conf_file_names"] = conf_file_names
         select_info["file_name"] = "Autoexec"
         return render(request, "config.html", select_info)
 
-    if form == "Config":
+    if form == "Config" and not client_button:
+
         select_info = {}
         select_info["conf_file_names"] = conf_file_names
 
@@ -122,15 +132,42 @@ def form_request(request):
             select_info["conf_file"] = reply
             return render(request, "config.html", select_info)
 
-    client = request.POST.get("Client")     # Client has value if we change config to client
+    return client_processes(request, client_button)    # Client processes - the main form interacting with the network
 
-    send = request.POST.get("Send")
+# ---------------------------------------------------------------------------------------
+# Client processes - the main form interacting with the network
+# ---------------------------------------------------------------------------------------
+def video_processes(request, video_button):
+
+    if video_button:
+        # video_button was selected - go to the video page
+
+        file_path = Path("D:/Node/AnyLog-Network/data/video/files.10_seconds.0.mp4")
+
+        select_info = {}
+        select_info["file_path"] = file_path
+        return render(request, "video.html", select_info)
+
+
+    #Process the Video page
+
+    select_info = {}
+    return render(request, "video.html", select_info)
+
+
+# ---------------------------------------------------------------------------------------
+# Client processes - the main form interacting with the network
+# ---------------------------------------------------------------------------------------
+def client_processes(request, client_button):
+
+    send_button = request.POST.get("Send")
 
     # Check the form is submitted or not
-    if not client and request.method == 'POST' and send:
+    if not client_button and request.method == 'POST' and send_button:
+        # SEND THE COMMAND TO DESTINATION NODE
 
         # Proces the command
-        output = process_anylog(request)
+        output = process_anylog(request)        # SEND THE COMMAND TO DESTINATION NODE
 
         user_cmd = request.POST.get("command")
         if len(user_cmd) > 5 and user_cmd.strip()[:4].lower() == "sql ":
@@ -143,69 +180,13 @@ def form_request(request):
 
     else:
         # Display the html form
-        select_info = {}
-        button = request.POST.get("button")
-        if button:
-            add_form_value(select_info, request)
-            command_id = COMMAND_BY_BUTTON[button]
-            cmd_info = ANYLOG_COMMANDS[command_id]
 
-            if request.POST.get("help"):
-                # Open the URL for help
-                select_info["help"] = True
-                help_url = "https://github.com/AnyLog-co/documentation/"
-                if "help_url" in cmd_info and cmd_info["help_url"]:
-                    help_url += cmd_info["help_url"]
-
-                webbrowser.open(help_url)
-            else:
-                user_cmd = cmd_info["command"]             # Set the command
-
-                if len (user_cmd) > 5 and user_cmd[:4].lower().startswith("sql "):
-                    select_info["network"] = True     # Used to Flag the network bool on the page
-
-                    # add dbms name and table name
-                    dbms_name = request.POST.get('dbms')
-                    table_name = request.POST.get('table')
-
-                    if dbms_name:
-                        user_cmd = user_cmd.replace("[DBMS]", dbms_name, 1)
-                    if table_name:
-                        user_cmd = user_cmd.replace("[TABLE]", table_name, 1)
-
-                    timezone = request.POST.get('timezone')
-
-
-                    # Add output format
-                    out_format = request.POST.get('out_format')
-                    cmd_list = user_cmd.split(' ',3)
-                    if len(cmd_list) > 3:
-                        if out_format == "table":
-                            sql_instruct = "format = table "
-                            select_info["out_format"] = "table"  # Keep selection menue on table
-                        else:
-                            sql_instruct = "format = json "
-                            select_info["out_format"] = None        # Keep selection menue on JSON
-
-                        if timezone:
-                            sql_instruct += "and timezone = %s " % timezone
-                            select_info["timezone"] = timezone
-                        else:
-                            select_info["timezone"] = None
-
-                        user_cmd = user_cmd.replace(cmd_list[2], sql_instruct + cmd_list[2])
-                else:
-                    select_info["network"] = False
-
-                select_info["command"] = user_cmd
-                rest_call = cmd_info["type"]
-                if rest_call == "GET":
-                    select_info["rest_call"] = rest_call        # Set Put or Get
-                else:
-                    select_info["rest_call"] = None
-
+        command_button = request.POST.get("button")
+        if command_button:
+            select_info = command_button_selected(request, command_button)
         else:
-            if not client and request.method == 'POST':
+            select_info = {}
+            if not client_button and request.method == 'POST':
                 # Send was not selected - keep the older selected values
                 add_form_value(select_info, request)  # add the values of the last form to the select_info
             else:
@@ -222,6 +203,76 @@ def form_request(request):
         select_info["commands_groups"] = COMMANDS_GROUPS
 
         return render(request, "base.html", select_info)
+
+# ---------------------------------------------------------------------------------------
+# Command button was selected - get the command info and set the command on select_info
+# so it can be placed on the command line
+# ---------------------------------------------------------------------------------------
+def command_button_selected(request, command_button):
+    '''
+    Return a select_info structure with the info selected by the button
+    '''
+    select_info = {}
+
+    # AnyLog command button was selected
+    add_form_value(select_info, request)
+    command_id = COMMAND_BY_BUTTON[command_button]
+    cmd_info = ANYLOG_COMMANDS[command_id]
+
+    if request.POST.get("help"):
+        # Open the URL for help
+        select_info["help"] = True
+        help_url = "https://github.com/AnyLog-co/documentation/"
+        if "help_url" in cmd_info and cmd_info["help_url"]:
+            help_url += cmd_info["help_url"]
+
+        webbrowser.open(help_url)
+    else:
+        user_cmd = cmd_info["command"]  # Set the command
+
+        if len(user_cmd) > 5 and user_cmd[:4].lower().startswith("sql "):
+            select_info["network"] = True  # Used to Flag the network bool on the page
+
+            # add dbms name and table name
+            dbms_name = request.POST.get('dbms')
+            table_name = request.POST.get('table')
+
+            if dbms_name:
+                user_cmd = user_cmd.replace("[DBMS]", dbms_name, 1)
+            if table_name:
+                user_cmd = user_cmd.replace("[TABLE]", table_name, 1)
+
+            timezone = request.POST.get('timezone')
+
+            # Add output format
+            out_format = request.POST.get('out_format')
+            cmd_list = user_cmd.split(' ', 3)
+            if len(cmd_list) > 3:
+                if out_format == "table":
+                    sql_instruct = "format = table "
+                    select_info["out_format"] = "table"  # Keep selection menue on table
+                else:
+                    sql_instruct = "format = json "
+                    select_info["out_format"] = None  # Keep selection menue on JSON
+
+                if timezone:
+                    sql_instruct += "and timezone = %s " % timezone
+                    select_info["timezone"] = timezone
+                else:
+                    select_info["timezone"] = None
+
+                user_cmd = user_cmd.replace(cmd_list[2], sql_instruct + cmd_list[2])
+        else:
+            select_info["network"] = False
+
+        select_info["command"] = user_cmd
+        rest_call = cmd_info["type"]
+        if rest_call == "GET":
+            select_info["rest_call"] = rest_call  # Set Put or Get
+        else:
+            select_info["rest_call"] = None
+
+    return select_info
 # ---------------------------------------------------------------------------------------
 # Process the AnyLog command form
 # ---------------------------------------------------------------------------------------
@@ -239,6 +290,9 @@ def process_anylog(request):
     password = post_data.get('auth_pass').strip()
     command = post_data.get('command').strip()
 
+    timeout = request.POST.get('timeout').strip()  # Change default timeout
+    subset = request.POST.get('subset') == "on" # Returns reply even if not oll nodes replied
+
     network = post_data.get('network') == "on"
     rest_call = post_data.get('rest_call')
 
@@ -252,7 +306,7 @@ def process_anylog(request):
         if rest_call == "post":
             output = anylog_conn.post_cmd(conn=conn_info, command=command, authentication=authentication)
         else:
-            output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network, dest=destination)
+            output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network, dest=destination, timeout=timeout, subset=subset)
     else:
         output = "Mising commmand"
 
@@ -477,7 +531,7 @@ def config_load_file(request):
     if username != '' and password != '':
         authentication = (username, password)
 
-    output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=False,  dest="")
+    output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=False,  dest="", timeout="", subset=False)
     if output:
         file_rows = output.split("\r\n")
         # organize each roow with id
