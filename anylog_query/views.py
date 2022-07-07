@@ -166,17 +166,21 @@ def client_processes(request, client_button):
     if not client_button and request.method == 'POST' and send_button:
         # SEND THE COMMAND TO DESTINATION NODE
 
-        # Proces the command
-        output = process_anylog(request)        # SEND THE COMMAND TO DESTINATION NODE
-
         user_cmd = request.POST.get("command")
         if len(user_cmd) > 5 and user_cmd.strip()[:4].lower() == "sql ":
             query_result = True
+            if user_cmd.endswith(" selection"):
+                sql_cmd = user_cmd[:-10].rstrip()
+                if sql_cmd[-2:] == " >":
+                    user_cmd = sql_cmd[:-2].rstrip()
+                    selection_output = True     # Push the returned JSON value into a selection table
         else:
             query_result = False
 
+        # Process the command
+        output = process_anylog(request, user_cmd)        # SEND THE COMMAND TO DESTINATION NODE
 
-        return print_network_reply(request, query_result, output)
+        return print_network_reply(request, query_result, output, selection_output)
 
     else:
         # Display the html form
@@ -276,9 +280,10 @@ def command_button_selected(request, command_button):
 # ---------------------------------------------------------------------------------------
 # Process the AnyLog command form
 # ---------------------------------------------------------------------------------------
-def process_anylog(request):
+def process_anylog(request, user_cmd):
     '''
     :param request: The info needed to execute command to the AnyLog network
+    :param user_cmd: The command issued by the user - it appears in requests (request.POST.get("command")), but maybe was modified by the caller
     :return: The data to display on the output form
     '''
 
@@ -288,10 +293,10 @@ def process_anylog(request):
     conn_info = post_data.get('connect_info').strip()
     username = post_data.get('auth_usr').strip()
     password = post_data.get('auth_pass').strip()
-    command = post_data.get('command').strip()
+    command = user_cmd
 
-    timeout = request.POST.get('timeout').strip()  # Change default timeout
-    subset = request.POST.get('subset') == "on" # Returns reply even if not oll nodes replied
+    timeout = post_data.get('timeout').strip()  # Change default timeout
+    subset = post_data.get('subset') == "on" # Returns reply even if not oll nodes replied
 
     network = post_data.get('network') == "on"
     rest_call = post_data.get('rest_call')
@@ -317,7 +322,13 @@ def process_anylog(request):
 # Option 2 - a table
 # Option 3 - text
 # -----------------------------------------------------------------------------------
-def print_network_reply(request, query_result, data):
+def print_network_reply(request, query_result, data, selection_output):
+    '''
+    request - the form info
+    query_result - a True/False value representing SQL query data set returned
+    data - the query or command result
+    selection_output - user issued a SQL statement with "> selection" at the end - indicating output to a selection table
+    '''
 
     select_info = {}
     add_form_value(select_info, request)        # add the values of the last form to the select_info
