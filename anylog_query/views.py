@@ -361,25 +361,7 @@ def print_network_reply(request, query_result, data, selection_output):
         if policies:
             if selection_output:
                 # Show as a selection table
-                policies_list = policies["Query"]
-                one_policy = policies_list[0]
-                column_names = []
-                # Get the title for the table from the first policy
-                for attr_name in one_policy.keys():
-                    column_names.append(attr_name)
-                select_info['column_names'] = column_names
-
-                # add the data as a columns per row
-                rows = []
-                for policy in policies_list:
-                    columns_val = []
-                    for attr_val in policy.values():
-                        columns_val.append(attr_val)
-                    rows.append(columns_val)
-
-                select_info['rows'] = rows
-
-                return render(request, 'output_selection.html', select_info)
+                return json_to_selection_table(request, select_info, policies)
             else:
                 # Reply was a JSON policies or a query replied in JSON
                 data_list = []
@@ -405,6 +387,32 @@ def print_network_reply(request, query_result, data, selection_output):
     select_info['text'] = [("text", data)]        # Only TEXT
 
     return render(request, 'output_cmd.html', select_info)
+
+# -----------------------------------------------------------------------------------
+# Output to selection table
+# Change the query reply from JSON to selection table format and call the report
+# -----------------------------------------------------------------------------------
+def json_to_selection_table(request, select_info, policies):
+    # Show as a selection table
+    policies_list = policies["Query"]
+    one_policy = policies_list[0]
+    column_names = []
+    # Get the title for the table from the first policy
+    for attr_name in one_policy.keys():
+        column_names.append(attr_name)
+    select_info['column_names'] = column_names
+
+    # add the data as a columns per row
+    rows = []
+    for policy in policies_list:
+        columns_val = []
+        for attr_val in policy.values():
+            columns_val.append(attr_val)
+        rows.append(columns_val)
+
+    select_info['rows'] = rows
+
+    return render(request, 'output_selection.html', select_info)
 
 
 # -----------------------------------------------------------------------------------
