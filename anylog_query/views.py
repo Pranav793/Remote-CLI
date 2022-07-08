@@ -14,6 +14,7 @@ from djangoProject.settings import BASE_DIR
 
 
 import anylog_query.json_api as json_api
+import anylog_query.utils_io as utils_io
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
 json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "commands.json")
@@ -142,12 +143,17 @@ def video_processes(request, video_button):
 
     if video_button:
         # video_button was selected - go to the video page
+        select_info = {}
 
-        get_video(request)      # Copy video files from dest machines
+        copied_info = get_video(request)      # Copy video files from dest machines
+
+        copied_videos = utils_io.get_files_in_dir(video_dir)     # Get the list of files that were copied
+
+        select_info["copied_videos"] = copied_videos
 
         file_path = Path("D:/Node/AnyLog-Network/data/video/files.10_seconds.0.mp4")
 
-        select_info = {}
+
         select_info["file_path"] = file_path
         return render(request, "video.html", select_info)
 
@@ -661,9 +667,10 @@ def get_video(request):
 
     authentication = anylog_conn.get_auth(request)
 
-
-
     # Search for selected files
+
+    copied_info = []        # Collect the files copied and the message if an error happened
+
     for entry in post_data:
         if entry.startswith("get@"):
             entry_list = entry.split('@')
@@ -674,7 +681,10 @@ def get_video(request):
                 destination = "%s:%s" % (operator_ip, operator_port)
                 file_name = entry_list[3]
 
-
                 command = "file get !!video_dir/%s %s" % (file_name, video_dir)
 
                 output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=True,  dest=destination, timeout="", subset=False)
+
+                copied_info.append((file_name, output))
+
+    return copied_info
