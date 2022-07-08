@@ -90,5 +90,19 @@ def post_cmd(conn:str, command:str, authentication:tuple=(), msg_data:str = None
     return output
 
 
+def get_auth(request):
+    '''
+    Get the Authentication info from the form info
+    '''
 
+    post_data = request.POST
 
+    # Get the needed info from the form
+    username = post_data.get('auth_usr').strip()
+    password = post_data.get('auth_pass').strip()
+
+    authentication = ()
+    if username != '' and password != '':
+        authentication = (username, password)
+
+    return authentication

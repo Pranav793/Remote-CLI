@@ -17,6 +17,7 @@ import anylog_query.json_api as json_api
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
 json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "commands.json")
+video_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "video" + os.sep + "current")
 
 data, error_msg = json_api.load_json(json_file)
 
@@ -141,6 +142,8 @@ def video_processes(request, video_button):
 
     if video_button:
         # video_button was selected - go to the video page
+
+        get_video(request)      # Copy video files from dest machines
 
         file_path = Path("D:/Node/AnyLog-Network/data/video/files.10_seconds.0.mp4")
 
@@ -561,16 +564,13 @@ def config_load_file(request):
 
     # Get the needed info from the form
     conn_info = post_data.get('connect_info').strip()
-    username = post_data.get('auth_usr').strip()
-    password = post_data.get('auth_pass').strip()
+
+    authentication = anylog_conn.get_auth(request)
+
 
     file_name = post_data.get('file_name').strip()
 
     command = "get script %s" % file_name
-
-    authentication = ()
-    if username != '' and password != '':
-        authentication = (username, password)
 
     output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=False,  dest="", timeout="", subset=False)
     if output:
@@ -593,8 +593,9 @@ def config_save_file(request, file_rows):
 
     # Get the needed info from the form
     conn_info = post_data.get('connect_info').strip()
-    username = post_data.get('auth_usr').strip()
-    password = post_data.get('auth_pass').strip()
+
+    authentication = anylog_conn.get_auth(request)
+
     file_name = post_data.get('file_name').strip()
 
     # Note 1 - the \r is used to take the info as one word in the network node
@@ -603,9 +604,6 @@ def config_save_file(request, file_rows):
 
     command = "body"        # The command is passed in the message body
 
-    authentication = ()
-    if username != '' and password != '':
-        authentication = (username, password)
 
     output = anylog_conn.post_cmd(conn=conn_info, command=command, authentication=authentication, msg_data=file_data)
 
@@ -648,3 +646,35 @@ def get_updated_config(operation, update_id, request):
             insert_below = False
 
     return config_list
+
+# -----------------------------------------------------------------------------------
+# Get the Video files from the dest machines
+# -----------------------------------------------------------------------------------
+def get_video(request):
+
+    global video_dir
+
+    post_data = request.POST
+
+    # Get the needed info from the form
+    conn_info = post_data.get('connect_info').strip()
+
+    authentication = anylog_conn.get_auth(request)
+
+
+
+    # Search for selected files
+    for entry in post_data:
+        if entry.startswith("get@"):
+            entry_list = entry.split('@')
+            if len(entry_list) >= 4:
+                # Get the video file operator info and file name
+                operator_ip = entry_list[1]
+                operator_port = entry_list[2]
+                destination = "%s:%s" % (operator_ip, operator_port)
+                file_name = entry_list[3]
+
+
+                command = "file get !!video/%s %s" % (file_name, video_dir)
+
+                output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=False,  dest=destination, timeout="", subset=False)

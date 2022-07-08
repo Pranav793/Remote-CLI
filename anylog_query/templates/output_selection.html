@@ -2,15 +2,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-     <br>
-     <input type="text123" id="table123" name="table123">
 
-    <br>
+        <br> <br>
 
-        <h3 style="color: #336699">{{ table.table_name }}</h3>
-       <!-- Show nodes and checkbox for selection -->
+
        <table border="1">
-            <tr>    <!-- table row  -->
+            <tr style="background-color: azure">    <!-- table row  -->
                 {% for col_name in column_names %}
                     <td>{{col_name}}</td> <!-- table cell  -->
                 {% endfor %}
@@ -22,7 +19,7 @@
                 {% for col_val in row %}
                     <td>{{ col_val }}</td>
                 {% endfor %}
-                <td><label><input type="checkbox" id="{{ col_val.0 }}" name="{{ col_val.1 }}" value="{{ col_val.1 }}"/></label></td> <!-- The selection column: -->
+                <td><label><input type="checkbox" name="get@{{ row.0 }}@{{ row.1 }}@{{ row.2 }}" value="True"/></label></td> <!-- The selection column: -->
 
             </tr>
             {% endfor %}
