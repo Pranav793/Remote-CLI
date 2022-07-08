@@ -13,11 +13,28 @@ such non-permitted act to AnyLog, Inc.
 
 import os
 
-def get_files_in_dir(path):
+def get_files_in_dir(path, size_flag):
+    '''
+    Return the list of files:
+    path - path to directory
+    size_flag - if True - returns a list of lists - every list include file name + size
+    '''
 
+    files_info = []
     try:
         files_list = os.listdir(path)
     except:
         files_list = None
+    else:
+        for file_name in files_list:
+            if  size_flag:
+                try:
+                    file_size = os.path.getsize(path + file_name)
+                except:
+                    file_size = 0
+            else:
+                file_size = 0
+            files_info.append([file_name, file_size])
 
-    return files_list
+
+    return files_info

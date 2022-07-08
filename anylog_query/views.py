@@ -141,28 +141,31 @@ def form_request(request):
 # ---------------------------------------------------------------------------------------
 def video_processes(request, video_button):
 
+    select_info = {}
+
     if video_button:
-        # video_button was selected - go to the video page
-        select_info = {}
+        # video_button was selected - Copy the files from the source servers
 
         copied_info = get_video(request)      # Copy video files from dest machines
 
-        copied_videos = utils_io.get_files_in_dir(video_dir)     # Get the list of files that were copied
-
-        select_info["copied_videos"] = copied_videos
-
-        file_path = Path("D:/Node/AnyLog-Network/data/video/files.10_seconds.0.mp4")
 
 
-        select_info["file_path"] = file_path
-        return render(request, "video.html", select_info)
+    copied_videos = utils_io.get_files_in_dir(video_dir, True)     # Get the list of files that were copied
 
+    # Go to the page - video.html
 
-    #Process the Video page
+    select_info["column_names"] = ["Video", "Size", "select"]
 
-    select_info = {}
-    return render(request, "video.html", select_info)
+    select_info["rows"] = copied_videos
 
+    if len (copied_videos):
+        file_path = Path("%s%s" % (video_dir, copied_videos[0]) )
+    else:
+        file_path = None
+
+    select_info["file_path"] = file_path
+
+    return render(request, "video.html", select_info) # Process the Video page
 
 # ---------------------------------------------------------------------------------------
 # Client processes - the main form interacting with the network

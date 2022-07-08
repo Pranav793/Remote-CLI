@@ -53,25 +53,39 @@
       Your browser does not support the video tag.
     </video>
 
+  </div>
 
-   <br/>
+   <br/> <br/>  <br/>
 
-    <input type ="submit" name = "Search" id="Search" value="Search"  onclick="spin1();" style="font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey"/>
+
+    <table border="1">
+    <tr style="background-color: azure">    <!-- table row  -->
+        {% for col_name in column_names %}
+            <td>{{col_name}}</td> <!-- table cell  -->
+        {% endfor %}
+
+    </tr>
+    {% for row in rows %}
+    <tr>
+        {% for col_val in row %}
+            <td>{{ col_val }}</td>
+        {% endfor %}
+        <td><label><input type="checkbox" name="get@{{ row.0 }}" value="True"/></label></td> <!-- The selection column: -->
+
+    </tr>
+    {% endfor %}
+
+    </table>
+
+  <br/>  <br/>
+
+    <input type ="submit" name = "Keep" value="Keep"/>
+
+        &nbsp; &nbsp;
+
+    <input type ="submit" name = "Delete" value="Delete"/>
 
      &nbsp; &nbsp;
-
-    <label for="command">Command:</label>
-
-    {% if command %}
-        <input type="text" id="command" name="command" value="{{command}}" size="166" onkeypress="disableEnter()" >
-    {% else %}
-        <input type="text" id="command" name="command" size="166">
-    {% endif %}
-
-
-
-
-   </div>
 
 
 
