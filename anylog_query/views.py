@@ -19,6 +19,7 @@ import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
 json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "commands.json")
 video_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "video" + os.sep + "current"+ os.sep)
+saved_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "video" + os.sep + "saved"+ os.sep)
 
 data, error_msg = json_api.load_json(json_file)
 
@@ -141,6 +142,9 @@ def form_request(request):
 # ---------------------------------------------------------------------------------------
 def video_processes(request, video_button):
 
+    global saved_dir        # Saved videos
+    global video_dir        # Copied videos
+
     select_info = {}
 
     if video_button:
@@ -148,6 +152,24 @@ def video_processes(request, video_button):
 
         copied_info = get_video(request)      # Copy video files from dest machines
 
+    else:
+        # process the form - delete or move the file
+
+        post_data = request.POST
+        if "Keep" in post_data:
+            # move the file to "Keep" Directory
+            keep_file = True
+        elif "Delete" in post_data:
+            delete_file = True
+        elif "Saved" in post_data:
+            # Watch the saved files
+            list_saved = True
+
+
+        for entry in post_data:
+            if entry.startswith("file@"):
+                if len(entry > 5):
+                    file_name = entry[5:]
 
 
     copied_videos = utils_io.get_files_in_dir(video_dir, True)     # Get the list of files that were copied
