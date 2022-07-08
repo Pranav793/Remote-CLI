@@ -17,7 +17,7 @@ import anylog_query.json_api as json_api
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
 json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "commands.json")
-video_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "video" + os.sep + "current")
+video_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "video" + os.sep + "current"+ os.sep)
 
 data, error_msg = json_api.load_json(json_file)
 
@@ -675,6 +675,6 @@ def get_video(request):
                 file_name = entry_list[3]
 
 
-                command = "file get !!video/%s %s" % (file_name, video_dir)
+                command = "file get !!video_dir/%s %s" % (file_name, video_dir)
 
-                output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=False,  dest=destination, timeout="", subset=False)
+                output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=True,  dest=destination, timeout="", subset=False)
