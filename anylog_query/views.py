@@ -345,11 +345,11 @@ def print_network_reply(request, query_result, data, selection_output):
     elif data.startswith("Failed to"):
         print_info = [("text", data)]  # Print the error msg as a string
     elif query_result and data[:8] != "{\"Query\"":
-        policy, error_msg = json_api.string_to_json(data)
-        if policy:
+        policies, error_msg = json_api.string_to_json(data)
+        if policies:
             # Show as JSON
             data_list = []
-            json_api.setup_print_tree(policy, data_list)
+            json_api.setup_print_tree(policies, data_list)
             select_info['text'] = data_list
             return render(request, 'output_tree.html', select_info)
 
@@ -357,13 +357,35 @@ def print_network_reply(request, query_result, data, selection_output):
     elif is_complex_struct(data):
         print_info = [("text", data)]   # Keep as is
     else:
-        policy, table_info, print_info, error_msg = format_message_reply(data)
-        if policy:
-            # Reply was a JSON policy or a query replied in JSON
-            data_list = []
-            json_api.setup_print_tree(policy, data_list)
-            select_info['text'] = data_list
-            return render(request, 'output_tree.html', select_info)
+        policies, table_info, print_info, error_msg = format_message_reply(data)
+        if policies:
+            if selection_output:
+                # Show as a selection table
+                policies_list = policies["Query"]
+                one_policy = policies_list[0]
+                column_names = []
+                # Get the title for the table from the first policy
+                for attr_name in one_policy.keys():
+                    column_names.append(attr_name)
+                select_info['column_names'] = column_names
+
+                # add the data as a columns per row
+                rows = []
+                for policy in policies_list:
+                    columns_val = []
+                    for attr_val in policy.values():
+                        columns_val.append(attr_val)
+                    rows.append(columns_val)
+
+                select_info['rows'] = rows
+
+                return render(request, 'output_selection.html', select_info)
+            else:
+                # Reply was a JSON policies or a query replied in JSON
+                data_list = []
+                json_api.setup_print_tree(policies, data_list)
+                select_info['text'] = data_list
+                return render(request, 'output_tree.html', select_info)
 
         if query_result:
             # Failed to map the result to JSON

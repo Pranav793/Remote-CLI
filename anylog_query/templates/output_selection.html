@@ -1,0 +1,34 @@
+
+{% include "base.html" %}
+
+{% block content %}
+
+
+        <h3 style="color: #336699">{{ table.table_name }}</h3>
+       <!-- Show nodes and checkbox for selection -->
+       <table border="1">
+            <tr>    <!-- table row  -->
+                {% for col_name in column_names %}
+                    <td>{{col_name}}</td> <!-- table cell  -->
+                {% endfor %}
+                <td>Select</td>
+
+            </tr>
+            {% for row in rows %}
+            <tr>
+                {% for col_val in row %}
+                    <td>{{ col_val }}</td>
+                {% endfor %}
+                <td><label><input type="checkbox" /></label></td> <!-- The selection column: -->
+
+            </tr>
+            {% endfor %}
+
+    </table>
+
+    <br>
+    <br>
+
+
+
+{% endblock %}
