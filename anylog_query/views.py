@@ -76,6 +76,21 @@ conf_file_names = [
     "Master",
     "Standalone"
 ]
+
+user_selections = {
+        'connect_info' : None,
+        'auth_usr' : None,
+        'auth_pass' : None,
+        'cmd_type' : None,
+        'timeout' : None,
+        'dbms' : None,
+        'table' : None,
+        'timezone' : None,
+        'out_format' : None,
+        'network' : None,
+        'destination' : None,
+        'command' : None,
+}
 # ---------------------------------------------------------------------------------------
 # GET / POST  AnyLog command form
 # ---------------------------------------------------------------------------------------
@@ -85,8 +100,7 @@ def form_request(request):
 
     video_button = request.POST.get("Video")    # The Video button was selected
     config_button = request.POST.get("Config")  # The Config button was selected
-    client_button = request.POST.get("Client")  # Clientbutton was selected
-
+    client_button = request.POST.get("Client")  # Client button was selected
 
     if video_button or (form == "Video" and not client_button and not config_button):
         # Either the Video Button was selected (on a different form) or the Video Page is processed.
@@ -154,6 +168,8 @@ def video_processes(request, video_button):
     watch_file = False
     file_name = None
 
+    post_data = request.POST
+
     if video_button:
         # video_button was selected - Copy the files from the source servers
 
@@ -161,7 +177,7 @@ def video_processes(request, video_button):
 
     else:
         # process the form - delete or move the file
-        post_data = request.POST
+
         if "Keep" in post_data:
             # move the file to "Keep" Directory
             keep_file = True
@@ -241,6 +257,8 @@ def client_processes(request, client_button):
             select_info = command_button_selected(request, command_button)
         else:
             select_info = {}
+            restore_user_selections(request.POST, select_info)
+
             if not client_button and request.method == 'POST':
                 # Send was not selected - keep the older selected values
                 add_form_value(select_info, request)  # add the values of the last form to the select_info
@@ -257,6 +275,8 @@ def client_processes(request, client_button):
         select_info["commands_list"] = ANYLOG_COMMANDS
         select_info["commands_groups"] = COMMANDS_GROUPS
 
+        keep_user_selections(select_info)
+
         return render(request, "base.html", select_info)
 
 # ---------------------------------------------------------------------------------------
@@ -268,6 +288,9 @@ def command_button_selected(request, command_button):
     Return a select_info structure with the info selected by the button
     '''
     select_info = {}
+
+
+    restore_user_selections(request.POST, select_info)
 
     # AnyLog command button was selected
     add_form_value(select_info, request)
@@ -402,6 +425,7 @@ def print_network_reply(request, query_result, data, selection_output):
             data_list = []
             json_api.setup_print_tree(policies, data_list)
             select_info['text'] = data_list
+            keep_user_selections(select_info)
             return render(request, 'output_tree.html', select_info)
 
         print_info = [("text", data)]  # Print the error msg as a string
@@ -412,12 +436,14 @@ def print_network_reply(request, query_result, data, selection_output):
         if policies:
             if selection_output:
                 # Show as a selection table
+                keep_user_selections(select_info)
                 return json_to_selection_table(request, select_info, policies)
             else:
                 # Reply was a JSON policies or a query replied in JSON
                 data_list = []
                 json_api.setup_print_tree(policies, data_list)
                 select_info['text'] = data_list
+                keep_user_selections(select_info)
                 return render(request, 'output_tree.html', select_info)
 
         if query_result:
@@ -432,11 +458,12 @@ def print_network_reply(request, query_result, data, selection_output):
                 select_info['table_title'] = table_info['table_title']
             if 'rows' in table_info:
                 select_info['rows'] = table_info['rows']
+            keep_user_selections(select_info)
             return render(request, 'output_table.html', select_info)
 
 
     select_info['text'] = [("text", data)]        # Only TEXT
-
+    keep_user_selections(select_info)
     return render(request, 'output_cmd.html', select_info)
 
 # -----------------------------------------------------------------------------------
@@ -730,3 +757,32 @@ def get_video(request):
                 copied_info.append((file_name, output))
 
     return copied_info
+
+
+# -----------------------------------------------------------------------------------
+# Keep the user selections
+# -----------------------------------------------------------------------------------
+def keep_user_selections(select_info):
+
+    global user_selections
+
+    for key, value in user_selections.items():
+        if key in select_info:
+            # This key was updated
+            user_selections[key] = select_info[key]  # Keep the last selections
+        else:
+            user_selections[key] = None         # No selection
+
+
+# -----------------------------------------------------------------------------------
+# put back the last user selections
+# -----------------------------------------------------------------------------------
+def restore_user_selections(post_data, select_info):
+    global user_selections
+
+    for key, value in user_selections.items():
+        if value:
+            # This key was updated
+            select_info[key] =value  # Keep the last selections
+
+
