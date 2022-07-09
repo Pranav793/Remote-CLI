@@ -17,9 +17,10 @@ import anylog_query.json_api as json_api
 import anylog_query.utils_io as utils_io
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
-json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "commands.json")
-video_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "video" + os.sep + "current"+ os.sep)
-keep_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "video" + os.sep + "keep"+ os.sep) # Dir for saved videos
+json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "commands.json") # Absolute path
+video_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "video" + os.sep + "current"+ os.sep) # Absolute path
+keep_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "video" + os.sep + "keep"+ os.sep) # Dir for saved videos - # Absolute path
+video_local_dir = "video/current/"
 
 data, error_msg = json_api.load_json(json_file)
 
@@ -142,8 +143,9 @@ def form_request(request):
 # ---------------------------------------------------------------------------------------
 def video_processes(request, video_button):
 
-    global keep_dir        # Saved videos
-    global video_dir        # Copied videos
+    global keep_dir         # Absolute Path - Saved videos
+    global video_dir        # Absolute Path - Copied videos
+    global video_local_dir  # "video/current/"
 
     select_info = {}
 
@@ -192,15 +194,15 @@ def video_processes(request, video_button):
 
     if watch_file:
         # Use the first flagged file
-        file_path = Path("%s%s" % (video_dir, file_name) )
+        active_file = video_local_dir + file_name
     elif len (copied_videos):
         # Use the first file in the directory
-        file_path = Path("%s%s" % (video_dir, copied_videos[0]) )
+        active_file = video_local_dir + copied_videos[0][0]
     else:
-        file_path = None
+        active_file = None
 
-    if file_path:
-        select_info["file_path"] = file_path
+    if active_file:
+        select_info["active_file"] = active_file        # Taken as - <source src="{% static "video/current/files.10_seconds.0.mp4" %}" type="video/mp4">
 
     return render(request, "video.html", select_info) # Process the Video page
 
