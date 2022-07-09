@@ -147,6 +147,11 @@ def video_processes(request, video_button):
 
     select_info = {}
 
+    keep_file = False
+    delete_file = False
+    watch_file = False
+    file_name = None
+
     if video_button:
         # video_button was selected - Copy the files from the source servers
 
@@ -154,22 +159,24 @@ def video_processes(request, video_button):
 
     else:
         # process the form - delete or move the file
-
         post_data = request.POST
         if "Keep" in post_data:
             # move the file to "Keep" Directory
             keep_file = True
         elif "Delete" in post_data:
             delete_file = True
-        elif "Saved" in post_data:
-            # Watch the saved files
-            list_saved = True
-
+        if "Watch" in post_data:
+            # move the file to "Keep" Directory
+            watch_file = True
 
         for entry in post_data:
             if entry.startswith("file@"):
-                if len(entry > 5):
+                if len(entry) > 5:
                     file_name = entry[5:]
+                    if watch_file:
+                        break       # Exit with the first file to watch
+                    if delete_file:
+                        utils_io.delete_file(video_dir + file_name)
 
 
     copied_videos = utils_io.get_files_in_dir(video_dir, True)     # Get the list of files that were copied
@@ -180,12 +187,17 @@ def video_processes(request, video_button):
 
     select_info["rows"] = copied_videos
 
-    if len (copied_videos):
+    if watch_file:
+        # Use the first flagged file
+        file_path = Path("%s%s" % (video_dir, file_name) )
+    elif len (copied_videos):
+        # Use the first file in the directory
         file_path = Path("%s%s" % (video_dir, copied_videos[0]) )
     else:
         file_path = None
 
-    select_info["file_path"] = file_path
+    if file_path:
+        select_info["file_path"] = file_path
 
     return render(request, "video.html", select_info) # Process the Video page
 

@@ -38,3 +38,14 @@ def get_files_in_dir(path, size_flag):
 
 
     return files_info
+
+def delete_file( file_path_name ):
+    ret_val = True
+
+    try:
+        os.remove(file_path_name)
+    except:
+        pass
+        ret_val = False
+
+    return ret_val
