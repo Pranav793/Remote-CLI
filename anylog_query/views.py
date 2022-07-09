@@ -19,7 +19,7 @@ import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
 json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "commands.json")
 video_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "video" + os.sep + "current"+ os.sep)
-saved_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "video" + os.sep + "saved"+ os.sep)
+keep_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "video" + os.sep + "keep"+ os.sep) # Dir for saved videos
 
 data, error_msg = json_api.load_json(json_file)
 
@@ -142,7 +142,7 @@ def form_request(request):
 # ---------------------------------------------------------------------------------------
 def video_processes(request, video_button):
 
-    global saved_dir        # Saved videos
+    global keep_dir        # Saved videos
     global video_dir        # Copied videos
 
     select_info = {}
@@ -177,6 +177,9 @@ def video_processes(request, video_button):
                         break       # Exit with the first file to watch
                     if delete_file:
                         utils_io.delete_file(video_dir + file_name)
+                    elif keep_file:
+                        # save the file in the "keep" directory
+                        utils_io.copy_file(keep_dir + file_name, video_dir + file_name)
 
 
     copied_videos = utils_io.get_files_in_dir(video_dir, True)     # Get the list of files that were copied

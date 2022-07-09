@@ -12,6 +12,7 @@ such non-permitted act to AnyLog, Inc.
 
 
 import os
+import shutil
 
 def get_files_in_dir(path, size_flag):
     '''
@@ -44,6 +45,19 @@ def delete_file( file_path_name ):
 
     try:
         os.remove(file_path_name)
+    except:
+        pass
+        ret_val = False
+
+    return ret_val
+
+
+def copy_file(des_file, source_file):
+
+    ret_val = True
+
+    try:
+        shutil.copyfile(source_file, des_file)
     except:
         pass
         ret_val = False
