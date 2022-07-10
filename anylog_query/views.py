@@ -227,6 +227,7 @@ def video_processes(request, video_button):
 # ---------------------------------------------------------------------------------------
 def client_processes(request, client_button):
 
+    selection_output = False
     send_button = request.POST.get("Send")
 
     # Check the form is submitted or not
@@ -743,7 +744,7 @@ def get_video(request):
     for entry in post_data:
         if entry.startswith("get@"):
             entry_list = entry.split('@')
-            if len(entry_list) >= 4:
+            if len(entry_list) == 4:
                 # Get the video file operator info and file name
                 operator_ip = entry_list[1]
                 operator_port = entry_list[2]
