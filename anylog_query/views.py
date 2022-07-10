@@ -744,14 +744,15 @@ def get_video(request):
     for entry in post_data:
         if entry.startswith("get@"):
             entry_list = entry.split('@')
-            if len(entry_list) == 4:
+            if len(entry_list) == 5:
                 # Get the video file operator info and file name
                 operator_ip = entry_list[1]
                 operator_port = entry_list[2]
                 destination = "%s:%s" % (operator_ip, operator_port)
-                file_name = entry_list[3]
+                archive_path = entry_list[3]
+                file_name = entry_list[4]
 
-                command = "file get !!video_dir/%s %s" % (file_name, video_dir)
+                command = "file get !!blobs_dir/%s/%s %s" % ( archive_path, file_name, video_dir)
 
                 output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=True,  dest=destination, timeout="", subset=False)
 
