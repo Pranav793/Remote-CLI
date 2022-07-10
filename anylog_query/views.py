@@ -102,7 +102,7 @@ def form_request(request):
     config_button = request.POST.get("Config")  # The Config button was selected
     client_button = request.POST.get("Client")  # Client button was selected
 
-    if blobs_button or (form == "blobs" and not client_button and not config_button):
+    if blobs_button or (form == "Blobs" and not client_button and not config_button):
         # Either the blobs Button was selected (on a different form) or the blobs Page is processed.
         return blobs_processes(request, blobs_button)
 
@@ -208,7 +208,7 @@ def blobs_processes(request, blobs_button):
 
     select_info["rows"] = copied_blobs
 
-    if watch_file:
+    if watch_file and file_name:
         # Use the first flagged file
         active_file = blobs_local_dir + file_name
     elif len (copied_blobs):
@@ -321,45 +321,10 @@ def command_button_selected(request, command_button):
             if table_name:
                 user_cmd = user_cmd.replace("[TABLE]", table_name, 1)
 
-            timezone = request.POST.get('timezone')
-
             # Add output format
-            out_format = request.POST.get('out_format')
-            cmd_list = user_cmd.split(' ', 3)
+            user_cmd = add_sql_instructions(request, user_cmd) # Add format and timezone
 
 
-            if len(cmd_list) > 3:
-                sql_instruct = ""
-                index = user_cmd.find(" format")
-                if index > 0 and (len(user_cmd) > (index + 9) and (user_cmd[index + 7] == ' ' or (user_cmd[index + 7] == '='))):
-                    add_format = False  # Query from JSON file includes format
-                else:
-                    add_format = True
-
-                if add_format:
-                    if out_format == "table":
-                        sql_instruct = "format = table "
-                        select_info["out_format"] = "table"  # Keep selection menue on table
-                    else:
-                        sql_instruct = "format = json "
-                        select_info["out_format"] = None  # Keep selection menue on JSON
-
-                index = user_cmd.find(" timezone")
-                if index > 0 and (len(user_cmd) > (index + 11) and (
-                        user_cmd[index + 9] == ' ' or (user_cmd[index + 9] == '='))):
-                    add_timezone = False  # Query from JSON file includes timezone
-                else:
-                    add_timezone = True
-
-                if add_timezone:
-                    if timezone:
-                        sql_instruct += "and timezone = %s " % timezone
-                        select_info["timezone"] = timezone
-                    else:
-                        select_info["timezone"] = None
-
-                if sql_instruct:
-                    user_cmd = user_cmd.replace(cmd_list[2], sql_instruct + cmd_list[2])
         else:
             select_info["network"] = False
 
@@ -371,6 +336,48 @@ def command_button_selected(request, command_button):
             select_info["rest_call"] = None
 
     return select_info
+
+# ---------------------------------------------------------------------------------------
+# Update SQL Instructions section
+# Find the location after the "sql" and database name, and update the instructions if needed
+# ---------------------------------------------------------------------------------------
+def add_sql_instructions(request, user_cmd):
+
+
+    added_instructions = {
+        "timezone" : request.POST.get('timezone'),
+        "format"    : request.POST.get('out_format')
+    }
+
+    cmd_list = user_cmd.split(' ', 2)
+
+    if len(cmd_list) == 3:
+
+        # Split by: sql, dbms_name, instructions + SQL
+        cmd_lower = cmd_list[2].lower()
+        index = cmd_lower.find("select ")
+
+        if index != -1:
+            if index == 0:
+                instructions = ""       # No instructions
+                instructions_lower = ""
+            else:
+                instructions = cmd_list[2][:index]
+                instructions_lower = cmd_lower[:index]  # The existing instructions
+
+            for key, value in added_instructions.items():
+                # Add values from the Form
+                if value:
+                    if instructions_lower.find(key) == -1:
+                        new_instruction = "%s = %s " % (key, value)
+                        if len(instructions):
+                            instructions = new_instruction + ("and " + instructions)
+                        else:
+                            instructions = new_instruction
+
+
+            user_cmd = "sql " + cmd_list[1] + instructions + cmd_list[2][index:]
+    return user_cmd
 # ---------------------------------------------------------------------------------------
 # Process the AnyLog command form
 # ---------------------------------------------------------------------------------------
