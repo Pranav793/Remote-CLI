@@ -65,7 +65,7 @@
       {"button": "Date Time", "command": "get datetime pt now()", "type": "GET", "group" : "Other", "help_url" : "blob/master/queries.md#get-datetime-command"},
 
      {"button": "Releases",
-       "command": "sql video and extend=(@ip, @port) and  timezone = utc  select  insert_timestamp, file, minutes, name, timestamp, title from releases > selection", "type": "GET",
+       "command": "sql video extend=(@ip, @port) and format = json and timezone = utc  select  insert_timestamp, file, minutes, name, title from releases > selection", "type": "GET",
        "group" : "Video",
        "help_url" : "blob/master/queries.md#queries"}
 
