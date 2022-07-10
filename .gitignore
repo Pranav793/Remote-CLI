@@ -1,4 +1,4 @@
 .idea/
 __pycache__/
 anylog_deploy/configs/*
-anylog_query/static/video/*
+anylog_query/static/blobs/*

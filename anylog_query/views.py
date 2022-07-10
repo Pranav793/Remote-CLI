@@ -18,9 +18,9 @@ import anylog_query.utils_io as utils_io
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
 json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "commands.json") # Absolute path
-video_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "video" + os.sep + "current"+ os.sep) # Absolute path
-keep_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "video" + os.sep + "keep"+ os.sep) # Dir for saved videos - # Absolute path
-video_local_dir = "video/current/"
+blobs_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "blobs" + os.sep + "current"+ os.sep) # Absolute path
+keep_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "blobs" + os.sep + "keep"+ os.sep) # Dir for saved blobs - # Absolute path
+blobs_local_dir = "blobs/current/"
 
 data, error_msg = json_api.load_json(json_file)
 
@@ -98,13 +98,13 @@ def form_request(request):
 
     form = request.POST.get("Form")         # The form used
 
-    video_button = request.POST.get("Video")    # The Video button was selected
+    blobs_button = request.POST.get("Blobs")    # The blobs button was selected
     config_button = request.POST.get("Config")  # The Config button was selected
     client_button = request.POST.get("Client")  # Client button was selected
 
-    if video_button or (form == "Video" and not client_button and not config_button):
-        # Either the Video Button was selected (on a different form) or the Video Page is processed.
-        return video_processes(request, video_button)
+    if blobs_button or (form == "blobs" and not client_button and not config_button):
+        # Either the blobs Button was selected (on a different form) or the blobs Page is processed.
+        return blobs_processes(request, blobs_button)
 
     if config_button:
         # config button was selected - go to the config page
@@ -155,11 +155,11 @@ def form_request(request):
 # ---------------------------------------------------------------------------------------
 # Client processes - the main form interacting with the network
 # ---------------------------------------------------------------------------------------
-def video_processes(request, video_button):
+def blobs_processes(request, blobs_button):
 
-    global keep_dir         # Absolute Path - Saved videos
-    global video_dir        # Absolute Path - Copied videos
-    global video_local_dir  # "video/current/"
+    global keep_dir         # Absolute Path - Saved blobss
+    global blobs_dir        # Absolute Path - Copied blobss
+    global blobs_local_dir  # "blobs/current/"
 
     select_info = {}
 
@@ -170,10 +170,10 @@ def video_processes(request, video_button):
 
     post_data = request.POST
 
-    if video_button:
-        # video_button was selected - Copy the files from the source servers
+    if blobs_button:
+        # blobs_button was selected - Copy the files from the source servers
 
-        copied_info = get_video(request)      # Copy video files from dest machines
+        copied_info = get_blobs(request)      # Copy blobs files from dest machines
 
     else:
         # process the form - delete or move the file
@@ -194,33 +194,33 @@ def video_processes(request, video_button):
                     if watch_file:
                         break       # Exit with the first file to watch
                     if delete_file:
-                        utils_io.delete_file(video_dir + file_name)
+                        utils_io.delete_file(blobs_dir + file_name)
                     elif keep_file:
                         # save the file in the "keep" directory
-                        utils_io.copy_file(keep_dir + file_name, video_dir + file_name)
+                        utils_io.copy_file(keep_dir + file_name, blobs_dir + file_name)
 
 
-    copied_videos = utils_io.get_files_in_dir(video_dir, True)     # Get the list of files that were copied
+    copied_blobs = utils_io.get_files_in_dir(blobs_dir, True)     # Get the list of files that were copied
 
-    # Go to the page - video.html
+    # Go to the page - blobs.html
 
-    select_info["column_names"] = ["Video", "Size", "select"]
+    select_info["column_names"] = ["blobs", "Size", "select"]
 
-    select_info["rows"] = copied_videos
+    select_info["rows"] = copied_blobs
 
     if watch_file:
         # Use the first flagged file
-        active_file = video_local_dir + file_name
-    elif len (copied_videos):
+        active_file = blobs_local_dir + file_name
+    elif len (copied_blobs):
         # Use the first file in the directory
-        active_file = video_local_dir + copied_videos[0][0]
+        active_file = blobs_local_dir + copied_blobs[0][0]
     else:
         active_file = None
 
     if active_file:
-        select_info["active_file"] = active_file        # Taken as - <source src="{% static "video/current/files.10_seconds.0.mp4" %}" type="video/mp4">
+        select_info["active_file"] = active_file        # Taken as - <source src="{% static "blobs/current/files.10_seconds.0.mp4" %}" type="blobs/mp4">
 
-    return render(request, "video.html", select_info) # Process the Video page
+    return render(request, "blobs.html", select_info) # Process the blobs page
 
 # ---------------------------------------------------------------------------------------
 # Client processes - the main form interacting with the network
@@ -326,21 +326,40 @@ def command_button_selected(request, command_button):
             # Add output format
             out_format = request.POST.get('out_format')
             cmd_list = user_cmd.split(' ', 3)
+
+
             if len(cmd_list) > 3:
-                if out_format == "table":
-                    sql_instruct = "format = table "
-                    select_info["out_format"] = "table"  # Keep selection menue on table
+                sql_instruct = ""
+                index = user_cmd.find(" format")
+                if index > 0 and (len(user_cmd) > (index + 9) and (user_cmd[index + 7] == ' ' or (user_cmd[index + 7] == '='))):
+                    add_format = False  # Query from JSON file includes format
                 else:
-                    sql_instruct = "format = json "
-                    select_info["out_format"] = None  # Keep selection menue on JSON
+                    add_format = True
 
-                if timezone:
-                    sql_instruct += "and timezone = %s " % timezone
-                    select_info["timezone"] = timezone
+                if add_format:
+                    if out_format == "table":
+                        sql_instruct = "format = table "
+                        select_info["out_format"] = "table"  # Keep selection menue on table
+                    else:
+                        sql_instruct = "format = json "
+                        select_info["out_format"] = None  # Keep selection menue on JSON
+
+                index = user_cmd.find(" timezone")
+                if index > 0 and (len(user_cmd) > (index + 11) and (
+                        user_cmd[index + 9] == ' ' or (user_cmd[index + 9] == '='))):
+                    add_timezone = False  # Query from JSON file includes timezone
                 else:
-                    select_info["timezone"] = None
+                    add_timezone = True
 
-                user_cmd = user_cmd.replace(cmd_list[2], sql_instruct + cmd_list[2])
+                if add_timezone:
+                    if timezone:
+                        sql_instruct += "and timezone = %s " % timezone
+                        select_info["timezone"] = timezone
+                    else:
+                        select_info["timezone"] = None
+
+                if sql_instruct:
+                    user_cmd = user_cmd.replace(cmd_list[2], sql_instruct + cmd_list[2])
         else:
             select_info["network"] = False
 
@@ -724,11 +743,11 @@ def get_updated_config(operation, update_id, request):
     return config_list
 
 # -----------------------------------------------------------------------------------
-# Get the Video files from the dest machines
+# Get the blobs files from the dest machines
 # -----------------------------------------------------------------------------------
-def get_video(request):
+def get_blobs(request):
 
-    global video_dir
+    global blobs_dir
 
     post_data = request.POST
 
@@ -745,14 +764,14 @@ def get_video(request):
         if entry.startswith("get@"):
             entry_list = entry.split('@')
             if len(entry_list) == 5:
-                # Get the video file operator info and file name
+                # Get the blobs file operator info and file name
                 operator_ip = entry_list[1]
                 operator_port = entry_list[2]
                 destination = "%s:%s" % (operator_ip, operator_port)
                 archive_path = entry_list[3]
                 file_name = entry_list[4]
 
-                command = "file get !!blobs_dir/%s/%s %s" % ( archive_path, file_name, video_dir)
+                command = "file get !!blobs_dir/%s/%s %s" % ( archive_path, file_name, blobs_dir)
 
                 output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=True,  dest=destination, timeout="", subset=False)
 
