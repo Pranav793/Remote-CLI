@@ -376,7 +376,7 @@ def add_sql_instructions(request, user_cmd):
                             instructions = new_instruction
 
 
-            user_cmd = "sql " + cmd_list[1] + instructions + cmd_list[2][index:]
+            user_cmd = "sql " + cmd_list[1] + " " + instructions + cmd_list[2][index:]
     return user_cmd
 # ---------------------------------------------------------------------------------------
 # Process the AnyLog command form
