@@ -778,7 +778,7 @@ def get_blobs(request):
                 archive_path = entry_list[3]
                 file_name = entry_list[4]
 
-                command = "file get !!blobs_dir/%s/%s %s" % ( archive_path, file_name, blobs_dir)
+                command = "file get !!blobs_dir/%s/%s %s%s.%s" % ( archive_path, file_name, blobs_dir, operator_ip, file_name)
 
                 output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=True,  dest=destination, timeout="", subset=False)
 
