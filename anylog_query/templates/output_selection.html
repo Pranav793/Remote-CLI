@@ -16,10 +16,10 @@
             </tr>
             {% for row in rows %}
             <tr>
-                {% for col_val in row %}
+                {% for col_val in row.0 %}
                     <td>{{ col_val }}</td>
                 {% endfor %}
-                <td><label><input type="checkbox" name="get@{{ row.0 }}@{{ row.1 }}@{{ row.2.2 }}{{ row.2.3 }}/{{ row.2.5 }}{{ row.2.6 }}/{{ row.2.8 }}{{ row.2.9 }}@{{ row.3 }}" value="True"/></label></td> <!-- The selection column: -->
+                <td><label><input type="checkbox" name="get@{{ row.1 }}" value="True"/></label></td> <!-- The selection column: -->
 
             </tr>
             {% endfor %}

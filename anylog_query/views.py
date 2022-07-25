@@ -228,27 +228,25 @@ def blobs_processes(request, blobs_button):
 def client_processes(request, client_button):
 
     selection_output = False
+    get_columns = None
     send_button = request.POST.get("Send")
 
     # Check the form is submitted or not
     if not client_button and request.method == 'POST' and send_button:
         # SEND THE COMMAND TO DESTINATION NODE
 
-        user_cmd = request.POST.get("command")
-        if len(user_cmd) > 5 and user_cmd.strip()[:4].lower() == "sql ":
+        user_cmd = request.POST.get("command").strip()
+        if len(user_cmd) > 5 and user_cmd[:4].lower() == "sql ":
             query_result = True
-            if user_cmd.endswith(" selection"):
-                sql_cmd = user_cmd[:-10].rstrip()
-                if sql_cmd[-2:] == " >":
-                    user_cmd = sql_cmd[:-2].rstrip()
-                    selection_output = True     # Push the returned JSON value into a selection table
+
+            user_cmd, selection_output, get_columns = get_file_copy_info(user_cmd)
         else:
             query_result = False
 
         # Process the command
         output = process_anylog(request, user_cmd)        # SEND THE COMMAND TO DESTINATION NODE
 
-        return print_network_reply(request, query_result, output, selection_output)
+        return print_network_reply(request, query_result, output, selection_output, get_columns)
 
     else:
         # Display the html form
@@ -279,6 +277,62 @@ def client_processes(request, client_button):
         keep_user_selections(select_info)
 
         return render(request, "base.html", select_info)
+
+
+# ---------------------------------------------------------------------------------------
+# If the query is an input to a file copy - get the column name that holds the file name
+# sql edgex extend=   (@ip, @port) and format  = json and timezone = utc  select  * from image  > selection (columns: ip using ip and port using port and file using file)
+# ---------------------------------------------------------------------------------------
+def get_file_copy_info(user_cmd):
+    '''
+    user_cmd - provided by the user
+
+    return:
+        command - the command without the suffix: > (file id in column file)
+        selection_output - bool to determine if redirection exists
+        id_column - the column that includes the id of the file (Hash value or file name)
+    '''
+    updated_command = command
+    selection_output = False
+    get_columns = ["ip", "port", "dbms", "file"]  # Location for column names for IP, Port, File Name    selection_output = False
+    if user_cmd[-1] == ')':
+        index = user_cmd.rfind('(')
+        if index > 10:
+            paren_info = user_cmd[index+1:-1].strip()   # info inside the parenthesis, i.e.: (file id in column file)
+            sql_cmd = user_cmd[:index].rstrip()
+            if sql_cmd.endswith(">selection"):
+                updated_command = user_cmd[:-10].rstrip()
+            elif sql_cmd.endswith(" selection"):
+                sql_cmd = sql_cmd[:-10].rstrip()
+                if sql_cmd[-1] == ">":
+                    updated_command = sql_cmd[:-1].rstrip()
+                    # Get the column name
+                    # The format is (columns: ip using [column name of ip] and port using [column name of port] and file using [column name of file])
+                    if paren_info.startswith("columns: "):
+                        paren_info = paren_info[9:].lstrip()
+                        columns_list = paren_info.split("and")
+                        if len(columns_list) == 3:
+                            # needs to describe IP, Port, File Name (or Hash)
+
+                            counter = 0
+                            for entry in columns_list:
+                                column_info = entry.strip().split()     # X using [column name]
+                                if len(column_info) != 3 or column_info[1] != "using":
+                                    break
+                                index = get_columns.index(column_info[0])
+                                if index == -1:
+                                    break
+                                get_columns[index] = column_info[2]
+                                counter += 1
+                            if counter == 3:
+                                # all fields found
+                                selection_output = True  # Push the returned JSON value into a selection table
+                                # get the dbms_name
+                                dbms_name = user_cmd[3:].lstrip()
+                                get_columns[2] = dbms_name[:dbms_name.find(' ')]
+
+
+    return [updated_command, selection_output, get_columns]
 
 # ---------------------------------------------------------------------------------------
 # Command button was selected - get the command info and set the command on select_info
@@ -423,12 +477,13 @@ def process_anylog(request, user_cmd):
 # Option 2 - a table
 # Option 3 - text
 # -----------------------------------------------------------------------------------
-def print_network_reply(request, query_result, data, selection_output):
+def print_network_reply(request, query_result, data, selection_output, get_columns):
     '''
     request - the form info
     query_result - a True/False value representing SQL query data set returned
     data - the query or command result
     selection_output - user issued a SQL statement with "> selection" at the end - indicating output to a selection table
+    get_columns - the name of the columns that includes the IP, Port, dbms name and file name to retrieve he file
     '''
 
     select_info = {}
@@ -464,7 +519,8 @@ def print_network_reply(request, query_result, data, selection_output):
             if selection_output:
                 # Show as a selection table
                 keep_user_selections(select_info)
-                return json_to_selection_table(request, select_info, policies)
+
+                return json_to_selection_table(request, select_info, policies, get_columns)
             else:
                 # Reply was a JSON policies or a query replied in JSON
                 data_list = []
@@ -497,23 +553,55 @@ def print_network_reply(request, query_result, data, selection_output):
 # Output to selection table
 # Change the query reply from JSON to selection table format and call the report
 # -----------------------------------------------------------------------------------
-def json_to_selection_table(request, select_info, policies):
+def json_to_selection_table(request, select_info, policies, get_columns):
     # Show as a selection table
+    '''
+    select_info - info directing the page
+    policies - the data returned from the network
+    id_column - the name of the column that includes the file name
+    '''
+
+
     policies_list = policies["Query"]
     one_policy = policies_list[0]
     column_names = []
     # Get the title for the table from the first policy
-    for attr_name in one_policy.keys():
+
+    ip_column = -1
+    port_column = -1
+    file_column = -1
+
+    for column_id, attr_name in enumerate(one_policy.keys()):
         column_names.append(attr_name)
+        if len(get_columns) == 4:
+            # Includes: IP+Port+DBS-Name+File_id
+            if attr_name == get_columns[0]:
+                ip_column = column_id
+            elif attr_name == get_columns[1]:
+                port_column = column_id
+            elif attr_name == get_columns[3]:
+                file_column = column_id
+
     select_info['column_names'] = column_names
 
     # add the data as a columns per row
     rows = []
     for policy in policies_list:
         columns_val = []
-        for attr_val in policy.values():
+        selection = ""
+        for att_id, attr_val in enumerate(policy.values()):
             columns_val.append(attr_val)
-        rows.append(columns_val)
+            if att_id == ip_column:
+                selection += "+ip@" + attr_val
+            elif att_id == port_column:
+                selection += "+port@" + attr_val
+            elif att_id == file_column:
+                selection += "+file@" + attr_val
+
+        if len(get_columns) == 4:
+            selection += "+dbms@" + get_columns[2]
+
+        rows.append([columns_val, selection])
 
     select_info['rows'] = rows
 
@@ -768,21 +856,42 @@ def get_blobs(request):
     copied_info = []        # Collect the files copied and the message if an error happened
 
     for entry in post_data:
-        if entry.startswith("get@"):
-            entry_list = entry.split('@')
-            if len(entry_list) == 5:
+        if entry.startswith("get@+"):
+            operator_ip = None
+            operator_port = None
+            operator_dbms = None
+            operator_file = None
+
+            entry_list = entry[5:].split('+')
+
+            if len(entry_list) == 4: # Organized with IP and Port and File-Name and DBMS
                 # Get the blobs file operator info and file name
-                operator_ip = entry_list[1]
-                operator_port = entry_list[2]
-                destination = "%s:%s" % (operator_ip, operator_port)
-                archive_path = entry_list[3]
-                file_name = entry_list[4]
+                for part in entry_list:
+                    if part.startswith("ip@"):
+                        operator_ip = part[3:]
+                    elif part.startswith("port@"):
+                        operator_port = part[5:]
+                    elif part.startswith("dbms@"):
+                        operator_dbms = part[5:]
+                    elif part.startswith("file@"):
+                        operator_file = part[5:]
 
-                command = "file get !!blobs_dir/%s/%s %s%s.%s" % ( archive_path, file_name, blobs_dir, operator_ip, file_name)
 
-                output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=True,  dest=destination, timeout="", subset=False)
+                info_needed = True
+                if operator_ip and operator_port:
+                    destination = "%s:%s" % (operator_ip, operator_port)
+                else:
+                    info_needed = False
 
-                copied_info.append((file_name, output))
+                if operator_dbms and operator_file:
+                    command = f"file get (dbms = {operator_dbms} and id = {operator_file}) {blobs_dir}{operator_file}"
+                else:
+                    info_needed = False
+
+                if info_needed:
+                    output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=True,  dest=destination, timeout="", subset=False)
+
+                copied_info.append((operator_file, output))
 
     return copied_info
 
