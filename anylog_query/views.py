@@ -884,7 +884,7 @@ def get_blobs(request):
                     info_needed = False
 
                 if operator_dbms and operator_file:
-                    command = f"file get (dbms = {operator_dbms} and id = {operator_file}) {blobs_dir}{operator_file}"
+                    command = f"file get (dbms = blobs_{operator_dbms} and id = {operator_file}) {blobs_dir}{operator_file}"
                 else:
                     info_needed = False
 
