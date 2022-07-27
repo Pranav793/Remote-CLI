@@ -10,7 +10,7 @@ to be broadly interpreted) you or your such affiliates shall unconditionally ass
 such non-permitted act to AnyLog, Inc.
 '''
 
-
+import sys
 import os
 import shutil
 
@@ -46,7 +46,6 @@ def delete_file( file_path_name ):
     try:
         os.remove(file_path_name)
     except:
-        pass
         ret_val = False
 
     return ret_val
@@ -59,7 +58,20 @@ def copy_file(des_file, source_file):
     try:
         shutil.copyfile(source_file, des_file)
     except:
-        pass
         ret_val = False
 
     return ret_val
+
+def read_file(file_name):
+    '''
+    file_name - pathe + file name
+    '''
+
+    try:
+        with open(file_name) as f:
+            data = f.read()
+    except:
+        errno, value = sys.exc_info()[:2]
+        data = None
+
+    return data
