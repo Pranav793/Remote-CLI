@@ -56,14 +56,15 @@
             {% if file_info.1 == "png" %}
                 <img src="{{ file_info.3 }}" width=320 height=240 alt="{{ file_info.0 }}">
 
-            {% elif file_info.1 == "jpg" %}
-                <img src="{% static   file_info.2  %}" width=320 height=240 alt="{{ file_info.0 }}">
-
             {% elif file_info.1 == "mp4" %}
                 <video width="320" height="240" controls preload="none">
                 <source src="{% static   file_info.2  %}" type="video/mp4">
                 Your browser does not support the video tag.
                 </video>
+
+            {% else %}
+                <img src="{% static   file_info.2  %}" width=320 height=240 alt="{{ file_info.0 }}">
+
             {% endif %}
         {% endfor %}
 
