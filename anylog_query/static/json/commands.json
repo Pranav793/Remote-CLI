@@ -62,6 +62,13 @@
       {"button": "CPU Info", "command": "get cpu info", "type": "GET", "group" : "Other", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
       {"button": "Disk Info", "command": "get disk usage .", "type": "GET", "group" : "Other", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
       {"button": "Timezone Info", "command": "get timezone info", "type": "GET", "group" : "Other", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
-      {"button": "Date Time", "command": "get datetime pt now()", "type": "GET", "group" : "Other", "help_url" : "blob/master/queries.md#get-datetime-command"}
+      {"button": "Date Time", "command": "get datetime pt now()", "type": "GET", "group" : "Other", "help_url" : "blob/master/queries.md#get-datetime-command"},
+
+     {"button": "Releases",
+       "command": "sql edgex extend=   (@ip, @port) and format  = json and timezone = utc  select  * from image  > selection (columns: ip using ip and port using port and file using file)", "type": "GET",
+       "group" : "Video",
+       "help_url" : "blob/master/queries.md#queries"}
+
+
     ]
 }
