@@ -39,16 +39,16 @@ must_have_keys = [      # These keys are tested in each coimmand in the JSON fil
 
 COMMANDS_GROUPS = ["All"]
 if ANYLOG_COMMANDS:
-    for command in ANYLOG_COMMANDS:
+    for command_ in ANYLOG_COMMANDS:
         for key in must_have_keys:
             # test all keys exists
-            if not key in command:
+            if not key in command_:
                 if key != "help_url":
-                    sys.exit("Missing key: '%s' in commands.json file at entry: %s" % (key, str(command)))
+                    sys.exit("Missing key: '%s' in commands.json file at entry: %s" % (key, str(command_)))
             if key == "group":
-                value = command[key]
+                value = command_[key]
                 if not value in COMMANDS_GROUPS:
-                    COMMANDS_GROUPS.append(command[key])
+                    COMMANDS_GROUPS.append(command_[key])
 
 
 '''
@@ -297,7 +297,7 @@ def get_file_copy_info(user_cmd):
         selection_output - bool to determine if redirection exists
         id_column - the column that includes the id of the file (Hash value or file name)
     '''
-    updated_command = command
+    updated_command = user_cmd
     selection_output = False
     get_columns = ["ip", "port", "dbms", "file"]  # Location for column names for IP, Port, File Name    selection_output = False
     if user_cmd[-1] == ')':
