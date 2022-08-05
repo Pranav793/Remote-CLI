@@ -983,7 +983,7 @@ def make_qrcode(request):
         destination = request.POST.get('destination').strip()
         if not destination:
             destination = "network"
-        url_string += f"?destination=({destination})"
+        url_string += f"?destination={destination}"
 
 
     url_string += '?command=' + request.POST.get("command").strip()
