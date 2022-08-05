@@ -224,7 +224,9 @@ def blobs_processes(request, blobs_button):
                             file_type = file_name[index+1:]
                             if file_type == "png":
                                 # Read the file and add the base64 conversion string
-                                file_data = "data:image/png;base64," + utils_io.read_file(blobs_dir + file_name)
+                                data = utils_io.read_file(blobs_dir + file_name)
+                                if data:
+                                    file_data = "data:image/png;base64," + data
                             else:
                                 file_data = ""
 
@@ -876,9 +878,14 @@ def get_blobs(request):
     post_data = request.POST
 
     # Get the needed info from the form
-    conn_info = post_data.get('connect_info').strip()
+    conn_info = post_data.get('connect_info')
+    if conn_info:
+        conn_info = conn_info.strip()
 
-    authentication = anylog_conn.get_auth(request)
+    try:
+        authentication = anylog_conn.get_auth(request)
+    except:
+        authentication = None
 
     # Search for selected files
 
