@@ -1,0 +1,72 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+  <head>
+    {% load static %}
+    <link rel="icon" href="{% static 'css/anylog-logo.ico' %}">
+    <link rel='stylesheet' href="{% static 'css/default.css' %}">
+
+    <meta charset="UTF-8">
+    <title>AnyLog</title>
+
+    <style>
+        input[type=button], input[type=submit], input[type=reset]{
+        background-color: lightslategray;
+        border: none;
+        color: white;
+        padding: 16px 32px;
+        text-decoration: none;
+        margin: 4px 2px;
+        cursor: pointer;
+        }
+    </style>
+
+
+  </head>
+  <body>
+
+  <form method="POST" class="post-form" >
+
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    {% load static %} <img src="{% static "css/anylog-logo.ico" %}" alt="AnyLog Network" onclick="window.location.href='https://anylog.co/'" class="floatleft"/>
+
+    <div class="networktext">
+    <text style="float: left">AnyLog Network Client</text>
+    </div>
+
+
+  <input type ="submit" name = "dummy" id="dummy" value="dummy" style="background:transparent; border:none; color:transparent; height:1px; width:1px" />
+  <input type ="submit" name = "Config" id="Config" value="Config" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
+  <input type ="submit" name = "Blobs" id="Blobs" value="Blobs" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
+  <input type ="submit" name = "Client" id="Client" value="Client" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
+
+
+    <br/> <br/> <br/>
+
+
+    <div>
+
+
+    <img src="{{ qrcode }}" width=320 height=240 alt="{{ file_info.0 }}"  width="50" height="50"/>
+
+
+  </div>
+
+
+
+   <br/> <br/>  <br/>
+
+   &nbsp; &nbsp; &nbsp;
+   <h3>{{ command }}</h3>
+
+  </form>
+
+
+  </body>
+
+</html>
+
