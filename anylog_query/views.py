@@ -967,17 +967,42 @@ def make_qrcode(request):
 
     select_info = {}
 
-    test_string = "  123  456"
-
-    updated_str = update_url(test_string)
-
-    qrcode = create_qr(updated_str)
-
-    image_as_str = qrcode.png_as_base64_str(scale=5)
-
-    html_img = "data:image/png;base64,{}".format(image_as_str)
+    html_img = ""
+    qrcode_command = ""     # The final command structure
 
 
+
+    conn_info = request.POST.get('connect_info').strip()
+
+    url_string = f"http://{conn_info}/?User-Agent=AnyLog/1.23"
+
+    username = request.POST.get('auth_usr').strip()
+    password = request.POST.get('auth_pass').strip()
+
+    if request.POST.get('network') == "on":
+        destination = request.POST.get('destination').strip()
+        if not destination:
+            destination = "network"
+        url_string += f"?destination=({destination})"
+
+
+    url_string += '?command=' + request.POST.get("command").strip()
+
+    try:
+        qrcode = create_qr(url_string)
+    except:
+        pass
+    else:
+        try:
+            image_as_str = qrcode.png_as_base64_str(scale=5)
+        except:
+            pass
+        else:
+
+            qrcode_command = url_string       # The command that is in the qrcode
+            html_img = "data:image/png;base64,{}".format(image_as_str)
+
+    select_info["command"] = qrcode_command
     select_info["qrcode"] = html_img  # The files to watch
 
     return render(request, "qrcode.html", select_info)  # Process the blobs page
