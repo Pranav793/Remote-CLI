@@ -13,6 +13,8 @@ RUN apt-get -y install libpq-dev python3.9-dev
 RUN python3.9 -m pip install --upgrade pip
 RUN python3.9 -m pip install django
 RUN python3.9 -m pip install requests
+RUN python3.9 -m pip install pyqrcode[pi] 
+RUN python3.9 -m pip install pypng
 RUN apt-get -y update
 
 WORKDIR $ANYLOG_ROOT_DIR
