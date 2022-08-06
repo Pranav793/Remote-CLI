@@ -78,20 +78,20 @@ conf_file_names = [
     "Standalone"
 ]
 
-user_selections = {
-        'connect_info' : None,
-        'auth_usr' : None,
-        'auth_pass' : None,
-        'cmd_type' : None,
-        'timeout' : None,
-        'dbms' : None,
-        'table' : None,
-        'timezone' : None,
-        'out_format' : None,
-        'network' : None,
-        'destination' : None,
-        'command' : None,
-}
+user_selections_ = [
+        'connect_info',
+        'auth_usr',
+        'auth_pass',
+        'cmd_type',
+        'timeout',
+        'dbms',
+        'table',
+        'timezone',
+        'out_format',
+        'network',
+        'destination',
+        'command',
+]
 
 url_chars_ = {
     ' ': '%20',
@@ -291,7 +291,6 @@ def client_processes(request, client_button):
             select_info = command_button_selected(request, command_button)
         else:
             select_info = {}
-            restore_user_selections(request.POST, select_info)
 
             if not client_button and request.method == 'POST':
                 # Send was not selected - keep the older selected values
@@ -309,7 +308,6 @@ def client_processes(request, client_button):
         select_info["commands_list"] = ANYLOG_COMMANDS
         select_info["commands_groups"] = COMMANDS_GROUPS
 
-        keep_user_selections(select_info)
 
         return render(request, "base.html", select_info)
 
@@ -379,8 +377,6 @@ def command_button_selected(request, command_button):
     '''
     select_info = {}
 
-
-    restore_user_selections(request.POST, select_info)
 
     # AnyLog command button was selected
     add_form_value(select_info, request)
@@ -542,7 +538,6 @@ def print_network_reply(request, query_result, data, selection_output, get_colum
             data_list = []
             json_api.setup_print_tree(policies, data_list)
             select_info['text'] = data_list
-            keep_user_selections(select_info)
             return render(request, 'output_tree.html', select_info)
 
         print_info = [("text", data)]  # Print the error msg as a string
@@ -553,7 +548,6 @@ def print_network_reply(request, query_result, data, selection_output, get_colum
         if policies:
             if selection_output:
                 # Show as a selection table
-                keep_user_selections(select_info)
 
                 return json_to_selection_table(request, select_info, policies, get_columns)
             else:
@@ -561,7 +555,6 @@ def print_network_reply(request, query_result, data, selection_output, get_colum
                 data_list = []
                 json_api.setup_print_tree(policies, data_list)
                 select_info['text'] = data_list
-                keep_user_selections(select_info)
                 return render(request, 'output_tree.html', select_info)
 
         if query_result:
@@ -576,12 +569,10 @@ def print_network_reply(request, query_result, data, selection_output, get_colum
                 select_info['table_title'] = table_info['table_title']
             if 'rows' in table_info:
                 select_info['rows'] = table_info['rows']
-            keep_user_selections(select_info)
             return render(request, 'output_table.html', select_info)
 
 
     select_info['text'] = [("text", data)]        # Only TEXT
-    keep_user_selections(select_info)
     return render(request, 'output_cmd.html', select_info)
 
 # -----------------------------------------------------------------------------------
@@ -937,30 +928,24 @@ def get_blobs(request):
 
 
 # -----------------------------------------------------------------------------------
-# Keep the user selections
+# Keep the user selections = move the previous form selctions to the current form
 # -----------------------------------------------------------------------------------
-def keep_user_selections(select_info):
+def transfer_selections(request, select_info):
+    '''
+    request - the previous form selections
+    select_info - current form data
+    '''
 
-    global user_selections
+    global user_selections_     # The entries to pass from form to form
 
-    for key, value in user_selections.items():
-        if key in select_info:
+    previous_form = request.POST
+
+    for entry in user_selections_:
+        if entry in previous_form:
             # This key was updated
-            user_selections[key] = select_info[key]  # Keep the last selections
-        else:
-            user_selections[key] = None         # No selection
+            select_info[entry] = previous_form[entry]  # info passed to the new form
 
 
-# -----------------------------------------------------------------------------------
-# put back the last user selections
-# -----------------------------------------------------------------------------------
-def restore_user_selections(post_data, select_info):
-    global user_selections
-
-    for key, value in user_selections.items():
-        if value:
-            # This key was updated
-            select_info[key] =value  # Keep the last selections
 
 # -----------------------------------------------------------------------------------
 # Make QR code - update the url string
@@ -971,17 +956,27 @@ def make_qrcode(request):
 
     select_info = {}
 
+    transfer_selections(request, select_info)       # Move selections from the previous fom to the current form
+
     html_img = ""
     qrcode_command = ""     # The final command structure
 
 
-
-    conn_info = request.POST.get('connect_info').strip()
+    conn_info = request.POST.get('connect_info')
+    if conn_info:
+        conn_info = conn_info.strip()
 
     url_string = f"http://{conn_info}/?User-Agent=AnyLog/1.23"
 
-    username = request.POST.get('auth_usr').strip()
-    password = request.POST.get('auth_pass').strip()
+
+    username = request.POST.get('auth_usr')
+    if username:
+        username = username.strip()
+
+    password = request.POST.get('auth_pass')
+    if password:
+        password = password.strip()
+
 
     if request.POST.get('network') == "on":
         destination = request.POST.get('destination').strip()
@@ -990,7 +985,10 @@ def make_qrcode(request):
         url_string += f"?destination={destination}"
 
 
-    url_string += '?command=' + request.POST.get("command").strip()
+    url_string += '?command='
+    user_command = request.POST.get("command")
+    if user_command:
+        url_string += user_command.strip()
 
     url_encoded = update_url(url_string)
 
