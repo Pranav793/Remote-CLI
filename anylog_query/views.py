@@ -992,8 +992,10 @@ def make_qrcode(request):
 
     url_string += '?command=' + request.POST.get("command").strip()
 
+    url_encoded = update_url(url_string)
+
     try:
-        qrcode = create_qr(url_string)
+        qrcode = create_qr(url_encoded)
     except:
         pass
     else:
@@ -1008,6 +1010,7 @@ def make_qrcode(request):
 
     select_info["command"] = qrcode_command
     select_info["qrcode"] = html_img  # The files to watch
+    select_info["url"] = url_encoded
 
     return render(request, "qrcode.html", select_info)  # Process the blobs page
 
@@ -1019,10 +1022,12 @@ def update_url(command:str)->str:
     """
     replace characters according to the url_chars_ dictionary
     """
-    qr_string = command
-    for char in url_chars_:
+    qr_string = ""
+    for char in command:
         if char in url_chars_:
-            qr_string = qr_string.replace(char, url_chars_[char])
+            qr_string += url_chars_[char]
+        else:
+            qr_string += char
     return qr_string
 # -----------------------------------------------------------------------------------
 # Create the QR code
@@ -1045,32 +1050,3 @@ def create_qr(url:str='https://anylog.co')->pyqrcode.QRCode:
         print(f'Failed to create QR code (Error: {error})')
 
     return qrcode
-
-def create_image_file(qrcode:pyqrcode.QRCode, file_name:str='$HOME/ibm_demo/qrcode.png')->bool:
-    """
-    store QR code in png image file
-    :args:
-        qrcode:pyqrcode.QRCode - QR code
-        file_name:str - path of png image file
-    :params:
-        status:bool
-        full_path:str - full path of file_name
-    :return:
-        bool
-    """
-    status = False
-    full_path = os.path.expandvars(os.path.expanduser(file_name))
-    if full_path.rsplit('.', 1)[-1] != 'png':
-        full_path.replace(full_path.rsplit('.', 1)[-1], 'png')
-    if isinstance(qrcode, pyqrcode.QRCode):
-        try:
-            with open(full_path, 'wb') as pngf:
-                try:
-                    qrcode.png(pngf, scale=10, module_color='#0023a5')
-                except Exception as error:
-                    print(f'Failed to store content in qrcode.png (Error: {error})')
-        except Exception as error:
-            print(f'Failed to open qrcode.png (Error: {error})')
-        else:
-            status = True
-    return status
