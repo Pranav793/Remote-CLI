@@ -4,6 +4,7 @@ from pathlib import Path
 from django.shortcuts import render
 
 import pyqrcode
+import base64
 
 # Import necessary modules
 from django.shortcuts import render
@@ -178,6 +179,7 @@ def form_request(request):
 
 # ---------------------------------------------------------------------------------------
 # Client processes - the main form interacting with the network
+# Base64 info - https://stackabuse.com/encoding-and-decoding-base64-strings-in-python/
 # ---------------------------------------------------------------------------------------
 def blobs_processes(request, blobs_button):
 
@@ -222,11 +224,13 @@ def blobs_processes(request, blobs_button):
                         index = file_name.rfind('.')
                         if index > 0 and index < (len(file_name) - 1):
                             file_type = file_name[index+1:]
-                            if file_type == "png":
+                            if file_type == "msg":
                                 # Read the file and add the base64 conversion string
-                                data = utils_io.read_file(blobs_dir + file_name)
-                                if data:
-                                    file_data = "data:image/png;base64," + data
+                                disk_data = utils_io.read_file(blobs_dir + file_name)
+                                if disk_data:
+                                    file_data = "data:image/png;base64," + disk_data
+                                else:
+                                    file_data = ""
                             else:
                                 file_data = ""
 
