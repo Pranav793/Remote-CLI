@@ -291,6 +291,7 @@ def client_processes(request, client_button):
             select_info = command_button_selected(request, command_button)
         else:
             select_info = {}
+            transfer_selections(request, select_info)   # Move selections from old form to the current form
 
             if not client_button and request.method == 'POST':
                 # Send was not selected - keep the older selected values
@@ -928,7 +929,7 @@ def get_blobs(request):
 
 
 # -----------------------------------------------------------------------------------
-# Keep the user selections = move the previous form selctions to the current form
+# Keep the user selections = move the previous form selections to the current form
 # -----------------------------------------------------------------------------------
 def transfer_selections(request, select_info):
     '''
@@ -944,7 +945,6 @@ def transfer_selections(request, select_info):
         if entry in previous_form:
             # This key was updated
             select_info[entry] = previous_form[entry]  # info passed to the new form
-
 
 
 # -----------------------------------------------------------------------------------
@@ -1006,7 +1006,7 @@ def make_qrcode(request):
             qrcode_command = url_string       # The command that is in the qrcode
             html_img = "data:image/png;base64,{}".format(image_as_str)
 
-    select_info["command"] = qrcode_command
+    select_info["qr_cmd"] = qrcode_command
     select_info["qrcode"] = html_img  # The files to watch
     select_info["url"] = url_encoded
 
