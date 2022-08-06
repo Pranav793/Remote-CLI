@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from django.shortcuts import render
 
-import copy
+import pyqrcode
 
 # Import necessary modules
 from django.shortcuts import render
@@ -91,6 +91,26 @@ user_selections = {
         'destination' : None,
         'command' : None,
 }
+
+url_chars_ = {
+    ' ': '%20',
+    '"': '%22',
+    '<': '%3c',
+    '>': '%3e',
+    '#': '%23',
+    '%': '%25',
+    '\'': "%27",
+    '{': '%7b',
+    '}': '%7d',
+    '|': '%7c',
+    '\\': '%5c',
+    '^': '%5e',
+    '~': '%7e',
+    '[': '%5b',
+    ']': '%5d',
+    '`': '%60'
+}
+
 # ---------------------------------------------------------------------------------------
 # GET / POST  AnyLog command form
 # ---------------------------------------------------------------------------------------
@@ -101,6 +121,10 @@ def form_request(request):
     blobs_button = request.POST.get("Blobs")    # The blobs button was selected
     config_button = request.POST.get("Config")  # The Config button was selected
     client_button = request.POST.get("Client")  # Client button was selected
+    qr_button = request.POST.get("Qrcode")      # Create QrCode from the command
+
+    if qr_button:
+        return make_qrcode(request)
 
     if blobs_button or (form == "Blobs" and not client_button and not config_button):
         # Either the blobs Button was selected (on a different form) or the blobs Page is processed.
@@ -200,7 +224,9 @@ def blobs_processes(request, blobs_button):
                             file_type = file_name[index+1:]
                             if file_type == "png":
                                 # Read the file and add the base64 conversion string
-                                file_data = "data:image/png;base64," + utils_io.read_file(blobs_dir + file_name)
+                                data = utils_io.read_file(blobs_dir + file_name)
+                                if data:
+                                    file_data = "data:image/png;base64," + data
                             else:
                                 file_data = ""
 
@@ -852,9 +878,14 @@ def get_blobs(request):
     post_data = request.POST
 
     # Get the needed info from the form
-    conn_info = post_data.get('connect_info').strip()
+    conn_info = post_data.get('connect_info')
+    if conn_info:
+        conn_info = conn_info.strip()
 
-    authentication = anylog_conn.get_auth(request)
+    try:
+        authentication = anylog_conn.get_auth(request)
+    except:
+        authentication = None
 
     # Search for selected files
 
@@ -927,4 +958,115 @@ def restore_user_selections(post_data, select_info):
             # This key was updated
             select_info[key] =value  # Keep the last selections
 
+# -----------------------------------------------------------------------------------
+# Make QR code - update the url string
+# pypng - required to install but not import
+# Info at https://pythonhosted.org/PyQRCode/moddoc.html
+# -----------------------------------------------------------------------------------
+def make_qrcode(request):
 
+    select_info = {}
+
+    html_img = ""
+    qrcode_command = ""     # The final command structure
+
+
+
+    conn_info = request.POST.get('connect_info').strip()
+
+    url_string = f"http://{conn_info}/?User-Agent=AnyLog/1.23"
+
+    username = request.POST.get('auth_usr').strip()
+    password = request.POST.get('auth_pass').strip()
+
+    if request.POST.get('network') == "on":
+        destination = request.POST.get('destination').strip()
+        if not destination:
+            destination = "network"
+        url_string += f"?destination={destination}"
+
+
+    url_string += '?command=' + request.POST.get("command").strip()
+
+    try:
+        qrcode = create_qr(url_string)
+    except:
+        pass
+    else:
+        try:
+            image_as_str = qrcode.png_as_base64_str(scale=5)
+        except:
+            pass
+        else:
+
+            qrcode_command = url_string       # The command that is in the qrcode
+            html_img = "data:image/png;base64,{}".format(image_as_str)
+
+    select_info["command"] = qrcode_command
+    select_info["qrcode"] = html_img  # The files to watch
+
+    return render(request, "qrcode.html", select_info)  # Process the blobs page
+
+
+# -----------------------------------------------------------------------------------
+# Make QR code - update the url string
+# -----------------------------------------------------------------------------------
+def update_url(command:str)->str:
+    """
+    replace characters according to the url_chars_ dictionary
+    """
+    qr_string = command
+    for char in url_chars_:
+        if char in url_chars_:
+            qr_string = qr_string.replace(char, url_chars_[char])
+    return qr_string
+# -----------------------------------------------------------------------------------
+# Create the QR code
+# pypng - required to install but not import
+# -----------------------------------------------------------------------------------
+def create_qr(url:str='https://anylog.co')->pyqrcode.QRCode:
+    """
+    Create QR code
+    :args:
+        url:str - URL correlated to QR
+    :params:
+        qrcode:pyqrcode.QRCode - Generated QR based on URL
+    :return:
+        qrcode
+    """
+    qrcode = None
+    try:
+        qrcode = pyqrcode.create(url)
+    except Exception as error:
+        print(f'Failed to create QR code (Error: {error})')
+
+    return qrcode
+
+def create_image_file(qrcode:pyqrcode.QRCode, file_name:str='$HOME/ibm_demo/qrcode.png')->bool:
+    """
+    store QR code in png image file
+    :args:
+        qrcode:pyqrcode.QRCode - QR code
+        file_name:str - path of png image file
+    :params:
+        status:bool
+        full_path:str - full path of file_name
+    :return:
+        bool
+    """
+    status = False
+    full_path = os.path.expandvars(os.path.expanduser(file_name))
+    if full_path.rsplit('.', 1)[-1] != 'png':
+        full_path.replace(full_path.rsplit('.', 1)[-1], 'png')
+    if isinstance(qrcode, pyqrcode.QRCode):
+        try:
+            with open(full_path, 'wb') as pngf:
+                try:
+                    qrcode.png(pngf, scale=10, module_color='#0023a5')
+                except Exception as error:
+                    print(f'Failed to store content in qrcode.png (Error: {error})')
+        except Exception as error:
+            print(f'Failed to open qrcode.png (Error: {error})')
+        else:
+            status = True
+    return status
