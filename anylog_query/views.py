@@ -189,6 +189,8 @@ def blobs_processes(request, blobs_button):
 
     select_info = {}
 
+    transfer_selections(request, select_info)  # Move selections from old form to the current form
+
     keep_file = False
     delete_file = False
     watch_file = False
