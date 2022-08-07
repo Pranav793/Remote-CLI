@@ -37,10 +37,25 @@
     </div>
 
 
+      <input type="hidden" id="connect_info" name="connect_info" value="{{connect_info}}">
+      <input type="hidden" id="auth_usr" name="auth_usr" value="{{auth_usr}}">
+      <input type="hidden" id="auth_pass" name="auth_pass" value="{{auth_pass}}">
+      <input type="hidden" id="cmd_type" name="cmd_type" value="{{cmd_type}}">
+      <input type="hidden" id="timeout" name="timeout" value="{{timeout}}">
+      <input type="hidden" id="dbms" name="dbms" value="{{dbms}}">
+      <input type="hidden" id="table" name="table" value="{{table}}">
+      <input type="hidden" id="timezone" name="timezone" value="{{timezone}}">
+      <input type="hidden" id="out_format" name="out_format" value="{{out_format}}">
+      <input type="hidden" id="network" name="network" value="{{network}}">
+      <input type="hidden" id="destination" name="destination" value="{{destination}}">
+      <input type="hidden" id="command" name="command" value="{{command}}">
+
+
+
 
 
   <input type ="submit" name = "dummy" id="dummy" value="dummy" style="background:transparent; border:none; color:transparent; height:1px; width:1px" />
-  <input type ="submit" name = "Config" id="Config" value="Config" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
+  <!input type ="submit" name = "Config" id="Config" value="Config" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
   <input type ="submit" name = "Qrcode" id="Qrcode" value="QR Code" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
   <input type ="submit" name = "Client" id="Client" value="Client" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
 
@@ -54,7 +69,7 @@
     <div>
 
         {% for file_info in watch %}
-            {% if file_info.1 == "png" %}
+            {% if file_info.1 == "msg" %}
                 <img src="{{ file_info.3 }}" width=320 height=240 alt="{{ file_info.0 }}">
 
             {% elif file_info.1 == "mp4" %}
