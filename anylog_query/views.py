@@ -352,7 +352,6 @@ def get_file_copy_info(user_cmd):
                         columns_list = paren_info.split("and")
                         if len(columns_list) == entries_count:
                             # needs to describe IP, Port, file name, table name, File Name (or Hash)
-
                             counter = 0
                             for entry in columns_list:
                                 column_info = entry.strip().split()     # X using [column name]
@@ -362,14 +361,10 @@ def get_file_copy_info(user_cmd):
                                     index = get_columns.index(column_info[0])
                                 except:
                                     break
-                                get_columns[index] = column_info[2]
+                                get_columns[index] = column_info[2] # CHANGE THE COLUMN NAME TO MACH THE QUERY COLUMN NAME
                                 counter += 1
                             if counter == entries_count:
-                                # all fields found
-                                selection_output = True  # Push the returned JSON value into a selection table
-                                # get the dbms_name
-                                dbms_name = user_cmd[3:].lstrip()
-                                get_columns[2] = dbms_name[:dbms_name.find(' ')]
+                                selection_output = True     # All fields for selection are available
 
 
     return [updated_command, selection_output, get_columns]
@@ -606,7 +601,7 @@ def json_to_selection_table(request, select_info, policies, get_columns):
 
     for column_id, attr_name in enumerate(one_policy.keys()):
         column_names.append(attr_name)
-        if len(get_columns) == 4:
+        if len(get_columns) == 5:
             # Includes: IP+Port+DBS-Name+File_id
             if attr_name == get_columns[0]:
                 ip_column = column_id
