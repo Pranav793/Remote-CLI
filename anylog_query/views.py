@@ -588,46 +588,37 @@ def json_to_selection_table(request, select_info, policies, get_columns):
     policies - the data returned from the network
     id_column - the name of the column that includes the file name
     '''
+    needed_columns = ["+ip@", "+port@", "+table@", "+dbms@", "+file@"]
 
 
     policies_list = policies["Query"]
+
     one_policy = policies_list[0]
     column_names = []
-    # Get the title for the table from the first policy
 
-    ip_column = -1
-    port_column = -1
-    file_column = -1
-
+    # Get the returned column names from the first returned policy
     for column_id, attr_name in enumerate(one_policy.keys()):
         column_names.append(attr_name)
-        if len(get_columns) == 5:
-            # Includes: IP+Port+DBS-Name+File_id
-            if attr_name == get_columns[0]:
-                ip_column = column_id
-            elif attr_name == get_columns[1]:
-                port_column = column_id
-            elif attr_name == get_columns[3]:
-                file_column = column_id
 
     select_info['column_names'] = column_names
 
-    # add the data as a columns per row
+    # for each policy - get 1) the data returned on selection and 2) the data to show the user
     rows = []
     for policy in policies_list:
-        columns_val = []
-        selection = ""
-        for att_id, attr_val in enumerate(policy.values()):
-            columns_val.append(attr_val)
-            if att_id == ip_column:
-                selection += "+ip@" + attr_val
-            elif att_id == port_column:
-                selection += "+port@" + attr_val
-            elif att_id == file_column:
-                selection += "+file@" + attr_val
+        selection = ""      # Set the data returned when selected
+        try:
+            for index, column_name in enumerate(get_columns):   # get columns include the columns names on the returned data
+                value = policy[column_name]
+                if index < len(needed_columns):
+                    selection += needed_columns[index] + value
+                else:
+                    break   # needed data
+        except:
+            pass    # No sufficient info
 
-        if len(get_columns) == 4:
-            selection += "+dbms@" + get_columns[2]
+        columns_val = []        # Collect the column values to display
+        for attr_val in policy.values():
+            columns_val.append(attr_val)
 
         rows.append([columns_val, selection])
 
