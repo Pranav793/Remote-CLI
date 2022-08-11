@@ -328,9 +328,12 @@ def get_file_copy_info(user_cmd):
         selection_output - bool to determine if redirection exists
         id_column - the column that includes the id of the file (Hash value or file name)
     '''
+
+    get_columns = ["ip", "port", "dbms", "table", "file"]  # These are the info that is needed to bring the blobs
+    entries_count = len(get_columns)
+
     updated_command = user_cmd
     selection_output = False
-    get_columns = ["ip", "port", "dbms", "file"]  # Location for column names for IP, Port, File Name    selection_output = False
     if user_cmd[-1] == ')':
         index = user_cmd.rfind('(')
         if index > 10:
@@ -347,20 +350,21 @@ def get_file_copy_info(user_cmd):
                     if paren_info.startswith("columns: "):
                         paren_info = paren_info[9:].lstrip()
                         columns_list = paren_info.split("and")
-                        if len(columns_list) == 3:
-                            # needs to describe IP, Port, File Name (or Hash)
+                        if len(columns_list) == entries_count:
+                            # needs to describe IP, Port, file name, table name, File Name (or Hash)
 
                             counter = 0
                             for entry in columns_list:
                                 column_info = entry.strip().split()     # X using [column name]
                                 if len(column_info) != 3 or column_info[1] != "using":
                                     break
-                                index = get_columns.index(column_info[0])
-                                if index == -1:
+                                try:
+                                    index = get_columns.index(column_info[0])
+                                except:
                                     break
                                 get_columns[index] = column_info[2]
                                 counter += 1
-                            if counter == 3:
+                            if counter == entries_count:
                                 # all fields found
                                 selection_output = True  # Push the returned JSON value into a selection table
                                 # get the dbms_name
