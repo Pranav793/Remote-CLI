@@ -588,7 +588,7 @@ def json_to_selection_table(request, select_info, policies, get_columns):
     policies - the data returned from the network
     id_column - the name of the column that includes the file name
     '''
-    needed_columns = ["+ip@", "+port@", "+table@", "+dbms@", "+file@"]
+    needed_columns = ["+ip@", "+port@", "+dbms@", "+table@", "+file@"]
 
 
     policies_list = policies["Query"]
@@ -888,7 +888,7 @@ def get_blobs(request):
 
             entry_list = entry[5:].split('+')
 
-            if len(entry_list) == 4: # Organized with IP and Port and File-Name and DBMS
+            if len(entry_list) == 5: # Organized with IP and Port and File-Name and DBMS
                 # Get the blobs file operator info and file name
                 for part in entry_list:
                     if part.startswith("ip@"):
@@ -897,6 +897,8 @@ def get_blobs(request):
                         operator_port = part[5:]
                     elif part.startswith("dbms@"):
                         operator_dbms = part[5:]
+                    elif part.startswith("table@"):
+                        operator_table = part[6:]
                     elif part.startswith("file@"):
                         operator_file = part[5:]
 
@@ -908,7 +910,7 @@ def get_blobs(request):
                     info_needed = False
 
                 if operator_dbms and operator_file:
-                    command = f"file get (dbms = blobs_{operator_dbms} and id = {operator_file}) {blobs_dir}{operator_file}"
+                    command = f"file get (dbms = blobs_{operator_dbms} and table = {operator_table} and id = {operator_file}) {blobs_dir}{operator_file}"
                 else:
                     info_needed = False
 
