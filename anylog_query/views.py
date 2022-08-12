@@ -4,6 +4,7 @@ from pathlib import Path
 from django.shortcuts import render
 
 import pyqrcode
+import base64
 
 # Import necessary modules
 from django.shortcuts import render
@@ -77,20 +78,20 @@ conf_file_names = [
     "Standalone"
 ]
 
-user_selections = {
-        'connect_info' : None,
-        'auth_usr' : None,
-        'auth_pass' : None,
-        'cmd_type' : None,
-        'timeout' : None,
-        'dbms' : None,
-        'table' : None,
-        'timezone' : None,
-        'out_format' : None,
-        'network' : None,
-        'destination' : None,
-        'command' : None,
-}
+user_selections_ = [
+        'connect_info',
+        'auth_usr',
+        'auth_pass',
+        'cmd_type',
+        'timeout',
+        'dbms',
+        'table',
+        'timezone',
+        'out_format',
+        'network',
+        'destination',
+        'command',
+]
 
 url_chars_ = {
     ' ': '%20',
@@ -178,6 +179,7 @@ def form_request(request):
 
 # ---------------------------------------------------------------------------------------
 # Client processes - the main form interacting with the network
+# Base64 info - https://stackabuse.com/encoding-and-decoding-base64-strings-in-python/
 # ---------------------------------------------------------------------------------------
 def blobs_processes(request, blobs_button):
 
@@ -186,6 +188,8 @@ def blobs_processes(request, blobs_button):
     global blobs_local_dir  # "blobs/current/"
 
     select_info = {}
+
+    transfer_selections(request, select_info)  # Move selections from old form to the current form
 
     keep_file = False
     delete_file = False
@@ -222,11 +226,13 @@ def blobs_processes(request, blobs_button):
                         index = file_name.rfind('.')
                         if index > 0 and index < (len(file_name) - 1):
                             file_type = file_name[index+1:]
-                            if file_type == "png":
+                            if file_type == "msg":
                                 # Read the file and add the base64 conversion string
-                                data = utils_io.read_file(blobs_dir + file_name)
-                                if data:
-                                    file_data = "data:image/png;base64," + data
+                                disk_data = utils_io.read_file(blobs_dir + file_name)
+                                if disk_data:
+                                    file_data = "data:image/png;base64," + disk_data
+                                else:
+                                    file_data = ""
                             else:
                                 file_data = ""
 
@@ -287,7 +293,7 @@ def client_processes(request, client_button):
             select_info = command_button_selected(request, command_button)
         else:
             select_info = {}
-            restore_user_selections(request.POST, select_info)
+            transfer_selections(request, select_info)   # Move selections from old form to the current form
 
             if not client_button and request.method == 'POST':
                 # Send was not selected - keep the older selected values
@@ -305,7 +311,6 @@ def client_processes(request, client_button):
         select_info["commands_list"] = ANYLOG_COMMANDS
         select_info["commands_groups"] = COMMANDS_GROUPS
 
-        keep_user_selections(select_info)
 
         return render(request, "base.html", select_info)
 
@@ -323,9 +328,12 @@ def get_file_copy_info(user_cmd):
         selection_output - bool to determine if redirection exists
         id_column - the column that includes the id of the file (Hash value or file name)
     '''
+
+    get_columns = ["ip", "port", "dbms", "table", "file"]  # These are the info that is needed to bring the blobs
+    entries_count = len(get_columns)
+
     updated_command = user_cmd
     selection_output = False
-    get_columns = ["ip", "port", "dbms", "file"]  # Location for column names for IP, Port, File Name    selection_output = False
     if user_cmd[-1] == ')':
         index = user_cmd.rfind('(')
         if index > 10:
@@ -342,25 +350,21 @@ def get_file_copy_info(user_cmd):
                     if paren_info.startswith("columns: "):
                         paren_info = paren_info[9:].lstrip()
                         columns_list = paren_info.split("and")
-                        if len(columns_list) == 3:
-                            # needs to describe IP, Port, File Name (or Hash)
-
+                        if len(columns_list) == entries_count:
+                            # needs to describe IP, Port, file name, table name, File Name (or Hash)
                             counter = 0
                             for entry in columns_list:
                                 column_info = entry.strip().split()     # X using [column name]
                                 if len(column_info) != 3 or column_info[1] != "using":
                                     break
-                                index = get_columns.index(column_info[0])
-                                if index == -1:
+                                try:
+                                    index = get_columns.index(column_info[0])
+                                except:
                                     break
-                                get_columns[index] = column_info[2]
+                                get_columns[index] = column_info[2] # CHANGE THE COLUMN NAME TO MACH THE QUERY COLUMN NAME
                                 counter += 1
-                            if counter == 3:
-                                # all fields found
-                                selection_output = True  # Push the returned JSON value into a selection table
-                                # get the dbms_name
-                                dbms_name = user_cmd[3:].lstrip()
-                                get_columns[2] = dbms_name[:dbms_name.find(' ')]
+                            if counter == entries_count:
+                                selection_output = True     # All fields for selection are available
 
 
     return [updated_command, selection_output, get_columns]
@@ -375,8 +379,6 @@ def command_button_selected(request, command_button):
     '''
     select_info = {}
 
-
-    restore_user_selections(request.POST, select_info)
 
     # AnyLog command button was selected
     add_form_value(select_info, request)
@@ -538,7 +540,6 @@ def print_network_reply(request, query_result, data, selection_output, get_colum
             data_list = []
             json_api.setup_print_tree(policies, data_list)
             select_info['text'] = data_list
-            keep_user_selections(select_info)
             return render(request, 'output_tree.html', select_info)
 
         print_info = [("text", data)]  # Print the error msg as a string
@@ -549,7 +550,6 @@ def print_network_reply(request, query_result, data, selection_output, get_colum
         if policies:
             if selection_output:
                 # Show as a selection table
-                keep_user_selections(select_info)
 
                 return json_to_selection_table(request, select_info, policies, get_columns)
             else:
@@ -557,7 +557,6 @@ def print_network_reply(request, query_result, data, selection_output, get_colum
                 data_list = []
                 json_api.setup_print_tree(policies, data_list)
                 select_info['text'] = data_list
-                keep_user_selections(select_info)
                 return render(request, 'output_tree.html', select_info)
 
         if query_result:
@@ -572,12 +571,10 @@ def print_network_reply(request, query_result, data, selection_output, get_colum
                 select_info['table_title'] = table_info['table_title']
             if 'rows' in table_info:
                 select_info['rows'] = table_info['rows']
-            keep_user_selections(select_info)
             return render(request, 'output_table.html', select_info)
 
 
     select_info['text'] = [("text", data)]        # Only TEXT
-    keep_user_selections(select_info)
     return render(request, 'output_cmd.html', select_info)
 
 # -----------------------------------------------------------------------------------
@@ -591,46 +588,37 @@ def json_to_selection_table(request, select_info, policies, get_columns):
     policies - the data returned from the network
     id_column - the name of the column that includes the file name
     '''
+    needed_columns = ["+ip@", "+port@", "+dbms@", "+table@", "+file@"]
 
 
     policies_list = policies["Query"]
+
     one_policy = policies_list[0]
     column_names = []
-    # Get the title for the table from the first policy
 
-    ip_column = -1
-    port_column = -1
-    file_column = -1
-
+    # Get the returned column names from the first returned policy
     for column_id, attr_name in enumerate(one_policy.keys()):
         column_names.append(attr_name)
-        if len(get_columns) == 4:
-            # Includes: IP+Port+DBS-Name+File_id
-            if attr_name == get_columns[0]:
-                ip_column = column_id
-            elif attr_name == get_columns[1]:
-                port_column = column_id
-            elif attr_name == get_columns[3]:
-                file_column = column_id
 
     select_info['column_names'] = column_names
 
-    # add the data as a columns per row
+    # for each policy - get 1) the data returned on selection and 2) the data to show the user
     rows = []
     for policy in policies_list:
-        columns_val = []
-        selection = ""
-        for att_id, attr_val in enumerate(policy.values()):
-            columns_val.append(attr_val)
-            if att_id == ip_column:
-                selection += "+ip@" + attr_val
-            elif att_id == port_column:
-                selection += "+port@" + attr_val
-            elif att_id == file_column:
-                selection += "+file@" + attr_val
+        selection = ""      # Set the data returned when selected
+        try:
+            for index, column_name in enumerate(get_columns):   # get columns include the columns names on the returned data
+                value = policy[column_name]
+                if index < len(needed_columns):
+                    selection += needed_columns[index] + value
+                else:
+                    break   # needed data
+        except:
+            pass    # No sufficient info
 
-        if len(get_columns) == 4:
-            selection += "+dbms@" + get_columns[2]
+        columns_val = []        # Collect the column values to display
+        for attr_val in policy.values():
+            columns_val.append(attr_val)
 
         rows.append([columns_val, selection])
 
@@ -900,7 +888,7 @@ def get_blobs(request):
 
             entry_list = entry[5:].split('+')
 
-            if len(entry_list) == 4: # Organized with IP and Port and File-Name and DBMS
+            if len(entry_list) == 5: # Organized with IP and Port and File-Name and DBMS
                 # Get the blobs file operator info and file name
                 for part in entry_list:
                     if part.startswith("ip@"):
@@ -909,6 +897,8 @@ def get_blobs(request):
                         operator_port = part[5:]
                     elif part.startswith("dbms@"):
                         operator_dbms = part[5:]
+                    elif part.startswith("table@"):
+                        operator_table = part[6:]
                     elif part.startswith("file@"):
                         operator_file = part[5:]
 
@@ -920,7 +910,7 @@ def get_blobs(request):
                     info_needed = False
 
                 if operator_dbms and operator_file:
-                    command = f"file get (dbms = blobs_{operator_dbms} and id = {operator_file}) {blobs_dir}{operator_file}"
+                    command = f"file get (dbms = blobs_{operator_dbms} and table = {operator_table} and id = {operator_file}) {blobs_dir}{operator_file}"
                 else:
                     info_needed = False
 
@@ -933,30 +923,23 @@ def get_blobs(request):
 
 
 # -----------------------------------------------------------------------------------
-# Keep the user selections
+# Keep the user selections = move the previous form selections to the current form
 # -----------------------------------------------------------------------------------
-def keep_user_selections(select_info):
+def transfer_selections(request, select_info):
+    '''
+    request - the previous form selections
+    select_info - current form data
+    '''
 
-    global user_selections
+    global user_selections_     # The entries to pass from form to form
 
-    for key, value in user_selections.items():
-        if key in select_info:
+    previous_form = request.POST
+
+    for entry in user_selections_:
+        if entry in previous_form:
             # This key was updated
-            user_selections[key] = select_info[key]  # Keep the last selections
-        else:
-            user_selections[key] = None         # No selection
+            select_info[entry] = previous_form[entry]  # info passed to the new form
 
-
-# -----------------------------------------------------------------------------------
-# put back the last user selections
-# -----------------------------------------------------------------------------------
-def restore_user_selections(post_data, select_info):
-    global user_selections
-
-    for key, value in user_selections.items():
-        if value:
-            # This key was updated
-            select_info[key] =value  # Keep the last selections
 
 # -----------------------------------------------------------------------------------
 # Make QR code - update the url string
@@ -967,17 +950,27 @@ def make_qrcode(request):
 
     select_info = {}
 
+    transfer_selections(request, select_info)       # Move selections from the previous fom to the current form
+
     html_img = ""
     qrcode_command = ""     # The final command structure
 
 
-
-    conn_info = request.POST.get('connect_info').strip()
+    conn_info = request.POST.get('connect_info')
+    if conn_info:
+        conn_info = conn_info.strip()
 
     url_string = f"http://{conn_info}/?User-Agent=AnyLog/1.23"
 
-    username = request.POST.get('auth_usr').strip()
-    password = request.POST.get('auth_pass').strip()
+
+    username = request.POST.get('auth_usr')
+    if username:
+        username = username.strip()
+
+    password = request.POST.get('auth_pass')
+    if password:
+        password = password.strip()
+
 
     if request.POST.get('network') == "on":
         destination = request.POST.get('destination').strip()
@@ -986,10 +979,15 @@ def make_qrcode(request):
         url_string += f"?destination={destination}"
 
 
-    url_string += '?command=' + request.POST.get("command").strip()
+    url_string += '?command='
+    user_command = request.POST.get("command")
+    if user_command:
+        url_string += user_command.strip()
+
+    url_encoded = update_url(url_string)
 
     try:
-        qrcode = create_qr(url_string)
+        qrcode = create_qr(url_encoded)
     except:
         pass
     else:
@@ -1002,8 +1000,9 @@ def make_qrcode(request):
             qrcode_command = url_string       # The command that is in the qrcode
             html_img = "data:image/png;base64,{}".format(image_as_str)
 
-    select_info["command"] = qrcode_command
+    select_info["qr_cmd"] = qrcode_command
     select_info["qrcode"] = html_img  # The files to watch
+    select_info["url"] = url_encoded
 
     return render(request, "qrcode.html", select_info)  # Process the blobs page
 
@@ -1015,10 +1014,12 @@ def update_url(command:str)->str:
     """
     replace characters according to the url_chars_ dictionary
     """
-    qr_string = command
-    for char in url_chars_:
+    qr_string = ""
+    for char in command:
         if char in url_chars_:
-            qr_string = qr_string.replace(char, url_chars_[char])
+            qr_string += url_chars_[char]
+        else:
+            qr_string += char
     return qr_string
 # -----------------------------------------------------------------------------------
 # Create the QR code
@@ -1041,32 +1042,3 @@ def create_qr(url:str='https://anylog.co')->pyqrcode.QRCode:
         print(f'Failed to create QR code (Error: {error})')
 
     return qrcode
-
-def create_image_file(qrcode:pyqrcode.QRCode, file_name:str='$HOME/ibm_demo/qrcode.png')->bool:
-    """
-    store QR code in png image file
-    :args:
-        qrcode:pyqrcode.QRCode - QR code
-        file_name:str - path of png image file
-    :params:
-        status:bool
-        full_path:str - full path of file_name
-    :return:
-        bool
-    """
-    status = False
-    full_path = os.path.expandvars(os.path.expanduser(file_name))
-    if full_path.rsplit('.', 1)[-1] != 'png':
-        full_path.replace(full_path.rsplit('.', 1)[-1], 'png')
-    if isinstance(qrcode, pyqrcode.QRCode):
-        try:
-            with open(full_path, 'wb') as pngf:
-                try:
-                    qrcode.png(pngf, scale=10, module_color='#0023a5')
-                except Exception as error:
-                    print(f'Failed to store content in qrcode.png (Error: {error})')
-        except Exception as error:
-            print(f'Failed to open qrcode.png (Error: {error})')
-        else:
-            status = True
-    return status

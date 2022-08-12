@@ -65,7 +65,7 @@
       {"button": "Date Time", "command": "get datetime pt now()", "type": "GET", "group" : "Other", "help_url" : "blob/master/queries.md#get-datetime-command"},
 
      {"button": "Releases",
-       "command": "sql edgex extend=   (@ip, @port) and format  = json and timezone = utc  select  * from image  > selection (columns: ip using ip and port using port and file using file)", "type": "GET",
+       "command": "sql [DBMS] extend= (@ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  * from [TABLE] > selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)", "type": "GET",
        "group" : "Video",
        "help_url" : "blob/master/queries.md#queries"}
 
