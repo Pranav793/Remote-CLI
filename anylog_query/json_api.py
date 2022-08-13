@@ -80,8 +80,20 @@ def string_to_list(data: str):
     try:
         list_obj = list(eval(data))
     except:
-        error_msg = "Failed to map List to string"
+        errno, value = sys.exc_info()[:2]
         list_obj = None
+        sys_error = str(value)
+        if "true" in sys_error or "false" in sys_error:
+            # Python needs True/False capitalized
+            updated_data = data.replace("true", "True").replace("false","False")
+            try:
+                list_obj = list(eval(updated_data))
+            except:
+                errno, value = sys.exc_info()[:2]
+        if not list_obj:
+            error_msg = f"Failed to map List to string: {value}"
+        else:
+            error_msg = None
     else:
         error_msg = None
 
