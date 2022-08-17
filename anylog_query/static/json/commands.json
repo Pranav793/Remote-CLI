@@ -64,11 +64,13 @@
       {"button": "Timezone Info", "command": "get timezone info", "type": "GET", "group" : "Other", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
       {"button": "Date Time", "command": "get datetime pt now()", "type": "GET", "group" : "Other", "help_url" : "blob/master/queries.md#get-datetime-command"},
 
-     {"button": "Releases",
-       "command": "sql [DBMS] extend= (@ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  * from [TABLE] > selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)", "type": "GET",
+     {"button": "Edgex",
+       "command": "sql edgex extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), num_cars, speed from videos where start_ts > '2022-08-06 00:00:00' and end_ts < '2022-08-06 23:59:59' order by speed > selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)", "type": "GET",
+       "group" : "Video",
+       "help_url" : "blob/master/queries.md#queries"},
+    {"button": "Generic",
+       "command": "sql [DBMS] extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), num_cars, speed from [TABLE] where start_ts > '2022-08-06 00:00:00' and end_ts < '2022-08-06 23:59:59' order by speed > selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)", "type": "GET",
        "group" : "Video",
        "help_url" : "blob/master/queries.md#queries"}
-
-
-    ]
+  ]
 }
