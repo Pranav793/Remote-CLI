@@ -980,21 +980,32 @@ def make_curl_cmd(request, select_info):
 
     curl_cmd += f"http://{conn_info} "
 
-    curl_cmd += "--header 'User-Agent: AnyLog/1.23' "
+    curl_cmd += "--header \"User-Agent: AnyLog/1.23\" "
 
     user_cmd = post_data.get("command").strip()
 
-    curl_cmd += f"--header 'command: {user_cmd}' "
+    if '"' in user_cmd:
+        wind_cmd = user_cmd.replace('"', '""')  # Set double quotes in windows
+        wind_curl_cmd = curl_cmd +  f"--header \"command: {wind_cmd}\" "
+    else:
+        wind_curl_cmd = None
 
+    curl_cmd += f"--header \"command: {user_cmd}\" "
     network = post_data.get('network') == "on"
     if network:
         destination = post_data.get('destination').strip()
         if not destination:
             destination = "network"
 
-        curl_cmd += f"--header 'destination: {destination}' "
+        curl_cmd += f"--header \"destination: {destination}\" "
+
+        if wind_curl_cmd:
+            wind_curl_cmd += f"--header \"destination: {destination}\" "
 
     select_info["curl_cmd"] = curl_cmd
+
+    if wind_curl_cmd:
+        select_info["win_curl_cmd"] = wind_curl_cmd     # Windows command - replacing quotation with 2 sets: " --> ""
 
 
 # -----------------------------------------------------------------------------------
