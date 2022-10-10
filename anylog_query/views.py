@@ -125,7 +125,7 @@ def form_request(request):
     code_button = request.POST.get("Code")      # Create QrCode from the command
 
     if code_button:
-        return query_options(request)
+        return code_options(request)
 
     if blobs_button or (form == "Blobs" and not client_button and not config_button):
         # Either the blobs Button was selected (on a different form) or the blobs Page is processed.
@@ -949,7 +949,7 @@ def transfer_selections(request, select_info):
 # AnyLog command
 # cURL command
 # -----------------------------------------------------------------------------------
-def query_options(request):
+def code_options(request):
 
     select_info = {}
 
@@ -959,7 +959,7 @@ def query_options(request):
 
     make_curl_cmd(request, select_info)
 
-    return render(request, "query_options.html", select_info)  # Process the blobs page
+    return render(request, "code_options.html", select_info)  # Process the blobs page
 
 # -----------------------------------------------------------------------------------
 # Make curl command in the format: curl --location --request GET 'http://10.0.0. ...
