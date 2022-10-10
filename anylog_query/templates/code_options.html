@@ -61,27 +61,52 @@
   <input type ="submit" name = "Client" id="Client" value="Client" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
 
 
-    <br/> <br/> <br/>
+    <br/>
 
+    <h2>AnyLog Command</h2>
 
     <div>
 
+    <h3>{{ user_cmd }}</h3>
+
+    </div>
+
+    <br/>
+
+    <h2>cURL Command</h2>
+
+    <div>
+
+    <h3>{{ curl_cmd }}</h3>
+
+    </div>
+    <br/>
+
+   {% if win_curl_cmd %}
+
+        <h2>cURL Command (Windows)</h2>
+
+        <div>
+
+        <h3>{{ win_curl_cmd }}</h3>
+
+       </div>
+        <br/>
+
+   {%  endif  %}
+
+    <h2>QR Code</h2>
+
+    <div>
 
     <img src="{{ qrcode }}" width=320 height=240 alt="{{ file_info.0 }}"  width="50" height="50"/>
 
-
-  </div>
-
-
-
-   <br/> <br/>  <br/>
-
+    </div>
    &nbsp; &nbsp; &nbsp;
 
       <a href="{{ qr_cmd }}" target="_blank">{{ qr_cmd }} </a>
 
   </form>
-
 
   </body>
 

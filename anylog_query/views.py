@@ -122,10 +122,10 @@ def form_request(request):
     blobs_button = request.POST.get("Blobs")    # The blobs button was selected
     config_button = request.POST.get("Config")  # The Config button was selected
     client_button = request.POST.get("Client")  # Client button was selected
-    qr_button = request.POST.get("Qrcode")      # Create QrCode from the command
+    code_button = request.POST.get("Code")      # Create QrCode from the command
 
-    if qr_button:
-        return make_qrcode(request)
+    if code_button:
+        return code_options(request)
 
     if blobs_button or (form == "Blobs" and not client_button and not config_button):
         # Either the blobs Button was selected (on a different form) or the blobs Page is processed.
@@ -328,9 +328,12 @@ def get_file_copy_info(user_cmd):
         selection_output - bool to determine if redirection exists
         id_column - the column that includes the id of the file (Hash value or file name)
     '''
+
+    get_columns = ["ip", "port", "dbms", "table", "file"]  # These are the info that is needed to bring the blobs
+    entries_count = len(get_columns)
+
     updated_command = user_cmd
     selection_output = False
-    get_columns = ["ip", "port", "dbms", "file"]  # Location for column names for IP, Port, File Name    selection_output = False
     if user_cmd[-1] == ')':
         index = user_cmd.rfind('(')
         if index > 10:
@@ -347,25 +350,21 @@ def get_file_copy_info(user_cmd):
                     if paren_info.startswith("columns: "):
                         paren_info = paren_info[9:].lstrip()
                         columns_list = paren_info.split("and")
-                        if len(columns_list) == 3:
-                            # needs to describe IP, Port, File Name (or Hash)
-
+                        if len(columns_list) == entries_count:
+                            # needs to describe IP, Port, file name, table name, File Name (or Hash)
                             counter = 0
                             for entry in columns_list:
                                 column_info = entry.strip().split()     # X using [column name]
                                 if len(column_info) != 3 or column_info[1] != "using":
                                     break
-                                index = get_columns.index(column_info[0])
-                                if index == -1:
+                                try:
+                                    index = get_columns.index(column_info[0])
+                                except:
                                     break
-                                get_columns[index] = column_info[2]
+                                get_columns[index] = column_info[2] # CHANGE THE COLUMN NAME TO MACH THE QUERY COLUMN NAME
                                 counter += 1
-                            if counter == 3:
-                                # all fields found
-                                selection_output = True  # Push the returned JSON value into a selection table
-                                # get the dbms_name
-                                dbms_name = user_cmd[3:].lstrip()
-                                get_columns[2] = dbms_name[:dbms_name.find(' ')]
+                            if counter == entries_count:
+                                selection_output = True     # All fields for selection are available
 
 
     return [updated_command, selection_output, get_columns]
@@ -589,46 +588,37 @@ def json_to_selection_table(request, select_info, policies, get_columns):
     policies - the data returned from the network
     id_column - the name of the column that includes the file name
     '''
+    needed_columns = ["+ip@", "+port@", "+dbms@", "+table@", "+file@"]
 
 
     policies_list = policies["Query"]
+
     one_policy = policies_list[0]
     column_names = []
-    # Get the title for the table from the first policy
 
-    ip_column = -1
-    port_column = -1
-    file_column = -1
-
+    # Get the returned column names from the first returned policy
     for column_id, attr_name in enumerate(one_policy.keys()):
         column_names.append(attr_name)
-        if len(get_columns) == 4:
-            # Includes: IP+Port+DBS-Name+File_id
-            if attr_name == get_columns[0]:
-                ip_column = column_id
-            elif attr_name == get_columns[1]:
-                port_column = column_id
-            elif attr_name == get_columns[3]:
-                file_column = column_id
 
     select_info['column_names'] = column_names
 
-    # add the data as a columns per row
+    # for each policy - get 1) the data returned on selection and 2) the data to show the user
     rows = []
     for policy in policies_list:
-        columns_val = []
-        selection = ""
-        for att_id, attr_val in enumerate(policy.values()):
-            columns_val.append(attr_val)
-            if att_id == ip_column:
-                selection += "+ip@" + attr_val
-            elif att_id == port_column:
-                selection += "+port@" + attr_val
-            elif att_id == file_column:
-                selection += "+file@" + attr_val
+        selection = ""      # Set the data returned when selected
+        try:
+            for index, column_name in enumerate(get_columns):   # get columns include the columns names on the returned data
+                value = policy[column_name]
+                if index < len(needed_columns):
+                    selection += needed_columns[index] + value
+                else:
+                    break   # needed data
+        except:
+            pass    # No sufficient info
 
-        if len(get_columns) == 4:
-            selection += "+dbms@" + get_columns[2]
+        columns_val = []        # Collect the column values to display
+        for attr_val in policy.values():
+            columns_val.append(attr_val)
 
         rows.append([columns_val, selection])
 
@@ -898,7 +888,7 @@ def get_blobs(request):
 
             entry_list = entry[5:].split('+')
 
-            if len(entry_list) == 4: # Organized with IP and Port and File-Name and DBMS
+            if len(entry_list) == 5: # Organized with IP and Port and File-Name and DBMS
                 # Get the blobs file operator info and file name
                 for part in entry_list:
                     if part.startswith("ip@"):
@@ -907,6 +897,8 @@ def get_blobs(request):
                         operator_port = part[5:]
                     elif part.startswith("dbms@"):
                         operator_dbms = part[5:]
+                    elif part.startswith("table@"):
+                        operator_table = part[6:]
                     elif part.startswith("file@"):
                         operator_file = part[5:]
 
@@ -918,7 +910,8 @@ def get_blobs(request):
                     info_needed = False
 
                 if operator_dbms and operator_file:
-                    command = f"file get (dbms = blobs_{operator_dbms} and id = {operator_file}) {blobs_dir}{operator_file}"
+                    #command = f"file get !!blobs_dir/{operator_dbms}.{operator_table}.{operator_file} {blobs_dir}{operator_file}"
+                    command = f"file get (dbms = blobs_{operator_dbms} and table = {operator_table} and id = {operator_file}) {blobs_dir}{operator_dbms}.{operator_table}.{operator_file}"
                 else:
                     info_needed = False
 
@@ -949,14 +942,98 @@ def transfer_selections(request, select_info):
             select_info[entry] = previous_form[entry]  # info passed to the new form
 
 
+
+# -----------------------------------------------------------------------------------
+# Query Options:
+# QR Code
+# AnyLog command
+# cURL command
+# -----------------------------------------------------------------------------------
+def code_options(request):
+
+    select_info = {}
+
+    make_qrcode(request, select_info)
+
+    make_anylog_cmd(request, select_info)
+
+    make_curl_cmd(request, select_info)
+
+    return render(request, "code_options.html", select_info)  # Process the blobs page
+
+# -----------------------------------------------------------------------------------
+# Make curl command in the format: curl --location --request GET 'http://10.0.0. ...
+# -----------------------------------------------------------------------------------
+def make_curl_cmd(request, select_info):
+
+    post_data = request.POST
+
+    curl_cmd = "curl --location --request "
+
+    rest_call = post_data.get('rest_call')
+    if rest_call == "post":
+        curl_cmd += "POST "
+    else:
+        curl_cmd += "GET "
+
+    conn_info = post_data.get('connect_info').strip()
+
+    curl_cmd += f"http://{conn_info} "
+
+    curl_cmd += "--header \"User-Agent: AnyLog/1.23\" "
+
+    user_cmd = post_data.get("command").strip()
+
+    if '"' in user_cmd:
+        wind_cmd = user_cmd.replace('"', '""')  # Set double quotes in windows
+        wind_curl_cmd = curl_cmd +  f"--header \"command: {wind_cmd}\" "
+    else:
+        wind_curl_cmd = None
+
+    curl_cmd += f"--header \"command: {user_cmd}\" "
+    network = post_data.get('network') == "on"
+    if network:
+        destination = post_data.get('destination').strip()
+        if not destination:
+            destination = "network"
+
+        curl_cmd += f"--header \"destination: {destination}\" "
+
+        if wind_curl_cmd:
+            wind_curl_cmd += f"--header \"destination: {destination}\" "
+
+    select_info["curl_cmd"] = curl_cmd
+
+    if wind_curl_cmd:
+        select_info["win_curl_cmd"] = wind_curl_cmd     # Windows command - replacing quotation with 2 sets: " --> ""
+
+
+# -----------------------------------------------------------------------------------
+# Make anylog command in the format: run client ...
+# -----------------------------------------------------------------------------------
+def make_anylog_cmd(request, select_info):
+
+    user_cmd = request.POST.get("command").strip()
+    if len(user_cmd) > 5 and user_cmd[:4].lower() == "sql ":
+        user_cmd, selection_output, get_columns = get_file_copy_info(user_cmd)
+
+    network = request.POST.get('network') == "on"
+    if network:
+        destination =  request.POST.get('destination').strip()
+        if destination:
+            user_cmd = "run client (%s) %s" % (destination, user_cmd)
+        else:
+            user_cmd = "run client () %s" % (user_cmd)
+
+    select_info["user_cmd"] = user_cmd
+
 # -----------------------------------------------------------------------------------
 # Make QR code - update the url string
 # pypng - required to install but not import
 # Info at https://pythonhosted.org/PyQRCode/moddoc.html
 # -----------------------------------------------------------------------------------
-def make_qrcode(request):
+def make_qrcode(request, select_info):
 
-    select_info = {}
 
     transfer_selections(request, select_info)       # Move selections from the previous fom to the current form
 
@@ -1011,8 +1088,6 @@ def make_qrcode(request):
     select_info["qr_cmd"] = qrcode_command
     select_info["qrcode"] = html_img  # The files to watch
     select_info["url"] = url_encoded
-
-    return render(request, "qrcode.html", select_info)  # Process the blobs page
 
 
 # -----------------------------------------------------------------------------------
