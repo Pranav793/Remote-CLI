@@ -984,7 +984,7 @@ def make_curl_cmd(request, select_info):
 
     user_cmd = post_data.get("command").strip()
 
-    curl_cmd += f"--header 'command: {user_cmd} "
+    curl_cmd += f"--header 'command: {user_cmd}' "
 
     network = post_data.get('network') == "on"
     if network:
@@ -992,7 +992,7 @@ def make_curl_cmd(request, select_info):
         if not destination:
             destination = "network"
 
-        curl_cmd += f"--header 'destination: {destination} "
+        curl_cmd += f"--header 'destination: {destination}' "
 
     select_info["curl_cmd"] = curl_cmd
 
