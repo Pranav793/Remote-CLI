@@ -122,9 +122,9 @@ def form_request(request):
     blobs_button = request.POST.get("Blobs")    # The blobs button was selected
     config_button = request.POST.get("Config")  # The Config button was selected
     client_button = request.POST.get("Client")  # Client button was selected
-    qr_button = request.POST.get("Qrcode")      # Create QrCode from the command
+    code_button = request.POST.get("Code")      # Create QrCode from the command
 
-    if qr_button:
+    if code_button:
         return query_options(request)
 
     if blobs_button or (form == "Blobs" and not client_button and not config_button):
@@ -959,7 +959,7 @@ def query_options(request):
 
     make_curl_cmd(request, select_info)
 
-    return render(request, "qrcode.html", select_info)  # Process the blobs page
+    return render(request, "query_options.html", select_info)  # Process the blobs page
 
 # -----------------------------------------------------------------------------------
 # Make curl command in the format: curl --location --request GET 'http://10.0.0. ...
