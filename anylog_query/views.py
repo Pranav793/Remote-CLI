@@ -990,7 +990,8 @@ def make_curl_cmd(request, select_info):
     else:
         wind_curl_cmd = None
 
-    curl_cmd += f"--header \"command: {user_cmd}\" "
+    linux_cmd = user_cmd.replace('"', '\\"')  # Set double quotes in windows
+    curl_cmd += f"--header \"command: {linux_cmd}\" "
     network = post_data.get('network') == "on"
     if network:
         destination = post_data.get('destination').strip()
