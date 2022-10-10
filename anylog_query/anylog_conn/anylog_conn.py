@@ -33,13 +33,19 @@ def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False, d
             headers['destination'] = 'network'
 
     if timeout:
-        headers['timeout'] = timeout        # Change default timeout
+        headers['timeout'] = timeout        # Change default timeout on the AnyLog Node
+        try:
+            client_timeout = int(timeout) + 5        # Add 5 sec to the node timeout for the browser to checkout
+        except:
+            client_timeout = 30             # Revert to the default
+    else:
+        client_timeout = 30                 # Default browser/client timeout
 
     if subset:
         headers['subset'] = str(subset)          # Return info even if not all replied
 
     try:
-        r = requests.get('http://%s' % conn, headers=headers, auth=authentication, timeout=30)
+        r = requests.get('http://%s' % conn, headers=headers, auth=authentication, timeout=client_timeout)
     except Exception as error_msg:
         results = other.error_message(conn=conn, command_type='GET', error_type='other', error_msg=error_msg)
     else:
