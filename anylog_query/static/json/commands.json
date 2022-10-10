@@ -91,6 +91,19 @@
     {"button": "Query 2",
        "command": "sql [DBMS] format=table  select increments(hour, 1, timestamp), min(timestamp), max(timestamp), min(value), avg(\nvalue), max(value), count(*)::format(:,) from [TABLE];", "type": "GET",
        "group" : "Performance",
-       "help_url" : "blob/master/queries.md#queries"}
+       "help_url" : "blob/master/queries.md#queries"},
+   {
+      "button": "sensor",
+      "command": "sql litsanleandro format=table and include=(percentagecpu_sensor) and extend=(@table_name as table) \"select increments(minute, 1, timestamp), device_name, min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value from ping_sensor where timestamp >= NOW() - 1hour GROUP BY device_name ORDER BY min_ts DESC\"",
+      "type": "GET",
+      "group": "demo"
+    },
+    {
+            "button": "video",
+            "command": "sql edgex extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), num_cars, speed from videos where start_ts > '2022-08-09 00:00:00' and end_ts < '2022-08-13 23:59:59' order by speed > selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
+            "type": "GET",
+            "group": "demo"
+    }
+
   ]
 }
