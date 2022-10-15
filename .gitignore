@@ -2,3 +2,4 @@
 __pycache__/
 anylog_deploy/configs/*
 anylog_query/static/blobs/*
+.*.swp
