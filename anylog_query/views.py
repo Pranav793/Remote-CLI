@@ -314,10 +314,45 @@ def client_processes(request, client_button):
 
         return render(request, "base.html", select_info)
 
+# ---------------------------------------------------------------------------------------
+# Additional instruction in the command line identified by: -->
+# Example:
+# sql ntt extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, class, bbox, score, status  from deeptector where score > 0   order by score
+# --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) --> description (columns: ip, class, bbox as diagram, score)
+# ---------------------------------------------------------------------------------------
+def get_additional_instructions(user_cmd):
+
+    selection_output = False
+    get_columns = None
+    descr_info = None
+    updated_command = None
+
+    commands_list = user_cmd.split("-->")
+
+    if len(commands_list) == 1:
+        updated_command = commands_list[0].strip()
+    if len(commands_list) > 1:
+        updated_command = commands_list[0].strip()
+
+        for instruction in commands_list[:1]:
+
+            instruct = instruction.strip()
+            if instruct.startswith("selection"):
+                selection_output, get_columns = get_file_copy_info(instruct)    # The info needed to copy a blob
+            elif instruct.startswith("collection"):
+                descr_info = get_descr_info(instruct)        # info to show with blob data
+
+    return  [updated_command, selection_output, get_columns, descr_info]
 
 # ---------------------------------------------------------------------------------------
+# Process the following:  --> selection (columns: ip using ip and port using port and file using file)
+# ---------------------------------------------------------------------------------------
+
+def get_descr_info(instruct):
+    return None
+# ---------------------------------------------------------------------------------------
 # If the query is an input to a file copy - get the column name that holds the file name
-# sql edgex extend=   (@ip, @port) and format  = json and timezone = utc  select  * from image  > selection (columns: ip using ip and port using port and file using file)
+# Process the following:  --> selection (columns: ip using ip and port using port and file using file)
 # ---------------------------------------------------------------------------------------
 def get_file_copy_info(user_cmd):
     '''
