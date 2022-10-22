@@ -122,10 +122,10 @@ def form_request(request):
     blobs_button = request.POST.get("Blobs")    # The blobs button was selected
     config_button = request.POST.get("Config")  # The Config button was selected
     client_button = request.POST.get("Client")  # Client button was selected
-    qr_button = request.POST.get("Qrcode")      # Create QrCode from the command
+    code_button = request.POST.get("Code")      # Create QrCode from the command
 
-    if qr_button:
-        return make_qrcode(request)
+    if code_button:
+        return code_options(request)
 
     if blobs_button or (form == "Blobs" and not client_button and not config_button):
         # Either the blobs Button was selected (on a different form) or the blobs Page is processed.
@@ -910,8 +910,8 @@ def get_blobs(request):
                     info_needed = False
 
                 if operator_dbms and operator_file:
-                    command = f"file get !!blobs_dir/{operator_dbms}.{operator_table}.{operator_file} {blobs_dir}{operator_file}"
-                    #command = f"file get (dbms = blobs_{operator_dbms} and table = {operator_table} and id = {operator_file}) {blobs_dir}{operator_file}"
+                    #command = f"file get !!blobs_dir/{operator_dbms}.{operator_table}.{operator_file} {blobs_dir}{operator_file}"
+                    command = f"file get (dbms = blobs_{operator_dbms} and table = {operator_table} and id = {operator_file}) {blobs_dir}{operator_dbms}.{operator_table}.{operator_file}"
                 else:
                     info_needed = False
 
@@ -942,14 +942,99 @@ def transfer_selections(request, select_info):
             select_info[entry] = previous_form[entry]  # info passed to the new form
 
 
+
+# -----------------------------------------------------------------------------------
+# Query Options:
+# QR Code
+# AnyLog command
+# cURL command
+# -----------------------------------------------------------------------------------
+def code_options(request):
+
+    select_info = {}
+
+    make_qrcode(request, select_info)
+
+    make_anylog_cmd(request, select_info)
+
+    make_curl_cmd(request, select_info)
+
+    return render(request, "code_options.html", select_info)  # Process the blobs page
+
+# -----------------------------------------------------------------------------------
+# Make curl command in the format: curl --location --request GET 'http://10.0.0. ...
+# -----------------------------------------------------------------------------------
+def make_curl_cmd(request, select_info):
+
+    post_data = request.POST
+
+    curl_cmd = "curl --location --request "
+
+    rest_call = post_data.get('rest_call')
+    if rest_call == "post":
+        curl_cmd += "POST "
+    else:
+        curl_cmd += "GET "
+
+    conn_info = post_data.get('connect_info').strip()
+
+    curl_cmd += f"http://{conn_info} "
+
+    curl_cmd += "--header \"User-Agent: AnyLog/1.23\" "
+
+    user_cmd = post_data.get("command").strip()
+
+    if '"' in user_cmd:
+        wind_cmd = user_cmd.replace('"', '""')  # Set double quotes in windows
+        wind_curl_cmd = curl_cmd +  f"--header \"command: {wind_cmd}\" "
+    else:
+        wind_curl_cmd = None
+
+    linux_cmd = user_cmd.replace('"', '\\"')  # Set double quotes in windows
+    curl_cmd += f"--header \"command: {linux_cmd}\" "
+    network = post_data.get('network') == "on"
+    if network:
+        destination = post_data.get('destination').strip()
+        if not destination:
+            destination = "network"
+
+        curl_cmd += f"--header \"destination: {destination}\" "
+
+        if wind_curl_cmd:
+            wind_curl_cmd += f"--header \"destination: {destination}\" "
+
+    select_info["curl_cmd"] = curl_cmd
+
+    if wind_curl_cmd:
+        select_info["win_curl_cmd"] = wind_curl_cmd     # Windows command - replacing quotation with 2 sets: " --> ""
+
+
+# -----------------------------------------------------------------------------------
+# Make anylog command in the format: run client ...
+# -----------------------------------------------------------------------------------
+def make_anylog_cmd(request, select_info):
+
+    user_cmd = request.POST.get("command").strip()
+    if len(user_cmd) > 5 and user_cmd[:4].lower() == "sql ":
+        user_cmd, selection_output, get_columns = get_file_copy_info(user_cmd)
+
+    network = request.POST.get('network') == "on"
+    if network:
+        destination =  request.POST.get('destination').strip()
+        if destination:
+            user_cmd = "run client (%s) %s" % (destination, user_cmd)
+        else:
+            user_cmd = "run client () %s" % (user_cmd)
+
+    select_info["user_cmd"] = user_cmd
+
 # -----------------------------------------------------------------------------------
 # Make QR code - update the url string
 # pypng - required to install but not import
 # Info at https://pythonhosted.org/PyQRCode/moddoc.html
 # -----------------------------------------------------------------------------------
-def make_qrcode(request):
+def make_qrcode(request, select_info):
 
-    select_info = {}
 
     transfer_selections(request, select_info)       # Move selections from the previous fom to the current form
 
@@ -1004,8 +1089,6 @@ def make_qrcode(request):
     select_info["qr_cmd"] = qrcode_command
     select_info["qrcode"] = html_img  # The files to watch
     select_info["url"] = url_encoded
-
-    return render(request, "qrcode.html", select_info)  # Process the blobs page
 
 
 # -----------------------------------------------------------------------------------

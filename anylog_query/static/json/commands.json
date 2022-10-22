@@ -64,11 +64,94 @@
       {"button": "Timezone Info", "command": "get timezone info", "type": "GET", "group" : "Other", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
       {"button": "Date Time", "command": "get datetime pt now()", "type": "GET", "group" : "Other", "help_url" : "blob/master/queries.md#get-datetime-command"},
 
-     {"button": "Releases",
-       "command": "sql [DBMS] extend= (@ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  * from [TABLE] > selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)", "type": "GET",
+     {"button": "Edgex",
+       "command": "sql edgex extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), num_cars, speed from videos where start_ts > '2022-08-06 00:00:00' and end_ts < '2022-08-06 23:59:59' order by speed > selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)", "type": "GET",
        "group" : "Video",
-       "help_url" : "blob/master/queries.md#queries"}
+       "help_url" : "blob/master/queries.md#queries"},
+    {"button": "Generic",
+       "command": "sql [DBMS] extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), num_cars, speed from [TABLE] where start_ts > '2022-08-06 00:00:00' and end_ts < '2022-08-06 23:59:59' order by speed > selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)", "type": "GET",
+       "group" : "Video",
+       "help_url" : "blob/master/queries.md#queries"},
 
+     {"button": "Data Nodes",
+       "command": "get data nodes", "type": "GET",
+       "group" : "Performance",
+       "help_url" : "blob/master/high%20availability.md#view-the-distribution-of-data-to-clusters"},
 
-    ]
+     {"button": "Query Status",
+       "command": "query status", "type": "GET",
+       "group" : "Performance",
+       "help_url" : "blob/master/profiling%20and%20monitoring%20queries.md#command-options-for-profiling-and-monitoring-queries"},
+
+   {"button": "Query 1",
+       "command": "sql [DBMS] format=table and extend=(+ip, +node_name) \"select min(insert_timestamp), max(insert_timestamp), count(*)::format(:,) from [TABLE];\"", "type": "GET",
+       "group" : "Performance",
+       "help_url" : "blob/master/queries.md#queries"},
+
+    {"button": "Query 2",
+       "command": "sql [DBMS] format=table  select increments(hour, 1, timestamp), min(timestamp), max(timestamp), min(value), avg(\nvalue), max(value), count(*)::format(:,) from [TABLE];", "type": "GET",
+       "group" : "Performance",
+       "help_url" : "blob/master/queries.md#queries"},
+    {
+      "button": "Operators Info",
+      "command": "blockchain get operator bring.table [operator][name] [operator][country] [operator][city] [operator][ip] [operator][port]",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "US Operators",
+      "command":  "blockchain get operator where [country] contains US bring.table [operator][name] [operator][country] [operator][city] [operator][ip] [operator][port]",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Target Operators",
+      "command": "blockchain get operator where [country] contains US bring [operator][ip] : [operator][port]  separator = ,",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Disk Usage",
+      "command": "get disk usage .",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Processes",
+      "command": "get processes",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Platform",
+      "command": "get platform info",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "CPU",
+      "command": "get cpu usage",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Data Nodes",
+      "command": "get data nodes",
+      "type": "GET",
+      "group": "Demo"
+    },
+   {
+      "button": "sensor",
+      "command": "sql litsanleandro format=table and include=(percentagecpu_sensor) and extend=(@table_name as table) \"select increments(minute, 1, timestamp), device_name, min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value from ping_sensor where timestamp >= NOW() - 1hour GROUP BY device_name ORDER BY min_ts DESC\"",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+            "button": "video",
+            "command": "sql edgex extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), num_cars, speed from videos where start_ts > '2022-08-09 00:00:00' and end_ts < '2022-08-13 23:59:59' order by speed > selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
+            "type": "GET",
+            "group": "Demo"
+    }
+
+  ]
 }
