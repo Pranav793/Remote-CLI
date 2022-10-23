@@ -244,8 +244,8 @@ def blobs_processes(request, blobs_button):
                             else:
                                 file_data = ""
 
-                            # Save the files to show: File Name + File Type + The file name + path in the local directory, file data (for png)
-                            files_list.append((file_name, file_type,  blobs_local_dir + file_name, file_data))
+                            # Save the files to show: File Name + File Type + The file name + path in the local directory, file data (for png), list of functions (like shape.rect)
+                            files_list.append((file_name, file_type,  blobs_local_dir + file_name, file_data, []))
 
                     if delete_file:
                         utils_io.delete_file(blobs_dir + file_name)
@@ -298,7 +298,7 @@ def blobs_processes(request, blobs_button):
             ip = info_list[0].split('@')[1]
             dbms_name = info_list[2].split('@')[1]
             table_name = info_list[3].split('@')[1]
-            file_name = dbms_name + '.' + table_name + '.' + info_list[4].split('@')[1]  # Same as disk fike name
+            file_name = dbms_name + '.' + table_name + '.' + info_list[4].split('@')[1]  # Same as disk file name
             for file_blob in copied_blobs:
                 if file_blob[0].startswith(file_name):       # Because of the .transfer prefix
                     file_blob[2] = ip
@@ -309,6 +309,17 @@ def blobs_processes(request, blobs_button):
                             if len (name_val) == 2:
                                 value = name_val[1]
                                 file_blob[3 + index] = value    # Set the Value from the SQL stmt
+
+                                # Add the functions info if images were selected to display
+                                if files_list:
+                                    name_func = name_val[0].split('*')
+                                    if len (name_func) == 2:
+                                        # Include a function like: bbox as shape.rect (bbox*shape.rect)
+                                        function = name_func[1]
+                                        for selected_file in files_list:
+                                            if selected_file[0].startswith(file_name):
+                                                selected_file[4].append((function, value))  # Add bbox*shape.rect + value
+                                                break
                     break
 
 
@@ -322,7 +333,7 @@ def blobs_processes(request, blobs_button):
 
     select_info["rows"] = copied_blobs          # The files in the directory placed in a selection list
 
-    select_info["watch"] = files_list           # The files to watch
+    select_info["watch"] = files_list           # The files selected to watch
 
 
     return render(request, "blobs.html", select_info) # Process the blobs page
