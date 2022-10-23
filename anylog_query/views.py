@@ -12,7 +12,7 @@ from django.http import HttpResponse
 import webbrowser
 
 from djangoProject.settings import BASE_DIR
-
+import ast
 
 import anylog_query.json_api as json_api
 import anylog_query.utils_io as utils_io
@@ -205,9 +205,15 @@ def blobs_processes(request, blobs_button):
         # blobs_button was selected - Copy the files from the source servers
 
         blobs_selected = get_blobs(request)      # Copy blobs files from dest machines
+        select_info["blobs_selected"] = blobs_selected      # Save the info to apply on Refresh
 
     else:
         # process the form - delete or move the file
+
+        if "blobs_selected" in post_data:
+            blobs_selected = post_data.get('blobs_selected')
+            if isinstance(blobs_selected, str):
+                blobs_selected = ast.literal_eval(blobs_selected)
 
         if "Keep" in post_data:
             # move the file to "Keep" Directory
