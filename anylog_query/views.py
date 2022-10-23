@@ -649,8 +649,6 @@ def json_to_selection_table(request, select_info, returned_data, get_columns, ge
 
     select_info['column_names'] = column_names
 
-    select_info['descr_names'] = get_descr      # Save the column names from -->  description (columns: ip and bbox as diagram and score)
-
     # for each policy - get 1) the data returned on selection and 2) the data to show the user
     rows = []
     for json_data in data_list:
@@ -683,7 +681,7 @@ def json_to_selection_table(request, select_info, returned_data, get_columns, ge
                     description += ("*" + method_name)
                 description += ('@' + json_data[col_name])
 
-        rows.append([columns_val, selection, description])       # The info on the columns transferred to the report
+        rows.append([columns_val, selection + description])       # The info on the columns transferred to the report
 
     select_info['rows'] = rows
 
@@ -951,9 +949,9 @@ def get_blobs(request):
 
             entry_list = entry[5:].split('+')
 
-            if len(entry_list) == 5: # Organized with IP and Port and File-Name and DBMS
+            if len(entry_list) >= 5: # Organized with IP and Port and File-Name and DBMS
                 # Get the blobs file operator info and file name
-                for part in entry_list:
+                for part in entry_list[:5]:         # Consider IP + Port + DBMS + Table + File
                     if part.startswith("ip@"):
                         operator_ip = part[3:]
                     elif part.startswith("port@"):
