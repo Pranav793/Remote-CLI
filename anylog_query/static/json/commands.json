@@ -154,13 +154,13 @@
     },
     {
             "button": "Last Day",
-            "command": "sql ntt extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, class, bbox, score, status  from deeptector where score > 0 and timestamp > now() - 1 day order by score --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: ip and bbox as shape.rect and score)",
+            "command": "sql ntt extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, class, bbox, score, status  from deeptector where score > 0 and timestamp > now() - 1 day order by timestamp desc --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: ip and bbox as shape.rect and score)",
             "type": "GET",
             "group": "NTT"
     },
     {
             "button": "Last 30 minutes",
-	        "command": "sql ntt extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, class, bbox, score, status  from deeptector where score > 0 and timestamp > now() - 30 minutes order by score --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
+	        "command": "sql ntt extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, class, bbox, score, status  from deeptector where timestamp > now() - 30 minutes order by timestamp desc --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
             "type": "GET",
             "group": "NTT"
     },
