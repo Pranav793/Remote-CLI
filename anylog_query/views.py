@@ -194,6 +194,9 @@ def blobs_processes(request, blobs_button):
     delete_file = False
     watch_file = False
 
+    width = 320
+    height = 240
+
     files_list = []  # A list of files to watch
 
     post_data = request.POST
@@ -311,7 +314,9 @@ def blobs_processes(request, blobs_button):
                                 file_blob[3 + index] = value    # Set the Value from the SQL stmt
 
                                 # Add the functions info if images were selected to display
-                                if files_list:
+                                if files_list and len(files_list) == 1:     # If 1 image selected
+                                    width = 1600
+                                    height = 1200
                                     name_func = name_val[0].split('*')
                                     if len (name_func) == 2:
                                         # Include a function like: bbox as shape.rect (bbox*shape.rect)
@@ -328,6 +333,9 @@ def blobs_processes(request, blobs_button):
 
 
     # Go to the page - blobs.html
+
+    select_info["width"] = width
+    select_info["height"] = height
 
     select_info["functions"] = functions        # Apply a function like a rectangle over the image
 
