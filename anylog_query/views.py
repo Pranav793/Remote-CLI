@@ -622,6 +622,8 @@ def print_network_reply(request, query_result, data, selection_output, get_colum
 # -----------------------------------------------------------------------------------
 # Output to selection table
 # Change the query reply from JSON to selection table format and call the report
+# Example:
+# sql ntt extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, class, bbox, score, status  from deeptector where score > 0   order by score --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: ip and bbox as diagram and score)
 # -----------------------------------------------------------------------------------
 def json_to_selection_table(request, select_info, returned_data, get_columns, get_descr):
 
@@ -647,6 +649,8 @@ def json_to_selection_table(request, select_info, returned_data, get_columns, ge
 
     select_info['column_names'] = column_names
 
+    select_info['descr_names'] = get_descr      # Save the column names from -->  description (columns: ip and bbox as diagram and score)
+
     # for each policy - get 1) the data returned on selection and 2) the data to show the user
     rows = []
     for json_data in data_list:
@@ -668,13 +672,16 @@ def json_to_selection_table(request, select_info, returned_data, get_columns, ge
             columns_val.append(attr_val)
 
         # ADDITIONAL FILE DESCRIPTION INFO
-        description = []
+        description = ""
         for column_info in get_descr:
             # in the --> description, get the list of columns to use + the method to apply
             col_name = column_info[0]
-            as_name = column_info[1]
             if col_name in json_data:
-                description.append([col_name, as_name])
+                method_name = column_info[1]     # Method to apply with the col value (like BOX/RECTENGALE over the coordinates)
+                description += ("+" + col_name)
+                if method_name:
+                    description += ("*" + method_name)
+                description += ('@' + json_data[col_name])
 
         rows.append([columns_val, selection, description])       # The info on the columns transferred to the report
 
