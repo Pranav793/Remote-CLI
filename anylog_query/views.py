@@ -204,6 +204,10 @@ def blobs_processes(request, blobs_button):
 
         copied_info = get_blobs(request)      # Copy blobs files from dest machines
 
+        for copied_blob in copied_info:
+            # Get additional info to present with the blob data
+            pass
+
     else:
         # process the form - delete or move the file
 
@@ -979,7 +983,7 @@ def get_blobs(request):
                 if info_needed:
                     output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=True,  dest=destination, timeout="", subset=False)
 
-                copied_info.append((operator_file, output))
+                copied_info.append((operator_file, output, entry_list))
 
     return copied_info
 
