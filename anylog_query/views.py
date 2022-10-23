@@ -623,12 +623,12 @@ def print_network_reply(request, query_result, data, selection_output, get_colum
 # Output to selection table
 # Change the query reply from JSON to selection table format and call the report
 # -----------------------------------------------------------------------------------
-def json_to_selection_table(request, select_info, policies, get_columns, get_descr):
+def json_to_selection_table(request, select_info, returned_data, get_columns, get_descr):
 
     # Show as a selection table
     '''
     select_info - info directing the page
-    policies - the data returned from the network
+    returned_data - the data returned from the network
     id_column - the name of the column that includes the file name
     get_columns - the list of columns needed to retieve the blobs
     get_descr - additional columns to describe the blobs
@@ -636,9 +636,9 @@ def json_to_selection_table(request, select_info, policies, get_columns, get_des
     needed_columns = ["+ip@", "+port@", "+dbms@", "+table@", "+file@"]
 
 
-    policies_list = policies["Query"]
+    data_list = returned_data["Query"]
 
-    one_policy = policies_list[0]
+    one_policy = data_list[0]
     column_names = []
 
     # Get the returned column names from the first returned policy
@@ -649,13 +649,13 @@ def json_to_selection_table(request, select_info, policies, get_columns, get_des
 
     # for each policy - get 1) the data returned on selection and 2) the data to show the user
     rows = []
-    for policy in policies_list:
+    for json_data in data_list:
 
         # THE INFO TO NEEDED TO BRING THE BLOB DATA (IP + PORT + DBMS + TABLE + FILE ID
         selection = ""      # Set the data returned when selected
         try:
             for index, column_name in enumerate(get_columns):   # get columns include the columns names on the returned data
-                value = policy[column_name]
+                value = json_data[column_name]
                 if index < len(needed_columns):
                     selection += needed_columns[index] + value
                 else:
@@ -664,12 +664,19 @@ def json_to_selection_table(request, select_info, policies, get_columns, get_des
             pass    # No sufficient info
 
         columns_val = []        # Collect the column values to display
-        for attr_val in policy.values():
+        for attr_val in json_data.values():
             columns_val.append(attr_val)
 
         # ADDITIONAL FILE DESCRIPTION INFO
+        description = []
+        for column_info in get_descr:
+            # in the --> description, get the list of columns to use + the method to apply
+            col_name = column_info[0]
+            as_name = column_info[1]
+            if col_name in json_data:
+                description.append([col_name, as_name])
 
-        rows.append([columns_val, selection])       # The info on the columns transferred to the report
+        rows.append([columns_val, selection, description])       # The info on the columns transferred to the report
 
     select_info['rows'] = rows
 
