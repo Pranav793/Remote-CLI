@@ -13,7 +13,6 @@ import webbrowser
 
 from djangoProject.settings import BASE_DIR
 
-
 import anylog_query.json_api as json_api
 import anylog_query.utils_io as utils_io
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
@@ -199,13 +198,24 @@ def blobs_processes(request, blobs_button):
 
     post_data = request.POST
 
+    blobs_selected = None
+
     if blobs_button:
         # blobs_button was selected - Copy the files from the source servers
 
-        copied_info = get_blobs(request)      # Copy blobs files from dest machines
+        blobs_selected = get_blobs(request)      # Copy blobs files from dest machines
+        select_info["blobs_selected"] = blobs_selected      # Save the info to apply on Refresh
 
     else:
         # process the form - delete or move the file
+
+        if "blobs_selected" in post_data:
+            blobs_selected = post_data.get('blobs_selected')
+            if isinstance(blobs_selected, str):
+                blobs_selected, err_msg = json_api.string_to_list(blobs_selected)
+                # blobs_selected = ast.literal_eval(blobs_selected)
+            if blobs_selected:
+                select_info["blobs_selected"] = blobs_selected  # Save the info to apply on Refresh
 
         if "Keep" in post_data:
             # move the file to "Keep" Directory
@@ -215,8 +225,6 @@ def blobs_processes(request, blobs_button):
         if "Watch" in post_data:
             # move the file to "Keep" Directory
             watch_file = True
-
-
 
         for entry in post_data:
             if entry.startswith("file@"):
@@ -248,9 +256,69 @@ def blobs_processes(request, blobs_button):
 
     copied_blobs = utils_io.get_files_in_dir(blobs_dir, True)     # Get the list of files that were copied
 
+    functions = {}
+
+    column_names = ["Blobs", "Size"]
+    if blobs_selected and len(blobs_selected):
+        # add Info from the selected blobs (adding info from the SQL query and the selection using -->  description (columns: ip and bbox as diagram and score)
+        # Add IP
+        columns_count = 4
+        column_names.append("IP")
+        for index, selection in enumerate(blobs_selected):
+            if not index:
+                # On the first selection, update the title
+                info_list = selection[2]        # The INfo from the SQL Query
+                if len (info_list) > 5:
+                    for entry in info_list[5:]:
+                        name_val = entry.split('@')     # Split between the nme and the value
+
+                        # Test if the name includes a function (like bbox as shape.rect)
+                        name_method = name_val[0].split('*')
+                        col_name = name_method[0]
+                        if len(name_method) == 2:
+                            method_name = name_method[1]
+
+                            functions[col_name] = method_name       # Add the function - like RECTENGALE over a jpeg
+
+                            #select_info["function"] = functions.append(col_name, method_name)   # Add the function - like RECTENGALE over a jpeg
+
+                        column_names.append(col_name[0].upper() + col_name[1:]) # Add the column name without the function (if available after the *, example: bbox as shape.rect)
+                        columns_count += 1
+
+
+
+                for blob in  copied_blobs:
+                    # Add empty fields to all blobs displayed
+                    blob.append("")     # For the IP
+                    for index in range (4,columns_count):
+                        blob.append("")     # For columns specified using: --> description (columns: ip and bbox as shape.rect and score)
+
+            # Find the row an update with the data from the SQL table
+            info_list = selection[2]
+            ip = info_list[0].split('@')[1]
+            dbms_name = info_list[2].split('@')[1]
+            table_name = info_list[3].split('@')[1]
+            file_name = dbms_name + '.' + table_name + '.' + info_list[4].split('@')[1]  # Same as disk fike name
+            for file_blob in copied_blobs:
+                if file_blob[0].startswith(file_name):       # Because of the .transfer prefix
+                    file_blob[2] = ip
+                    # Add extra fields
+                    if len(info_list) > 5:
+                        for index, entry in enumerate(info_list[5:]):
+                            name_val = entry.split('@')  # Split between the nme and the value
+                            if len (name_val) == 2:
+                                value = name_val[1]
+                                file_blob[3 + index] = value    # Set the Value from the SQL stmt
+                    break
+
+
+
     # Go to the page - blobs.html
 
-    select_info["column_names"] = ["blobs", "Size", "select"]
+    select_info["functions"] = functions        # Apply a function like a rectangle over the image
+
+    column_names.append("Select")
+    select_info["column_names"] = column_names
 
     select_info["rows"] = copied_blobs          # The files in the directory placed in a selection list
 
@@ -266,6 +334,7 @@ def client_processes(request, client_button):
 
     selection_output = False
     get_columns = None
+    get_descr = None
     send_button = request.POST.get("Send")
 
     # Check the form is submitted or not
@@ -276,14 +345,16 @@ def client_processes(request, client_button):
         if len(user_cmd) > 5 and user_cmd[:4].lower() == "sql ":
             query_result = True
 
-            user_cmd, selection_output, get_columns = get_file_copy_info(user_cmd)
+
+            user_cmd, selection_output, get_columns, get_descr = get_additional_instructions(user_cmd)
         else:
             query_result = False
 
         # Process the command
         output = process_anylog(request, user_cmd)        # SEND THE COMMAND TO DESTINATION NODE
 
-        return print_network_reply(request, query_result, output, selection_output, get_columns)
+
+        return print_network_reply(request, query_result, output, selection_output, get_columns, get_descr)
 
     else:
         # Display the html form
@@ -314,12 +385,62 @@ def client_processes(request, client_button):
 
         return render(request, "base.html", select_info)
 
+# ---------------------------------------------------------------------------------------
+# Additional instruction in the command line identified by: -->
+# Example:
+# sql ntt extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, class, bbox, score, status  from deeptector where score > 0   order by score
+# --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) --> description (columns: ip, class, bbox as diagram, score)
+# ---------------------------------------------------------------------------------------
+def get_additional_instructions(user_cmd):
+
+    selection_output = False
+    get_columns = None
+    descr_info = None
+    updated_command = None
+
+    commands_list = user_cmd.split("-->")
+
+    if len(commands_list) == 1:
+        updated_command = commands_list[0].strip()
+    if len(commands_list) > 1:
+        updated_command = commands_list[0].strip()
+
+        for instruction in commands_list[1:]:
+
+            instruct = instruction.strip()
+            if instruct.startswith("selection"):
+                if len(instruct) > 12:
+                    instruct = instruct[9:].strip()[1:-1]       # Remove the parenthesis of the selected columns
+                    selection_output, get_columns = get_file_copy_info(instruct)    # The info needed to copy a blob
+            elif instruct.startswith("description"):
+                if len(instruct) > 13:
+                    instruct = instruct[11:].strip()[1:-1]       # Remove the parenthesis of the selected columns
+                    descr_info = get_descr_info(instruct)        # info to show with blob data
+
+    return  [updated_command, selection_output, get_columns, descr_info]
 
 # ---------------------------------------------------------------------------------------
-# If the query is an input to a file copy - get the column name that holds the file name
-# sql edgex extend=   (@ip, @port) and format  = json and timezone = utc  select  * from image  > selection (columns: ip using ip and port using port and file using file)
+# Process the following:  -->  description (columns: ip and bbox as diagram and score)
 # ---------------------------------------------------------------------------------------
-def get_file_copy_info(user_cmd):
+def get_descr_info(descr_cmd):
+    descr_list = []
+    if descr_cmd.startswith("columns: "):
+        paren_info = descr_cmd[9:].strip()
+        columns_list = paren_info.split("and")
+        for column in columns_list:
+            column = column.strip()
+            column_sections = column.split(" as ")
+            if len(column_sections) == 1:
+                descr_list.append([column , None])      # Column name
+            elif len(column_sections) == 2:
+                descr_list.append([column_sections[0].rstrip(), column_sections[1].lstrip()])  # Column name
+
+    return descr_list
+# ---------------------------------------------------------------------------------------
+# If the query is an input to a file copy - get the column name that holds the file name
+# Process the following:  --> selection (columns: ip using ip and port using port and file using file)
+# ---------------------------------------------------------------------------------------
+def get_file_copy_info(selection_cmd):
     '''
     user_cmd - provided by the user
 
@@ -332,42 +453,30 @@ def get_file_copy_info(user_cmd):
     get_columns = ["ip", "port", "dbms", "table", "file"]  # These are the info that is needed to bring the blobs
     entries_count = len(get_columns)
 
-    updated_command = user_cmd
     selection_output = False
-    if user_cmd[-1] == ')':
-        index = user_cmd.rfind('(')
-        if index > 10:
-            paren_info = user_cmd[index+1:-1].strip()   # info inside the parenthesis, i.e.: (file id in column file)
-            sql_cmd = user_cmd[:index].rstrip()
-            if sql_cmd.endswith(">selection"):
-                updated_command = user_cmd[:-10].rstrip()
-            elif sql_cmd.endswith(" selection"):
-                sql_cmd = sql_cmd[:-10].rstrip()
-                if sql_cmd[-1] == ">":
-                    updated_command = sql_cmd[:-1].rstrip()
-                    # Get the column name
-                    # The format is (columns: ip using [column name of ip] and port using [column name of port] and file using [column name of file])
-                    if paren_info.startswith("columns: "):
-                        paren_info = paren_info[9:].lstrip()
-                        columns_list = paren_info.split("and")
-                        if len(columns_list) == entries_count:
-                            # needs to describe IP, Port, file name, table name, File Name (or Hash)
-                            counter = 0
-                            for entry in columns_list:
-                                column_info = entry.strip().split()     # X using [column name]
-                                if len(column_info) != 3 or column_info[1] != "using":
-                                    break
-                                try:
-                                    index = get_columns.index(column_info[0])
-                                except:
-                                    break
-                                get_columns[index] = column_info[2] # CHANGE THE COLUMN NAME TO MACH THE QUERY COLUMN NAME
-                                counter += 1
-                            if counter == entries_count:
-                                selection_output = True     # All fields for selection are available
+    # Get the column name
+    # The format is (columns: ip using [column name of ip] and port using [column name of port] and file using [column name of file])
+    if selection_cmd.startswith("columns: "):
+        paren_info = selection_cmd[9:].strip()
+        columns_list = paren_info.split("and")
+        if len(columns_list) == entries_count:
+            # needs to describe IP, Port, file name, table name, File Name (or Hash)
+            counter = 0
+            for entry in columns_list:
+                column_info = entry.strip().split()     # X using [column name]
+                if len(column_info) != 3 or column_info[1] != "using":
+                    break
+                try:
+                    index = get_columns.index(column_info[0])
+                except:
+                    break
+                get_columns[index] = column_info[2] # CHANGE THE COLUMN NAME TO MACH THE QUERY COLUMN NAME
+                counter += 1
+            if counter == entries_count:
+                selection_output = True     # All fields for selection are available
 
 
-    return [updated_command, selection_output, get_columns]
+    return [selection_output, get_columns]
 
 # ---------------------------------------------------------------------------------------
 # Command button was selected - get the command info and set the command on select_info
@@ -510,13 +619,16 @@ def process_anylog(request, user_cmd):
 # Option 2 - a table
 # Option 3 - text
 # -----------------------------------------------------------------------------------
-def print_network_reply(request, query_result, data, selection_output, get_columns):
+
+def print_network_reply(request, query_result, data, selection_output, get_columns, get_descr):
     '''
     request - the form info
     query_result - a True/False value representing SQL query data set returned
     data - the query or command result
     selection_output - user issued a SQL statement with "> selection" at the end - indicating output to a selection table
     get_columns - the name of the columns that includes the IP, Port, dbms name and file name to retrieve he file
+    get_descr - additional columns to describe the blobs
+
     '''
 
     select_info = {}
@@ -550,8 +662,8 @@ def print_network_reply(request, query_result, data, selection_output, get_colum
         if policies:
             if selection_output:
                 # Show as a selection table
+                return json_to_selection_table(request, select_info, policies, get_columns, get_descr)
 
-                return json_to_selection_table(request, select_info, policies, get_columns)
             else:
                 # Reply was a JSON policies or a query replied in JSON
                 data_list = []
@@ -580,20 +692,25 @@ def print_network_reply(request, query_result, data, selection_output, get_colum
 # -----------------------------------------------------------------------------------
 # Output to selection table
 # Change the query reply from JSON to selection table format and call the report
+# Example:
+# sql ntt extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, class, bbox, score, status  from deeptector where score > 0   order by score --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: ip and bbox as diagram and score)
 # -----------------------------------------------------------------------------------
-def json_to_selection_table(request, select_info, policies, get_columns):
+def json_to_selection_table(request, select_info, returned_data, get_columns, get_descr):
+
     # Show as a selection table
     '''
     select_info - info directing the page
-    policies - the data returned from the network
+    returned_data - the data returned from the network
     id_column - the name of the column that includes the file name
+    get_columns - the list of columns needed to retieve the blobs
+    get_descr - additional columns to describe the blobs
     '''
     needed_columns = ["+ip@", "+port@", "+dbms@", "+table@", "+file@"]
 
 
-    policies_list = policies["Query"]
+    data_list = returned_data["Query"]
 
-    one_policy = policies_list[0]
+    one_policy = data_list[0]
     column_names = []
 
     # Get the returned column names from the first returned policy
@@ -604,11 +721,13 @@ def json_to_selection_table(request, select_info, policies, get_columns):
 
     # for each policy - get 1) the data returned on selection and 2) the data to show the user
     rows = []
-    for policy in policies_list:
+    for json_data in data_list:
+
+        # THE INFO TO NEEDED TO BRING THE BLOB DATA (IP + PORT + DBMS + TABLE + FILE ID
         selection = ""      # Set the data returned when selected
         try:
             for index, column_name in enumerate(get_columns):   # get columns include the columns names on the returned data
-                value = policy[column_name]
+                value = json_data[column_name]
                 if index < len(needed_columns):
                     selection += needed_columns[index] + value
                 else:
@@ -617,10 +736,22 @@ def json_to_selection_table(request, select_info, policies, get_columns):
             pass    # No sufficient info
 
         columns_val = []        # Collect the column values to display
-        for attr_val in policy.values():
+        for attr_val in json_data.values():
             columns_val.append(attr_val)
 
-        rows.append([columns_val, selection])
+        # ADDITIONAL FILE DESCRIPTION INFO
+        description = ""
+        for column_info in get_descr:
+            # in the --> description, get the list of columns to use + the method to apply
+            col_name = column_info[0]
+            if col_name in json_data:
+                method_name = column_info[1]     # Method to apply with the col value (like BOX/RECTENGALE over the coordinates)
+                description += ("+" + col_name)
+                if method_name:
+                    description += ("*" + method_name)
+                description += ('@' + json_data[col_name])
+
+        rows.append([columns_val, selection + description])       # The info on the columns transferred to the report
 
     select_info['rows'] = rows
 
@@ -888,9 +1019,9 @@ def get_blobs(request):
 
             entry_list = entry[5:].split('+')
 
-            if len(entry_list) == 5: # Organized with IP and Port and File-Name and DBMS
+            if len(entry_list) >= 5: # Organized with IP and Port and File-Name and DBMS
                 # Get the blobs file operator info and file name
-                for part in entry_list:
+                for part in entry_list[:5]:         # Consider IP + Port + DBMS + Table + File
                     if part.startswith("ip@"):
                         operator_ip = part[3:]
                     elif part.startswith("port@"):
@@ -918,7 +1049,7 @@ def get_blobs(request):
                 if info_needed:
                     output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=True,  dest=destination, timeout="", subset=False)
 
-                copied_info.append((operator_file, output))
+                copied_info.append((operator_file, output, entry_list))
 
     return copied_info
 
@@ -1016,7 +1147,7 @@ def make_anylog_cmd(request, select_info):
 
     user_cmd = request.POST.get("command").strip()
     if len(user_cmd) > 5 and user_cmd[:4].lower() == "sql ":
-        user_cmd, selection_output, get_columns = get_file_copy_info(user_cmd)
+        user_cmd, selection_output, get_columns, descr_info = get_additional_instructions(user_cmd)
 
     network = request.POST.get('network') == "on"
     if network:

@@ -10,6 +10,9 @@
 }
 
 
+.square_color {
+  border: 1px solid red;
+  }
 
 ul.tree, ul.tree ul {
 list-style: none;

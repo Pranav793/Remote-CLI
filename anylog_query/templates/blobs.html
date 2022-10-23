@@ -22,6 +22,17 @@
     </style>
 
 
+      <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+
+      <script type='text/javascript' src='http://davidlynch.org/projects/maphilight/jquery.maphilight.js'></script>
+      <script type="text/javascript">
+        $(document).ready(function () {
+            $('.map').maphilight({ alwaysOn: true });
+            // uncomment this line for normal hover highlighting
+            //$('.map').maphilight();
+        });
+      </script>
+
   </head>
   <body>
 
@@ -49,6 +60,8 @@
       <input type="hidden" id="network" name="network" value="{{network}}">
       <input type="hidden" id="destination" name="destination" value="{{destination}}">
       <input type="hidden" id="command" name="command" value="{{command}}">
+
+      <input type="hidden" id="blobs_selected" name="blobs_selected" value="{{blobs_selected}}">
 
 
 
@@ -79,8 +92,13 @@
                 </video>
 
             {% else %}
-                <img src="{% static   file_info.2  %}" width=320 height=240 alt="{{ file_info.0 }}">
-
+                <!--  class="map" -->
+                <!--  width=320 height=240  -->
+                <img src="{% static   file_info.2  %}" width=320 height=240 usemap="#workmap" alt="{{ file_info.0 }}" class="map" />
+                <map name="workmap" id="workmap">
+                    <!-- <area shape="rect" alt="" style="cursor: pointer;" coords="1,1,120,120" class="marker"/> -->
+                    <area shape="rect" alt="" coords="1,1,120,120" style="cursor: pointer;"/>
+                </map>
             {% endif %}
         {% endfor %}
 
