@@ -252,7 +252,8 @@ def blobs_processes(request, blobs_button):
     if blobs_selected and len(blobs_selected):
         # add Info from the selected blobs (adding info from the SQL query and the selection using -->  description (columns: ip and bbox as diagram and score)
         # Add IP
-        column_names = ["IP", "blobs", "Size", "select"]
+        column_names = ["IP", "blobs", "Size"]
+        columns_count = 4
         for index, selection in enumerate(blobs_selected):
             if not index:
                 # On the first selection, update the title
@@ -261,6 +262,14 @@ def blobs_processes(request, blobs_button):
                     for entry in info_list[5:]:
                         name_val = entry.split('@')     # Split between the nme and the value
                         column_names.append(name_val[0].split('*')[0]) # Add the column name without the function (if available after the *, example: bbox as shape.rect)
+                        columns_count += 1
+                column_names.append("Select")
+
+                for blob in  copied_blobs:
+                    # Add empty fields to all blobs displayed
+                    blob.insert(0, "")
+                    for index in range (4,columns_count):
+                        blob.append("")
 
     else:
         column_names = ["blobs", "Size", "select"]
