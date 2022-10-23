@@ -214,6 +214,8 @@ def blobs_processes(request, blobs_button):
             if isinstance(blobs_selected, str):
                 blobs_selected, err_msg = json_api.string_to_list(blobs_selected)
                 # blobs_selected = ast.literal_eval(blobs_selected)
+            if blobs_selected:
+                select_info["blobs_selected"] = blobs_selected  # Save the info to apply on Refresh
 
         if "Keep" in post_data:
             # move the file to "Keep" Directory
@@ -254,12 +256,14 @@ def blobs_processes(request, blobs_button):
 
     copied_blobs = utils_io.get_files_in_dir(blobs_dir, True)     # Get the list of files that were copied
 
+    functions = {}
 
+    column_names = ["Blobs", "Size"]
     if blobs_selected and len(blobs_selected):
         # add Info from the selected blobs (adding info from the SQL query and the selection using -->  description (columns: ip and bbox as diagram and score)
         # Add IP
-        column_names = ["IP", "blobs", "Size"]
         columns_count = 4
+        column_names.append("IP")
         for index, selection in enumerate(blobs_selected):
             if not index:
                 # On the first selection, update the title
@@ -267,16 +271,27 @@ def blobs_processes(request, blobs_button):
                 if len (info_list) > 5:
                     for entry in info_list[5:]:
                         name_val = entry.split('@')     # Split between the nme and the value
-                        column_names.append(name_val[0].split('*')[0]) # Add the column name without the function (if available after the *, example: bbox as shape.rect)
+
+                        # Test if the name includes a function (like bbox as shape.rect)
+                        name_method = name_val[0].split('*')
+                        col_name = name_method[0]
+                        if len(name_method) == 2:
+                            method_name = name_method[1]
+
+                            functions[col_name] = method_name       # Add the function - like RECTENGALE over a jpeg
+
+                            #select_info["function"] = functions.append(col_name, method_name)   # Add the function - like RECTENGALE over a jpeg
+
+                        column_names.append(col_name[0].upper() + col_name[1:]) # Add the column name without the function (if available after the *, example: bbox as shape.rect)
                         columns_count += 1
-                column_names.append("Select")
+
+
 
                 for blob in  copied_blobs:
                     # Add empty fields to all blobs displayed
-                    blob.insert(0, "")
+                    blob.append("")     # For the IP
                     for index in range (4,columns_count):
-                        blob.append("")
-
+                        blob.append("")     # For columns specified using: --> description (columns: ip and bbox as shape.rect and score)
 
             # Find the row an update with the data from the SQL table
             info_list = selection[2]
@@ -285,8 +300,8 @@ def blobs_processes(request, blobs_button):
             table_name = info_list[3].split('@')[1]
             file_name = dbms_name + '.' + table_name + '.' + info_list[4].split('@')[1]  # Same as disk fike name
             for file_blob in copied_blobs:
-                if file_blob[1].startswith(file_name):       # Because of the .transfer prefix
-                    file_blob[0] = ip
+                if file_blob[0].startswith(file_name):       # Because of the .transfer prefix
+                    file_blob[2] = ip
                     # Add extra fields
                     if len(info_list) > 5:
                         for index, entry in enumerate(info_list[5:]):
@@ -297,11 +312,12 @@ def blobs_processes(request, blobs_button):
                     break
 
 
-    else:
-        column_names = ["blobs", "Size", "select"]
 
     # Go to the page - blobs.html
 
+    select_info["functions"] = functions        # Apply a function like a rectangle over the image
+
+    column_names.append("Select")
     select_info["column_names"] = column_names
 
     select_info["rows"] = copied_blobs          # The files in the directory placed in a selection list
