@@ -199,14 +199,12 @@ def blobs_processes(request, blobs_button):
 
     post_data = request.POST
 
+    blobs_selected = None
+
     if blobs_button:
         # blobs_button was selected - Copy the files from the source servers
 
-        copied_info = get_blobs(request)      # Copy blobs files from dest machines
-
-        for copied_blob in copied_info:
-            # Get additional info to present with the blob data
-            pass
+        blobs_selected = get_blobs(request)      # Copy blobs files from dest machines
 
     else:
         # process the form - delete or move the file
@@ -250,9 +248,26 @@ def blobs_processes(request, blobs_button):
 
     copied_blobs = utils_io.get_files_in_dir(blobs_dir, True)     # Get the list of files that were copied
 
+
+    if blobs_selected and len(blobs_selected):
+        # add Info from the selected blobs (adding info from the SQL query and the selection using -->  description (columns: ip and bbox as diagram and score)
+        # Add IP
+        column_names = ["IP", "blobs", "Size", "select"]
+        for index, selection in enumerate(blobs_selected):
+            if not index:
+                # On the first selection, update the title
+                info_list = selection[2]        # The INfo from the SQL Query
+                if len (info_list) > 5:
+                    for entry in info_list[5:]:
+                        name_val = entry.split('@')     # Split between the nme and the value
+                        column_names.append(name_val[0].split('*')[0]) # Add the column name without the function (if available after the *, example: bbox as shape.rect)
+
+    else:
+        column_names = ["blobs", "Size", "select"]
+
     # Go to the page - blobs.html
 
-    select_info["column_names"] = ["blobs", "Size", "select"]
+    select_info["column_names"] = column_names
 
     select_info["rows"] = copied_blobs          # The files in the directory placed in a selection list
 
