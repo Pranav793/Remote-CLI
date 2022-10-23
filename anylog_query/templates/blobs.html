@@ -94,10 +94,15 @@
             {% else %}
                 <!--  class="map" -->
                 <!--  width=320 height=240  -->
-                <img src="{% static   file_info.2  %}" width=320 height=240 usemap="#workmap" alt="{{ file_info.0 }}" class="map" />
+                <img src="{% static   file_info.2  %}" width=1000 height=1000 usemap="#workmap" alt="{{ file_info.0 }}" class="map" />
                 <map name="workmap" id="workmap">
                     <!-- <area shape="rect" alt="" style="cursor: pointer;" coords="1,1,120,120" class="marker"/> -->
-                    <area shape="rect" alt="" coords="1,1,120,120" style="cursor: pointer;"/>
+                    {% for function_val in file_info.4 %}
+                        <!-- <For example: shape.rect, 668, 657, 674,671 -->
+                        {% if function_val.0 == "shape.rect" %}
+                            <area shape="rect" alt="" coords="668, 657, 674,671 " style="cursor: pointer;"/>
+                        {% endif %}
+                    {% endfor %}
                 </map>
             {% endif %}
         {% endfor %}
