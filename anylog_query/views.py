@@ -216,8 +216,6 @@ def blobs_processes(request, blobs_button):
             # move the file to "Keep" Directory
             watch_file = True
 
-
-
         for entry in post_data:
             if entry.startswith("file@"):
                 if len(entry) > 5:
@@ -276,7 +274,7 @@ def client_processes(request, client_button):
         if len(user_cmd) > 5 and user_cmd[:4].lower() == "sql ":
             query_result = True
 
-            user_cmd, selection_output, get_columns = get_file_copy_info(user_cmd)
+            user_cmd, selection_output, get_columns, descr_info = get_additional_instructions(user_cmd)
         else:
             query_result = False
 
@@ -338,7 +336,9 @@ def get_additional_instructions(user_cmd):
 
             instruct = instruction.strip()
             if instruct.startswith("selection"):
-                selection_output, get_columns = get_file_copy_info(instruct)    # The info needed to copy a blob
+                if len(instruct) > 12:
+                    instruct = instruct[9:].strip()[1:-1]       # Remove the parenthesis of the selected columns
+                    selection_output, get_columns = get_file_copy_info(instruct)    # The info needed to copy a blob
             elif instruct.startswith("collection"):
                 descr_info = get_descr_info(instruct)        # info to show with blob data
 
@@ -347,14 +347,13 @@ def get_additional_instructions(user_cmd):
 # ---------------------------------------------------------------------------------------
 # Process the following:  --> selection (columns: ip using ip and port using port and file using file)
 # ---------------------------------------------------------------------------------------
-
 def get_descr_info(instruct):
     return None
 # ---------------------------------------------------------------------------------------
 # If the query is an input to a file copy - get the column name that holds the file name
 # Process the following:  --> selection (columns: ip using ip and port using port and file using file)
 # ---------------------------------------------------------------------------------------
-def get_file_copy_info(user_cmd):
+def get_file_copy_info(selection_cmd):
     '''
     user_cmd - provided by the user
 
@@ -367,42 +366,30 @@ def get_file_copy_info(user_cmd):
     get_columns = ["ip", "port", "dbms", "table", "file"]  # These are the info that is needed to bring the blobs
     entries_count = len(get_columns)
 
-    updated_command = user_cmd
     selection_output = False
-    if user_cmd[-1] == ')':
-        index = user_cmd.rfind('(')
-        if index > 10:
-            paren_info = user_cmd[index+1:-1].strip()   # info inside the parenthesis, i.e.: (file id in column file)
-            sql_cmd = user_cmd[:index].rstrip()
-            if sql_cmd.endswith(">selection"):
-                updated_command = user_cmd[:-10].rstrip()
-            elif sql_cmd.endswith(" selection"):
-                sql_cmd = sql_cmd[:-10].rstrip()
-                if sql_cmd[-1] == ">":
-                    updated_command = sql_cmd[:-1].rstrip()
-                    # Get the column name
-                    # The format is (columns: ip using [column name of ip] and port using [column name of port] and file using [column name of file])
-                    if paren_info.startswith("columns: "):
-                        paren_info = paren_info[9:].lstrip()
-                        columns_list = paren_info.split("and")
-                        if len(columns_list) == entries_count:
-                            # needs to describe IP, Port, file name, table name, File Name (or Hash)
-                            counter = 0
-                            for entry in columns_list:
-                                column_info = entry.strip().split()     # X using [column name]
-                                if len(column_info) != 3 or column_info[1] != "using":
-                                    break
-                                try:
-                                    index = get_columns.index(column_info[0])
-                                except:
-                                    break
-                                get_columns[index] = column_info[2] # CHANGE THE COLUMN NAME TO MACH THE QUERY COLUMN NAME
-                                counter += 1
-                            if counter == entries_count:
-                                selection_output = True     # All fields for selection are available
+    # Get the column name
+    # The format is (columns: ip using [column name of ip] and port using [column name of port] and file using [column name of file])
+    if selection_cmd.startswith("columns: "):
+        paren_info = selection_cmd[9:].lstrip()
+        columns_list = paren_info.split("and")
+        if len(columns_list) == entries_count:
+            # needs to describe IP, Port, file name, table name, File Name (or Hash)
+            counter = 0
+            for entry in columns_list:
+                column_info = entry.strip().split()     # X using [column name]
+                if len(column_info) != 3 or column_info[1] != "using":
+                    break
+                try:
+                    index = get_columns.index(column_info[0])
+                except:
+                    break
+                get_columns[index] = column_info[2] # CHANGE THE COLUMN NAME TO MACH THE QUERY COLUMN NAME
+                counter += 1
+            if counter == entries_count:
+                selection_output = True     # All fields for selection are available
 
 
-    return [updated_command, selection_output, get_columns]
+    return [selection_output, get_columns]
 
 # ---------------------------------------------------------------------------------------
 # Command button was selected - get the command info and set the command on select_info
@@ -1051,7 +1038,7 @@ def make_anylog_cmd(request, select_info):
 
     user_cmd = request.POST.get("command").strip()
     if len(user_cmd) > 5 and user_cmd[:4].lower() == "sql ":
-        user_cmd, selection_output, get_columns = get_file_copy_info(user_cmd)
+        user_cmd, selection_output, get_columns, descr_info = get_additional_instructions(user_cmd)
 
     network = request.POST.get('network') == "on"
     if network:
