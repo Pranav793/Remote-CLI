@@ -271,6 +271,26 @@ def blobs_processes(request, blobs_button):
                     for index in range (4,columns_count):
                         blob.append("")
 
+
+            # Find the row an update with the data from the SQL table
+            info_list = selection[2]
+            ip = info_list[0].split('@')[1]
+            dbms_name = info_list[2].split('@')[1]
+            table_name = info_list[3].split('@')[1]
+            file_name = dbms_name + '.' + table_name + '.' + info_list[4].split('@')[1]  # Same as disk fike name
+            for file_blob in copied_blobs:
+                if file_blob[1].startswith(file_name):       # Because of the .transfer prefix
+                    file_blob[0] = ip
+                    # Add extra fields
+                    if len(info_list) > 5:
+                        for index, entry in enumerate(info_list[5:]):
+                            name_val = entry.split('@')  # Split between the nme and the value
+                            if len (name_val) == 2:
+                                value = name_val[1]
+                                file_blob[3 + index] = value    # Set the Value from the SQL stmt
+                    break
+
+
     else:
         column_names = ["blobs", "Size", "select"]
 
