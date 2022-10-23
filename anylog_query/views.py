@@ -332,7 +332,7 @@ def get_additional_instructions(user_cmd):
     if len(commands_list) > 1:
         updated_command = commands_list[0].strip()
 
-        for instruction in commands_list[:1]:
+        for instruction in commands_list[1:]:
 
             instruct = instruction.strip()
             if instruct.startswith("selection"):
