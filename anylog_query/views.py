@@ -196,6 +196,7 @@ def blobs_processes(request, blobs_button):
 
     width = 320
     height = 240
+    java_class = None
 
     files_list = []  # A list of files to watch
 
@@ -317,6 +318,7 @@ def blobs_processes(request, blobs_button):
                                 if files_list and len(files_list) == 1:     # If 1 image selected
                                     width = 1600
                                     height = 1200
+                                    java_class = "map"
                                     name_func = name_val[0].split('*')
                                     if len (name_func) == 2:
                                         # Include a function like: bbox as shape.rect (bbox*shape.rect)
@@ -336,6 +338,7 @@ def blobs_processes(request, blobs_button):
 
     select_info["width"] = width
     select_info["height"] = height
+    select_info["class"] = java_class
 
     select_info["functions"] = functions        # Apply a function like a rectangle over the image
 
