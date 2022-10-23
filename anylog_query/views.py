@@ -775,7 +775,7 @@ def json_to_selection_table(request, select_info, returned_data, get_columns, ge
                     description += ("+" + col_name)
                     if method_name:
                         description += ("*" + method_name)
-                    description += ('@' + json_data[col_name])
+                    description += ('@' + str(json_data[col_name]))
 
         rows.append([columns_val, selection + description])       # The info on the columns transferred to the report
 
