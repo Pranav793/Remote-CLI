@@ -766,15 +766,16 @@ def json_to_selection_table(request, select_info, returned_data, get_columns, ge
 
         # ADDITIONAL FILE DESCRIPTION INFO
         description = ""
-        for column_info in get_descr:
-            # in the --> description, get the list of columns to use + the method to apply
-            col_name = column_info[0]
-            if col_name in json_data:
-                method_name = column_info[1]     # Method to apply with the col value (like BOX/RECTENGALE over the coordinates)
-                description += ("+" + col_name)
-                if method_name:
-                    description += ("*" + method_name)
-                description += ('@' + json_data[col_name])
+        if get_descr:
+            for column_info in get_descr:
+                # in the --> description, get the list of columns to use + the method to apply
+                col_name = column_info[0]
+                if col_name in json_data:
+                    method_name = column_info[1]     # Method to apply with the col value (like BOX/RECTENGALE over the coordinates)
+                    description += ("+" + col_name)
+                    if method_name:
+                        description += ("*" + method_name)
+                    description += ('@' + json_data[col_name])
 
         rows.append([columns_val, selection + description])       # The info on the columns transferred to the report
 
