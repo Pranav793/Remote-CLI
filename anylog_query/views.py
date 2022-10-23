@@ -274,14 +274,14 @@ def client_processes(request, client_button):
         if len(user_cmd) > 5 and user_cmd[:4].lower() == "sql ":
             query_result = True
 
-            user_cmd, selection_output, get_columns, descr_info = get_additional_instructions(user_cmd)
+            user_cmd, selection_output, get_columns, descr_columns = get_additional_instructions(user_cmd)
         else:
             query_result = False
 
         # Process the command
         output = process_anylog(request, user_cmd)        # SEND THE COMMAND TO DESTINATION NODE
 
-        return print_network_reply(request, query_result, output, selection_output, get_columns)
+        return print_network_reply(request, query_result, output, selection_output, get_columns, descr_columns)
 
     else:
         # Display the html form
@@ -546,13 +546,14 @@ def process_anylog(request, user_cmd):
 # Option 2 - a table
 # Option 3 - text
 # -----------------------------------------------------------------------------------
-def print_network_reply(request, query_result, data, selection_output, get_columns):
+def print_network_reply(request, query_result, data, selection_output, get_columns, descr_column):
     '''
     request - the form info
     query_result - a True/False value representing SQL query data set returned
     data - the query or command result
     selection_output - user issued a SQL statement with "> selection" at the end - indicating output to a selection table
     get_columns - the name of the columns that includes the IP, Port, dbms name and file name to retrieve he file
+    descr_column - additional columns to describe the blobs
     '''
 
     select_info = {}
@@ -587,7 +588,7 @@ def print_network_reply(request, query_result, data, selection_output, get_colum
             if selection_output:
                 # Show as a selection table
 
-                return json_to_selection_table(request, select_info, policies, get_columns)
+                return json_to_selection_table(request, select_info, policies, get_columns, descr_column)
             else:
                 # Reply was a JSON policies or a query replied in JSON
                 data_list = []
@@ -617,12 +618,14 @@ def print_network_reply(request, query_result, data, selection_output, get_colum
 # Output to selection table
 # Change the query reply from JSON to selection table format and call the report
 # -----------------------------------------------------------------------------------
-def json_to_selection_table(request, select_info, policies, get_columns):
+def json_to_selection_table(request, select_info, policies, get_columns, descr_column):
     # Show as a selection table
     '''
     select_info - info directing the page
     policies - the data returned from the network
     id_column - the name of the column that includes the file name
+    get_columns - the list of columns needed to retieve the blobs
+    descr_column - additional columns to describe the blobs
     '''
     needed_columns = ["+ip@", "+port@", "+dbms@", "+table@", "+file@"]
 
@@ -641,6 +644,8 @@ def json_to_selection_table(request, select_info, policies, get_columns):
     # for each policy - get 1) the data returned on selection and 2) the data to show the user
     rows = []
     for policy in policies_list:
+
+        # THE INFO TO NEEDED TO BRING THE BLOB DATA (IP + PORT + DBMS + TABLE + FILE ID
         selection = ""      # Set the data returned when selected
         try:
             for index, column_name in enumerate(get_columns):   # get columns include the columns names on the returned data
@@ -656,7 +661,9 @@ def json_to_selection_table(request, select_info, policies, get_columns):
         for attr_val in policy.values():
             columns_val.append(attr_val)
 
-        rows.append([columns_val, selection])
+        # ADDITIONAL FILE DESCRIPTION INFO
+
+        rows.append([columns_val, selection])       # The info on the columns transferred to the report
 
     select_info['rows'] = rows
 
