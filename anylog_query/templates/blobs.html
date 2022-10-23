@@ -100,7 +100,7 @@
                     {% for function_val in file_info.4 %}
                         <!-- <For example: shape.rect, 668, 657, 674,671 -->
                         {% if function_val.0 == "shape.rect" %}
-                            <area shape="rect" alt="" coords="668, 657, 674,671" style="cursor: pointer;"/>
+                            <area shape="rect" alt="" coords="{{ function_val.1 }}" style="cursor: pointer;"/>
                         {% endif %}
                     {% endfor %}
                 </map>
