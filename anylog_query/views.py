@@ -339,16 +339,30 @@ def get_additional_instructions(user_cmd):
                 if len(instruct) > 12:
                     instruct = instruct[9:].strip()[1:-1]       # Remove the parenthesis of the selected columns
                     selection_output, get_columns = get_file_copy_info(instruct)    # The info needed to copy a blob
-            elif instruct.startswith("collection"):
-                descr_info = get_descr_info(instruct)        # info to show with blob data
+            elif instruct.startswith("description"):
+                if len(instruct) > 13:
+                    instruct = instruct[11:].strip()[1:-1]       # Remove the parenthesis of the selected columns
+                    descr_info = get_descr_info(instruct)        # info to show with blob data
 
     return  [updated_command, selection_output, get_columns, descr_info]
 
 # ---------------------------------------------------------------------------------------
-# Process the following:  --> selection (columns: ip using ip and port using port and file using file)
+# Process the following:  -->  description (columns: ip and bbox as diagram and score)
 # ---------------------------------------------------------------------------------------
-def get_descr_info(instruct):
-    return None
+def get_descr_info(descr_cmd):
+    descr_list = []
+    if descr_cmd.startswith("columns: "):
+        paren_info = descr_cmd[9:].strip()
+        columns_list = paren_info.split("and")
+        for column in columns_list:
+            column = column.strip()
+            column_sections = column.split(" as ")
+            if len(column_sections) == 1:
+                descr_list.append([column , None])      # Column name
+            elif len(column_sections) == 2:
+                descr_list.append([column_sections[0].rstrip(), column_sections[1].lstrip()])  # Column name
+
+    return descr_list
 # ---------------------------------------------------------------------------------------
 # If the query is an input to a file copy - get the column name that holds the file name
 # Process the following:  --> selection (columns: ip using ip and port using port and file using file)
@@ -370,7 +384,7 @@ def get_file_copy_info(selection_cmd):
     # Get the column name
     # The format is (columns: ip using [column name of ip] and port using [column name of port] and file using [column name of file])
     if selection_cmd.startswith("columns: "):
-        paren_info = selection_cmd[9:].lstrip()
+        paren_info = selection_cmd[9:].strip()
         columns_list = paren_info.split("and")
         if len(columns_list) == entries_count:
             # needs to describe IP, Port, file name, table name, File Name (or Hash)
