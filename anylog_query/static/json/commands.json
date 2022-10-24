@@ -153,20 +153,20 @@
             "group": "Demo"
     },
     {
-            "button": "Last Day",
-	    "command": "sql ntt extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  timestamp, file, class, bbox, score, status  from deeptector where score > 0 and timestamp > now() - 1 day  order by timestamp desc --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: bbox as shape.rect and score)",
+            "button": "Last 1 hour",
+	    "command": "sql ntt extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  timestamp, file, class, bbox, score, status  from deeptector where score > 0 and timestamp > now() - 1 hour  order by timestamp desc --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: bbox as shape.rect and score)",
             "type": "GET",
             "group": "NTT"
     },
     {
-            "button": "Last 30 minutes",
-	    "command": "sql ntt extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  timestamp, file, class, bbox, score, status  from deeptector where timestamp > now() - 30 minutes order by timestamp desc --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: bbox as shape.rect and score)",
+            "button": "Last 5 minutes",
+	    "command": "sql ntt extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  timestamp, file, class, bbox, score, status  from deeptector where timestamp > now() - 5 minutes order by timestamp desc --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: bbox as shape.rect and score)",
             "type": "GET",
             "group": "NTT"
     },
     {
-            "button": "Summary",
-	    "command": "sql ntt format=table select  timestamp::ljust(19), bbox, score::float(2) from deeptector;",
+            "button": "Summry",
+	    "command": "sql ntt format=table select  timestamp::ljust(19), bbox, score::float(2) from deeptector where timestamp <= NOW() - 1 hour ORDER BY timestamp DESC;",
             "type": "GET",
             "group": "NTT"
     }
