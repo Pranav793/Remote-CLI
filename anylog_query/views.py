@@ -122,6 +122,10 @@ def form_request(request):
     config_button = request.POST.get("Config")  # The Config button was selected
     client_button = request.POST.get("Client")  # Client button was selected
     code_button = request.POST.get("Code")      # Create QrCode from the command
+    setting_button = request.POST.get("Setting")  # Create QrCode from the command
+
+    if setting_button:
+        return setting_options(request)
 
     if code_button:
         return code_options(request)
@@ -1283,3 +1287,14 @@ def create_qr(url:str='https://anylog.co')->pyqrcode.QRCode:
         print(f'Failed to create QR code (Error: {error})')
 
     return qrcode
+
+# -----------------------------------------------------------------------------------
+# Setting Options like ssl
+# -----------------------------------------------------------------------------------
+def setting_options(request):
+
+    select_info = {}
+
+
+    return render(request, "settings.html", select_info)  # Process the blobs page
+
