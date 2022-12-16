@@ -29,6 +29,30 @@ if not error_msg:
 else:
     sys.exit('Failed to load commands file from: %s\r\nError: %s\r\n' % (json_file, error_msg))
 
+if "settings" in data:
+    ANYLOG_SETTING = data["setting"]
+    if not isinstance(ANYLOG_SETTING,dict):
+        sys.exit('\r\nSetting are in a wrong format: %s\r\n' % (json_file))
+else:
+    ANYLOG_SETTING = {}
+
+if "certificates" in ANYLOG_SETTING:
+    SETTING_CER =  ANYLOG_SETTING["certificates"]
+    if not isinstance(SETTING_CER, dict):
+        sys.exit('\r\nSetting (certificates) are in a wrong format: %s\r\n' % (json_file))
+    else:
+        ANYLOG_SETTING = {}
+
+else:
+    SETTING_CER = {}
+
+if not "pem_file" in SETTING_CER:
+    SETTING_CER["pem_file"] = ""
+if not "crt_file" in SETTING_CER:
+    SETTING_CER["crt_file"] = ""
+if not "key_file" in SETTING_CER:
+    SETTING_CER["key_file"] = ""
+
 must_have_keys = [      # These keys are tested in each coimmand in the JSON file
     'button',
     'command',
@@ -1293,8 +1317,18 @@ def create_qr(url:str='https://anylog.co')->pyqrcode.QRCode:
 # -----------------------------------------------------------------------------------
 def setting_options(request):
 
+    global SETTING_CER
     select_info = {}
 
+    pem_file = SETTING_CER["pem_file"]
+    if pem_file:
+        select_info["pem_file"] = pem_file
+    crt_file = SETTING_CER["crt_file"]
+    if crt_file:
+        select_info["crt_file"] = crt_file
+    key_file = SETTING_CER["key_file"]
+    if key_file:
+        select_info["key_file"] = key_file
 
     return render(request, "settings.html", select_info)  # Process the blobs page
 
