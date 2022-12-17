@@ -64,7 +64,18 @@
     <div>
     <br/>
 
+        &nbsp; &nbsp;
+
     <h2>CA Certificate</h2>
+
+    <label for="certificate">Enable: &nbsp</label>
+
+    {% if help %}
+        <input type="checkbox" id="certificate" name="certificate" checked>
+    {% else %}
+        <input type="checkbox" id="certificate" name="certificate">
+    {% endif %}
+
     <h3>Trusted certificate in PEM format</h3>
     <label for="pem_file">PEM file:</label>
     {% if pem_file %}
