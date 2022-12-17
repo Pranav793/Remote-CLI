@@ -19,6 +19,8 @@ import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
 json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "commands.json") # Absolute path
 setting_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "settings.json") # Absolute path
+pem_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "pem" + os.sep) # Absolute path to certificates
+
 blobs_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "blobs" + os.sep + "current"+ os.sep) # Absolute path
 keep_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "blobs" + os.sep + "keep"+ os.sep) # Dir for saved blobs - # Absolute path
 blobs_local_dir = "blobs/current/"
@@ -40,16 +42,9 @@ if setting_info and "certificates" in setting_info:
 else:
     SETTING_CER = {}
 
-anylog_conn.set_certificate_info(SETTING_CER)       # Set the certificate info in anylog_conn.py
+anylog_conn.set_certificate_info(SETTING_CER, pem_dir)       # Set the certificate info in anylog_conn.py
 
-if not "pem_file" in SETTING_CER:
-    SETTING_CER["pem_file"] = ""
-if not "crt_file" in SETTING_CER:
-    SETTING_CER["crt_file"] = ""
-if not "key_file" in SETTING_CER:
-    SETTING_CER["key_file"] = ""
-if not "enable" in SETTING_CER:     # Needs to be True to enable certificates
-    SETTING_CER["enable"] =  False  # default
+
 
 must_have_keys = [      # These keys are tested in each coimmand in the JSON file
     'button',
@@ -1318,19 +1313,19 @@ def create_qr(url:str='https://anylog.co')->pyqrcode.QRCode:
 # -----------------------------------------------------------------------------------
 def setting_options(request):
 
-    global SETTING_CER
+    certificate_info = anylog_conn.get_certificate_info()
     select_info = {}
 
-    pem_file = SETTING_CER["pem_file"]
+    pem_file = certificate_info["pem_file"]
     if pem_file:
         select_info["pem_file"] = pem_file
-    crt_file = SETTING_CER["crt_file"]
+    crt_file = certificate_info["crt_file"]
     if crt_file:
         select_info["crt_file"] = crt_file
-    key_file = SETTING_CER["key_file"]
+    key_file = certificate_info["key_file"]
     if key_file:
         select_info["key_file"] = key_file
-    enable =  SETTING_CER["enable"]
+    enable =  certificate_info["enable"]
     if enable:
         select_info["certificate"] = True
 
@@ -1341,24 +1336,25 @@ def setting_options(request):
 # Setting Options like ssl - Exit from setting Form
 # -----------------------------------------------------------------------------------
 def form_setting_info(request):
-    global SETTING_CER
+
+    certificate_info = anylog_conn.get_certificate_info()
     post_data = request.POST
     if post_data.get("certificate"):
         enable = post_data.get("certificate")
         if enable and enable == "on":
-            SETTING_CER["enable"] = True
+            certificate_info["enable"] = True
         else:
-            SETTING_CER["enable"] = False
+            certificate_info["enable"] = False
     if post_data.get("pem_file"):
         pem_file = post_data.get("pem_file")
         if pem_file:
-            SETTING_CER["pem_file"] = pem_file
+            certificate_info["pem_file"] = pem_file
     if post_data.get("crt_file"):
         crt_file = post_data.get("crt_file")
         if crt_file:
-            SETTING_CER["crt_file"] = crt_file
+            certificate_info["crt_file"] = crt_file
     if post_data.get("key_file"):
         key_file = post_data.get("key_file")
         if key_file:
-            SETTING_CER["key_file"] = key_file
+            certificate_info["key_file"] = key_file
 
