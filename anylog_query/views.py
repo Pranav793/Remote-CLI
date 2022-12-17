@@ -1347,13 +1347,16 @@ def form_setting_info(request):
             SETTING_CER["enable"] = True
         else:
             SETTING_CER["enable"] = False
+    if post_data.get("pem_file"):
         pem_file = post_data.get("pem_file")
         if pem_file:
             SETTING_CER["pem_file"] = pem_file
+    if post_data.get("crt_file"):
         crt_file = post_data.get("crt_file")
         if crt_file:
             SETTING_CER["crt_file"] = crt_file
+    if post_data.get("key_file"):
         key_file = post_data.get("key_file")
         if key_file:
-            SETTING_CER["pem_file"] = key_file
+            SETTING_CER["key_file"] = key_file
 
