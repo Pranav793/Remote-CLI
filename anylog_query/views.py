@@ -18,6 +18,7 @@ import anylog_query.utils_io as utils_io
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
 json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "commands.json") # Absolute path
+setting_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "settings.json") # Absolute path
 blobs_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "blobs" + os.sep + "current"+ os.sep) # Absolute path
 keep_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "blobs" + os.sep + "keep"+ os.sep) # Dir for saved blobs - # Absolute path
 blobs_local_dir = "blobs/current/"
@@ -29,20 +30,13 @@ if not error_msg:
 else:
     sys.exit('Failed to load commands file from: %s\r\nError: %s\r\n' % (json_file, error_msg))
 
-if "settings" in data:
-    ANYLOG_SETTING = data["setting"]
-    if not isinstance(ANYLOG_SETTING,dict):
-        sys.exit('\r\nSetting are in a wrong format: %s\r\n' % (json_file))
-else:
-    ANYLOG_SETTING = {}
 
-if "certificates" in ANYLOG_SETTING:
-    SETTING_CER =  ANYLOG_SETTING["certificates"]
+setting_info, error_msg = json_api.load_json(setting_file)      # Read the setting.json file
+
+if setting_info and "certificates" in setting_info:
+    SETTING_CER =  setting_info["certificates"]
     if not isinstance(SETTING_CER, dict):
         sys.exit('\r\nSetting (certificates) are in a wrong format: %s\r\n' % (json_file))
-    else:
-        ANYLOG_SETTING = {}
-
 else:
     SETTING_CER = {}
 
@@ -52,6 +46,8 @@ if not "crt_file" in SETTING_CER:
     SETTING_CER["crt_file"] = ""
 if not "key_file" in SETTING_CER:
     SETTING_CER["key_file"] = ""
+if not "enable" in SETTING_CER:     # Needs to be True to enable certificates
+    SETTING_CER["enable"] =  False  # default
 
 must_have_keys = [      # These keys are tested in each coimmand in the JSON file
     'button',
@@ -149,7 +145,10 @@ def form_request(request):
     setting_button = request.POST.get("Setting")  # Create QrCode from the command
 
     if setting_button:
+        # Update the setting form (settings.html)
         return setting_options(request)
+
+    form_setting_info(request)      # Get info from the setting form (settings.html - if it was updated)
 
     if code_button:
         return code_options(request)
@@ -1313,7 +1312,7 @@ def create_qr(url:str='https://anylog.co')->pyqrcode.QRCode:
     return qrcode
 
 # -----------------------------------------------------------------------------------
-# Setting Options like ssl
+# Setting Options like ssl - Enter into setting Form
 # -----------------------------------------------------------------------------------
 def setting_options(request):
 
@@ -1329,6 +1328,33 @@ def setting_options(request):
     key_file = SETTING_CER["key_file"]
     if key_file:
         select_info["key_file"] = key_file
+    enable =  SETTING_CER["enable"]
+    if enable:
+        select_info["certificate"] = True
+    else:
+        select_info["certificate"] = False
 
     return render(request, "settings.html", select_info)  # Process the blobs page
+
+# -----------------------------------------------------------------------------------
+# Setting Options like ssl - Exit from setting Form
+# -----------------------------------------------------------------------------------
+def form_setting_info(request):
+    global SETTING_CER
+    post_data = request.POST
+    if post_data.get("certificate"):
+        enable = post_data.get("certificate")
+        if enable and enable == "on":
+            SETTING_CER["enable"] = True
+        else:
+            SETTING_CER["enable"] = False
+        pem_file = post_data.get("pem_file")
+        if pem_file:
+            SETTING_CER["pem_file"] = pem_file
+        crt_file = post_data.get("crt_file")
+        if crt_file:
+            SETTING_CER["crt_file"] = crt_file
+        key_file = post_data.get("key_file")
+        if key_file:
+            SETTING_CER["pem_file"] = key_file
 

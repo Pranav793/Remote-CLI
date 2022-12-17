@@ -1,0 +1,10 @@
+
+{
+  "certificates" : {
+      "enable"   : false,
+      "pem_file" : "ca-anylog-public-key.crt\n",
+      "crt_file" : "D:/Node/AnyLog-Network/data/pem/server-acme-inc-public-key.crt",
+      "key_file" : "D:/Node/AnyLog-Network/data/pem/server-acme-inc-public-key.crt"
+  }
+
+}
