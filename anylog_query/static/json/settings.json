@@ -1,6 +1,8 @@
 
 {
-  "connect" : "10.0.0.78:7849",
+  "client" : {
+  "connect_info": "10.0.0.78:7849"
+  },
   "certificates" : {
       "enable"   : false,
       "pem_file" : "ca-anylog-public-key.crt",

@@ -33,14 +33,20 @@ else:
     sys.exit('Failed to load commands file from: %s\r\nError: %s\r\n' % (json_file, error_msg))
 
 
-setting_info, error_msg = json_api.load_json(setting_file)      # Read the setting.json file
+setting_info_, error_msg = json_api.load_json(setting_file)      # Read the setting.json file
 
-if setting_info and "certificates" in setting_info:
-    SETTING_CER =  setting_info["certificates"]
-    if not isinstance(SETTING_CER, dict):
-        sys.exit('\r\nSetting (certificates) are in a wrong format: %s\r\n' % (json_file))
-else:
-    SETTING_CER = {}
+SETTING_CER = {}        # Maintain certificate info
+CLIENT_INFO = None      # Maintain client html page defaults
+if setting_info_:
+    if "certificates" in setting_info_:
+        SETTING_CER =  setting_info_["certificates"]
+        if not isinstance(SETTING_CER, dict):
+            sys.exit('\r\nSetting (certificates) are in a wrong format: %s\r\n' % (setting_file))
+    if "client" in setting_info_:
+        CLIENT_INFO = setting_info_["client"]
+        if not isinstance(SETTING_CER, dict):
+            sys.exit('\r\nSetting (client) is in a wrong format: %s\r\n' % (setting_file))
+
 
 anylog_conn.set_certificate_info(SETTING_CER, pem_dir)       # Set the certificate info in anylog_conn.py
 
@@ -1114,6 +1120,7 @@ def transfer_selections(request, select_info):
     '''
 
     global user_selections_     # The entries to pass from form to form
+    global CLIENT_INFO          # Defaults from the setting.json file
 
     previous_form = request.POST
 
@@ -1121,7 +1128,9 @@ def transfer_selections(request, select_info):
         if entry in previous_form:
             # This key was updated
             select_info[entry] = previous_form[entry]  # info passed to the new form
-
+        else:
+            if entry in CLIENT_INFO:
+                select_info[entry] = CLIENT_INFO[entry]  # info passed to the new form from "setting.json" file
 
 
 # -----------------------------------------------------------------------------------
