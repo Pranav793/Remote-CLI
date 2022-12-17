@@ -40,6 +40,8 @@ if setting_info and "certificates" in setting_info:
 else:
     SETTING_CER = {}
 
+anylog_conn.set_certificate_info(SETTING_CER)       # Set the certificate info in anylog_conn.py
+
 if not "pem_file" in SETTING_CER:
     SETTING_CER["pem_file"] = ""
 if not "crt_file" in SETTING_CER:

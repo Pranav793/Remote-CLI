@@ -2,6 +2,16 @@ import requests
 import anylog_query.anylog_conn.other as other
 
 
+cert_info_ = None
+
+def set_certificate_info(cert_info):
+    """
+    Keep a global param with the certificate info
+    """
+    global cert_info_
+
+
+
 def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False, dest:str = "", timeout:str="", subset:bool=False)->str:
     """
     Execute GET request
