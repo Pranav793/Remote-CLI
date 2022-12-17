@@ -1331,8 +1331,7 @@ def setting_options(request):
     enable =  SETTING_CER["enable"]
     if enable:
         select_info["certificate"] = True
-    else:
-        select_info["certificate"] = False
+
 
     return render(request, "settings.html", select_info)  # Process the blobs page
 
