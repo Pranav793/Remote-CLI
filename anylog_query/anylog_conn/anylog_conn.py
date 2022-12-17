@@ -73,12 +73,12 @@ def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False, d
 
     try:
         if cert_info_["enable"] :
-            pem_file = cert_info_["pem_dir"] + cert_info_["pem_file"]   # Add Path
+            pem_file = cert_info_["pem_file"]   # File name on the AnyLog Node
             crt_file = cert_info_["pem_dir"] + cert_info_["crt_file"]  # Add Path
             key_file = cert_info_["pem_dir"] + cert_info_["key_file"]  # Add Path
             # https://docs.python-requests.org/en/latest/user/advanced/
             # https://stackoverflow.com/questions/28768530/certificateerror-hostname-doesnt-match
-            r = requests.get('https://%s' % conn, headers=headers, auth=authentication, timeout=client_timeout, verify=pem_file,  cert=(crt_file, key_file))
+            r = requests.get('https://%s' % conn, headers=headers, auth=authentication, timeout=client_timeout, verify=False,  cert=(crt_file, key_file))
         else:
             r = requests.get('http://%s' % conn, headers=headers, auth=authentication, timeout=client_timeout)
     except Exception as error_msg:
