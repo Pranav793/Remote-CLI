@@ -1313,8 +1313,12 @@ def create_qr(url:str='https://anylog.co')->pyqrcode.QRCode:
 # -----------------------------------------------------------------------------------
 def setting_options(request):
 
-    certificate_info = anylog_conn.get_certificate_info()
+
     select_info = {}
+
+    transfer_selections(request, select_info)  # Move selections from old form to the current form
+
+    certificate_info = anylog_conn.get_certificate_info()   # Get the certificate setting info
 
     pem_file = certificate_info["pem_file"]
     if pem_file:
