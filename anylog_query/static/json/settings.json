@@ -1,7 +1,8 @@
 
 {
   "client" : {
-  "connect_info": "10.0.0.78:7849"
+    "connect_info": "10.0.0.78:7849",
+    "buttons" : "commands.json"
   },
   "certificates" : {
       "enable"   : false,

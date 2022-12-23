@@ -17,7 +17,7 @@ import anylog_query.json_api as json_api
 import anylog_query.utils_io as utils_io
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
-json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "commands.json") # Absolute path
+json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep) # Absolute path
 setting_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "settings.json") # Absolute path
 pem_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "pem" + os.sep) # Absolute path to certificates
 
@@ -25,18 +25,12 @@ blobs_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "sta
 keep_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "blobs" + os.sep + "keep"+ os.sep) # Dir for saved blobs - # Absolute path
 blobs_local_dir = "blobs/current/"
 
-data, error_msg = json_api.load_json(json_file)
-
-if not error_msg:
-    ANYLOG_COMMANDS = data["commands"]
-else:
-    sys.exit('Failed to load commands file from: %s\r\nError: %s\r\n' % (json_file, error_msg))
-
-
 setting_info_, error_msg = json_api.load_json(setting_file)      # Read the setting.json file
 
 SETTING_CER = {}        # Maintain certificate info
 CLIENT_INFO = None      # Maintain client html page defaults
+commands_file_name = "commands.json"                        # Default file name for commands
+
 if setting_info_:
     if "certificates" in setting_info_:
         SETTING_CER =  setting_info_["certificates"]
@@ -44,12 +38,21 @@ if setting_info_:
             sys.exit('\r\nSetting (certificates) are in a wrong format: %s\r\n' % (setting_file))
     if "client" in setting_info_:
         CLIENT_INFO = setting_info_["client"]
-        if not isinstance(SETTING_CER, dict):
+        if not isinstance(CLIENT_INFO, dict):
             sys.exit('\r\nSetting (client) is in a wrong format: %s\r\n' % (setting_file))
+        if "buttons" in CLIENT_INFO:
+            commands_file_name = CLIENT_INFO["buttons"] # replace "commands.json" with a different name
 
 
 anylog_conn.set_certificate_info(SETTING_CER, pem_dir)       # Set the certificate info in anylog_conn.py
 
+json_file += commands_file_name         # Add the default name or the name derived from the setting.js file
+data, error_msg = json_api.load_json(json_file)
+
+if not error_msg:
+    ANYLOG_COMMANDS = data["commands"]
+else:
+    sys.exit('Failed to load commands file from: %s\r\nError: %s\r\n' % (json_file, error_msg))
 
 
 must_have_keys = [      # These keys are tested in each coimmand in the JSON file
