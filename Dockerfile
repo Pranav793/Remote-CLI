@@ -23,4 +23,5 @@ WORKDIR $ANYLOG_ROOT_DIR
 COPY . Remote-CLI
 RUN chmod 775 $ANYLOG_ROOT_DIR
 
+RUN python3.9 /app/Remote-CLI/manage.py migrate
 ENTRYPOINT python3.9 /app/Remote-CLI/manage.py runserver ${CONN_IP}:${CLI_PORT}
