@@ -2,6 +2,30 @@ import requests
 import anylog_query.anylog_conn.other as other
 
 
+cert_info_ = None       # Info at https://docs.python-requests.org/en/latest/user/advanced/
+
+def set_certificate_info(cert_info, pem_dir):
+    """
+    Keep a global param with the certificate info
+    """
+    global cert_info_
+    cert_info_ = cert_info
+
+    cert_info_["pem_dir"] = pem_dir           # Default dir for certificates
+
+    if not "pem_file" in cert_info_:
+        cert_info_["pem_file"] = ""
+    if not "crt_file" in cert_info_:
+        cert_info_["crt_file"] = ""
+    if not "key_file" in cert_info_:
+        cert_info_["key_file"] = ""
+    if not "enable" in cert_info_:     # Needs to be True to enable certificates
+        cert_info_["enable"] =  False  # default
+
+def get_certificate_info():
+    global cert_info_
+    return cert_info_
+
 def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False, dest:str = "", timeout:str="", subset:bool=False)->str:
     """
     Execute GET request
@@ -18,6 +42,8 @@ def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False, d
     :return:
         content
     """
+    global cert_info_
+
     results = None
 
     headers = {
@@ -44,8 +70,16 @@ def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False, d
     if subset:
         headers['subset'] = str(subset)          # Return info even if not all replied
 
+
     try:
-        r = requests.get('http://%s' % conn, headers=headers, auth=authentication, timeout=client_timeout)
+        if cert_info_["enable"] :
+            pem_file = cert_info_["pem_file"]   # File name on the AnyLog Node
+            crt_file = cert_info_["pem_dir"] + cert_info_["crt_file"]  # Add Path
+            key_file = cert_info_["pem_dir"] + cert_info_["key_file"]  # Add Path
+            # https://docs.python-requests.org/en/latest/user/advanced/
+            r = requests.get('https://%s' % conn, headers=headers, auth=authentication, timeout=client_timeout, verify=False,  cert=(crt_file, key_file))
+        else:
+            r = requests.get('http://%s' % conn, headers=headers, auth=authentication, timeout=client_timeout)
     except Exception as error_msg:
         results = other.error_message(conn=conn, command_type='GET', error_type='other', error_msg=error_msg)
     else:
@@ -112,3 +146,5 @@ def get_auth(request):
         authentication = (username, password)
 
     return authentication
+
+

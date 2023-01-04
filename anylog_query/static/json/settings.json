@@ -1,0 +1,14 @@
+
+{
+  "client" : {
+    "connect_info": "10.0.0.78:7849",
+    "buttons" : "commands.json"
+  },
+  "certificates" : {
+      "enable"   : true,
+      "pem_file" : "ca-anylog-public-key.crt",
+      "crt_file" : "server-acme-inc-public-key.crt",
+      "key_file" : "server-acme-inc-private-key.key"
+  }
+
+}
