@@ -18,7 +18,7 @@ import anylog_query.utils_io as utils_io
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
 json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep) # Absolute path
-setting_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "settings.json") # Absolute path
+setting_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "settings.jsonn") # Absolute path
 pem_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "pem" + os.sep) # Absolute path to certificates
 
 blobs_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "blobs" + os.sep + "current"+ os.sep) # Absolute path
@@ -1132,7 +1132,7 @@ def transfer_selections(request, select_info):
             # This key was updated
             select_info[entry] = previous_form[entry]  # info passed to the new form
         else:
-            if entry in CLIENT_INFO:
+            if CLIENT_INFO and entry in CLIENT_INFO:
                 select_info[entry] = CLIENT_INFO[entry]  # info passed to the new form from "setting.json" file
 
 
