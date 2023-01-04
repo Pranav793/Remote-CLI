@@ -1132,7 +1132,7 @@ def transfer_selections(request, select_info):
             # This key was updated
             select_info[entry] = previous_form[entry]  # info passed to the new form
         else:
-            if entry in CLIENT_INFO:
+            if CLIENT_INFO and entry in CLIENT_INFO:
                 select_info[entry] = CLIENT_INFO[entry]  # info passed to the new form from "setting.json" file
 
 
