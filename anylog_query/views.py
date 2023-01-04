@@ -17,17 +17,43 @@ import anylog_query.json_api as json_api
 import anylog_query.utils_io as utils_io
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
-json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "commands.json") # Absolute path
+json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep) # Absolute path
+setting_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "settings.json") # Absolute path
+pem_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "pem" + os.sep) # Absolute path to certificates
+
 blobs_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "blobs" + os.sep + "current"+ os.sep) # Absolute path
 keep_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "blobs" + os.sep + "keep"+ os.sep) # Dir for saved blobs - # Absolute path
 blobs_local_dir = "blobs/current/"
 
+setting_info_, error_msg = json_api.load_json(setting_file)      # Read the setting.json file
+
+SETTING_CER = {}        # Maintain certificate info
+CLIENT_INFO = None      # Maintain client html page defaults
+commands_file_name = "commands.json"                        # Default file name for commands
+
+if setting_info_:
+    if "certificates" in setting_info_:
+        SETTING_CER =  setting_info_["certificates"]
+        if not isinstance(SETTING_CER, dict):
+            sys.exit('\r\nSetting (certificates) are in a wrong format: %s\r\n' % (setting_file))
+    if "client" in setting_info_:
+        CLIENT_INFO = setting_info_["client"]
+        if not isinstance(CLIENT_INFO, dict):
+            sys.exit('\r\nSetting (client) is in a wrong format: %s\r\n' % (setting_file))
+        if "buttons" in CLIENT_INFO:
+            commands_file_name = CLIENT_INFO["buttons"] # replace "commands.json" with a different name
+
+
+anylog_conn.set_certificate_info(SETTING_CER, pem_dir)       # Set the certificate info in anylog_conn.py
+
+json_file += commands_file_name         # Add the default name or the name derived from the setting.js file
 data, error_msg = json_api.load_json(json_file)
 
 if not error_msg:
     ANYLOG_COMMANDS = data["commands"]
 else:
     sys.exit('Failed to load commands file from: %s\r\nError: %s\r\n' % (json_file, error_msg))
+
 
 must_have_keys = [      # These keys are tested in each coimmand in the JSON file
     'button',
@@ -122,6 +148,13 @@ def form_request(request):
     config_button = request.POST.get("Config")  # The Config button was selected
     client_button = request.POST.get("Client")  # Client button was selected
     code_button = request.POST.get("Code")      # Create QrCode from the command
+    setting_button = request.POST.get("Setting")  # Create QrCode from the command
+
+    if setting_button:
+        # Update the setting form (settings.html)
+        return setting_options(request)
+
+    form_setting_info(request)      # Get info from the setting form (settings.html - if it was updated)
 
     if code_button:
         return code_options(request)
@@ -1090,6 +1123,7 @@ def transfer_selections(request, select_info):
     '''
 
     global user_selections_     # The entries to pass from form to form
+    global CLIENT_INFO          # Defaults from the setting.json file
 
     previous_form = request.POST
 
@@ -1097,7 +1131,9 @@ def transfer_selections(request, select_info):
         if entry in previous_form:
             # This key was updated
             select_info[entry] = previous_form[entry]  # info passed to the new form
-
+        else:
+            if CLIENT_INFO and entry in CLIENT_INFO:
+                select_info[entry] = CLIENT_INFO[entry]  # info passed to the new form from "setting.json" file
 
 
 # -----------------------------------------------------------------------------------
@@ -1283,3 +1319,58 @@ def create_qr(url:str='https://anylog.co')->pyqrcode.QRCode:
         print(f'Failed to create QR code (Error: {error})')
 
     return qrcode
+
+# -----------------------------------------------------------------------------------
+# Setting Options like ssl - Enter into setting Form
+# -----------------------------------------------------------------------------------
+def setting_options(request):
+
+
+    select_info = {}
+
+    transfer_selections(request, select_info)  # Move selections from old form to the current form
+
+    certificate_info = anylog_conn.get_certificate_info()   # Get the certificate setting info
+
+    pem_file = certificate_info["pem_file"]
+    if pem_file:
+        select_info["pem_file"] = pem_file
+    crt_file = certificate_info["crt_file"]
+    if crt_file:
+        select_info["crt_file"] = crt_file
+    key_file = certificate_info["key_file"]
+    if key_file:
+        select_info["key_file"] = key_file
+    enable =  certificate_info["enable"]
+    if enable:
+        select_info["certificate"] = True
+
+
+    return render(request, "settings.html", select_info)  # Process the blobs page
+
+# -----------------------------------------------------------------------------------
+# Setting Options like ssl - Exit from setting Form
+# -----------------------------------------------------------------------------------
+def form_setting_info(request):
+
+    certificate_info = anylog_conn.get_certificate_info()
+    post_data = request.POST
+    if post_data.get("certificate"):
+        enable = post_data.get("certificate")
+        if enable and enable == "on":
+            certificate_info["enable"] = True
+        else:
+            certificate_info["enable"] = False
+    if post_data.get("pem_file"):
+        pem_file = post_data.get("pem_file")
+        if pem_file:
+            certificate_info["pem_file"] = pem_file
+    if post_data.get("crt_file"):
+        crt_file = post_data.get("crt_file")
+        if crt_file:
+            certificate_info["crt_file"] = crt_file
+    if post_data.get("key_file"):
+        key_file = post_data.get("key_file")
+        if key_file:
+            certificate_info["key_file"] = key_file
+
