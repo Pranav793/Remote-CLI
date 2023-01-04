@@ -8,6 +8,7 @@ docker run -p ${CLI_PORT}:${CLI_PORT} --name remote-cli \
    -e CONN_IP=${CONN_IP} \
    -e CLI_PORT=${CLI_PORT} \
    -v remote-cli:/app/Remote-CLI/anylog_query/static/json \
+   -v remote-cli-keys:/app/Remote-CLI/anylog_query/static/pem \
    --rm  -it --detach-keys="ctrl-d" anylogco/remote-cli:latest
    
 
