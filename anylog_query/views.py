@@ -18,7 +18,7 @@ import anylog_query.utils_io as utils_io
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
 json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep) # Absolute path
-setting_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "settings.jsonn") # Absolute path
+setting_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "settings.json") # Absolute path
 pem_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "pem" + os.sep) # Absolute path to certificates
 
 blobs_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "blobs" + os.sep + "current"+ os.sep) # Absolute path
