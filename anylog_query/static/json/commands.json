@@ -154,7 +154,7 @@
     },
     {
       "button": "Sensor Q2",
-      "command": "sql litsanleandro format=table and include=(percentagecpu_sensor) and \"sql litsanleandro format=table and include=(percentagecpu_sensor) and \"select increments(minute, 1, timestamp), device_name, min(timestamp)::ljust(19)::rjust(8) as timestamp, min(value) as min, max(value) as max,  avg(value)::float(2) as avg, from ping_sensor where timestamp >= NOW() - 1hour GROUP BY device_name ORDER BY timestamp DESC\"\"",
+      "command": "sql litsanleandro format=table and include=(percentagecpu_sensor) \"select increments(minute, 1, timestamp), device_name, min(timestamp)::ljust(19)::rjust(8) as timestamp, min(value) as min, max(value) as max,  avg(value)::float(2) as avg, from ping_sensor where timestamp >= NOW() - 1hour GROUP BY device_name ORDER BY timestamp DESC\"",
       "type": "GET",
       "group": "Demo"
     },
