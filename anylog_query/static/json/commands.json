@@ -140,14 +140,26 @@
       "type": "GET",
       "group": "Demo"
     },
+    {
+      "button": "Virtualized Tables",
+      "command": "get virtual tables",
+      "type": "GET",
+      "group": "Demo"
+    },
    {
-      "button": "sensor",
+      "button": "Sensor Q1",
       "command": "sql litsanleandro format=table and include=(percentagecpu_sensor) and extend=(@table_name as table) \"select increments(minute, 1, timestamp), device_name, min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value from ping_sensor where timestamp >= NOW() - 1hour GROUP BY device_name ORDER BY min_ts DESC\"",
       "type": "GET",
       "group": "Demo"
     },
     {
-            "button": "video",
+      "button": "Sensor Q2",
+      "command": "sql litsanleandro format=table and include=(percentagecpu_sensor) and \"select increments(minute, 1, timestamp), device_name, min(timestamp)::ljust(19) as timestamp, min(value)::float(2) as min, avg(value)::float(2) as avg, max(value)::float(2) as max from ping_sensor where timestamp >= NOW() - 1hour GROUP BY device_name ORDER BY timestamp DESC\"",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+            "button": "Video",
             "command": "sql edgex extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), num_cars, speed from videos where start_ts > '2022-11-01 00:36:29' and end_ts > '2022-11-30 06:55:07' order by speed --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
             "type": "GET",
             "group": "Demo"
