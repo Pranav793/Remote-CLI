@@ -106,13 +106,14 @@
     },
     {
       "button": "Target Operators",
-      "command": "blockchain get operator where [country] contains US bring [operator][ip] : [operator][port]  separator = ,",
+      "command": "blockchain get operator where [company] contains AFG bring [operator][ip] : [operator][port]  separator = ,",
       "type": "GET",
       "group": "Demo"
     },
     {
       "button": "Disk Usage",
       "command": "get disk usage .",
+      "nodes": "blockchain get operator where [company] contains AFG bring [operator][ip] : [operator][port]  separator = ,",,
       "type": "GET",
       "group": "Demo"
     },
