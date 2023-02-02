@@ -113,7 +113,6 @@
     {
       "button": "Disk Usage",
       "command": "get disk usage .",
-      "nodes": "blockchain get operator where [company] contains AFG bring [operator][ip] : [operator][port]  separator = ,",
       "type": "GET",
       "group": "Demo"
     },
