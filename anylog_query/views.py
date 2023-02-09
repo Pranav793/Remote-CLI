@@ -359,9 +359,11 @@ def blobs_processes(request, blobs_button):
                                         for selected_file in files_list:
                                             if selected_file[0].startswith(file_name):
                                                 if function.startswith("shape."):
-                                                    if value[0] == "[" and value[-1] == "]":
-                                                        value = value[1:-1].strip()     # remove paren
-                                                selected_file[4].append((function, value))  # Add bbox*shape.rect + value
+                                                    if value:
+                                                        # If coordinates are provided
+                                                        if value[0] == "[" and value[-1] == "]":
+                                                            value = value[1:-1].strip()     # remove paren
+                                                        selected_file[4].append((function, value))  # Add bbox*shape.rect + value
                                                 break
                     break
 
