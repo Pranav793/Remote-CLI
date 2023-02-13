@@ -271,7 +271,7 @@ def blobs_processes(request, blobs_button):
                         index = file_name.rfind('.')
                         if index > 0 and index < (len(file_name) - 1):
                             file_type = file_name[index+1:]
-                            if file_type == "msg":
+                            if file_type == "msg" or file_type == "blob":
                                 # Read the file and add the base64 conversion string
                                 disk_data = utils_io.read_file(blobs_dir + file_name)
                                 if disk_data:
