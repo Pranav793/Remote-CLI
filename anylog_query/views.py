@@ -510,33 +510,44 @@ def get_file_copy_info(selection_cmd):
         id_column - the column that includes the id of the file (Hash value or file name)
     '''
 
-    get_columns = ["ip", "port", "dbms", "table", "file"]  # These are the info that is needed to bring the blobs
-    entries_count = len(get_columns)
+    get_columns = ["ip", "port", "dbms", "table", "file", "date"]  # These are the info that is needed to bring the blobs
 
-    selection_output = False
+    pull_columns = {}           # Columns to leverage in pulling the image
+    query_columns = None
+    selection_output = True
     # Get the column name
     # The format is (columns: ip using [column name of ip] and port using [column name of port] and file using [column name of file])
     if selection_cmd.startswith("columns: "):
         paren_info = selection_cmd[9:].strip()
         columns_list = paren_info.split("and")
-        if len(columns_list) == entries_count:
-            # needs to describe IP, Port, file name, table name, File Name (or Hash)
-            counter = 0
-            for entry in columns_list:
-                column_info = entry.strip().split()     # X using [column name]
-                if len(column_info) != 3 or column_info[1] != "using":
-                    break
-                try:
-                    index = get_columns.index(column_info[0])
-                except:
-                    break
-                get_columns[index] = column_info[2] # CHANGE THE COLUMN NAME TO MACH THE QUERY COLUMN NAME
-                counter += 1
-            if counter == entries_count:
-                selection_output = True     # All fields for selection are available
+        # needs to describe IP, Port, file name, table name, File Name (or Hash)
+
+        for entry in columns_list:
+            column_info = entry.strip().split()     # X using [column name]
+            if len(column_info) != 3 or column_info[1] != "using":
+                selection_output = False
+                break
+            try:
+                index = get_columns.index(column_info[0])
+            except:
+                selection_output = False
+                break
+            pull_columns[get_columns[index]] = column_info[2] # Keep  THE COLUMN NAME TO MACH THE QUERY COLUMN NAME
+
+        if selection_output:
+            # Test if all columns are detailed in the query
+            # Note: date is optional - it is used to find the file if stored in a file system
+            for column_name in get_columns:
+                if not column_name in pull_columns:
+                    if column_name != "date":       # DATE is optional
+                        selection_output = False
+                        break
+
+            if selection_output:
+                query_columns = list(pull_columns.values())
 
 
-    return [selection_output, get_columns]
+    return [selection_output, query_columns]
 
 # ---------------------------------------------------------------------------------------
 # Command button was selected - get the command info and set the command on select_info
@@ -670,7 +681,7 @@ def process_anylog(request, user_cmd):
         else:
             output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network, dest=destination, timeout=timeout, subset=subset)
     else:
-        output = "Mising commmand"
+        output = "Missing commmand"
 
     return output     # Data returned from AnyLog or an Error Message
 # -----------------------------------------------------------------------------------
@@ -765,7 +776,7 @@ def json_to_selection_table(request, select_info, returned_data, get_columns, ge
     get_columns - the list of columns needed to retieve the blobs
     get_descr - additional columns to describe the blobs
     '''
-    needed_columns = ["+ip@", "+port@", "+dbms@", "+table@", "+file@"]
+    needed_columns = ["+ip@", "+port@", "+dbms@", "+table@", "+file@", "+date@"]
 
 
     data_list = returned_data["Query"]
@@ -1082,7 +1093,7 @@ def get_blobs(request):
 
             if len(entry_list) >= 5: # Organized with IP and Port and File-Name and DBMS
                 # Get the blobs file operator info and file name
-                for part in entry_list[:5]:         # Consider IP + Port + DBMS + Table + File
+                for part in entry_list:         # Consider IP + Port + DBMS + Table + File
                     if part.startswith("ip@"):
                         operator_ip = part[3:]
                     elif part.startswith("port@"):
@@ -1093,6 +1104,8 @@ def get_blobs(request):
                         operator_table = part[6:]
                     elif part.startswith("file@"):
                         operator_file = part[5:]
+                    elif part.startswith("date@"):
+                        file_date = part[5:]        # Needed if file is not in a database - the date determines location on the file system
 
 
                 info_needed = True
