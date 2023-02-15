@@ -1084,10 +1084,12 @@ def get_blobs(request):
 
     for entry in post_data:
         if entry.startswith("get@+"):
-            operator_ip = None
-            operator_port = None
-            operator_dbms = None
-            operator_file = None
+            operator_ip = ""
+            operator_port = ""
+            operator_dbms = ""
+            operator_table = ""
+            operator_file = ""
+            file_date = ""
 
             entry_list = entry[5:].split('+')
 
@@ -1116,7 +1118,7 @@ def get_blobs(request):
 
                 if operator_dbms and operator_file:
                     #command = f"file get !!blobs_dir/{operator_dbms}.{operator_table}.{operator_file} {blobs_dir}{operator_file}"
-                    command = f"file get (dbms = blobs_{operator_dbms} and table = {operator_table} and id = {operator_file}) {blobs_dir}{operator_dbms}.{operator_table}.{operator_file}"
+                    command = f"file get (dbms = blobs_{operator_dbms} and table = {operator_table} and id = {operator_file} and date = {file_date}) {blobs_dir}{operator_dbms}.{operator_table}.{operator_file}"
                 else:
                     info_needed = False
 
