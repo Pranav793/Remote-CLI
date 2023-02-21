@@ -43,6 +43,12 @@ if setting_info_:
         if "buttons" in CLIENT_INFO:
             commands_file_name = CLIENT_INFO["buttons"] # replace "commands.json" with a different name
 
+    if "monitor" in setting_info_:
+        # Get the list of files that is with monitoring info
+        monitor_files_ = setting_info_["monitor"]
+    else:
+        monitor_files_ = None
+
 
 anylog_conn.set_certificate_info(SETTING_CER, pem_dir)       # Set the certificate info in anylog_conn.py
 
@@ -116,6 +122,7 @@ user_selections_ = [
         'network',
         'destination',
         'command',
+        'monitor'
 ]
 
 url_chars_ = {
@@ -1361,6 +1368,10 @@ def setting_options(request):
     enable =  certificate_info["enable"]
     if enable:
         select_info["certificate"] = True
+
+    if monitor_files_:
+        # A json file name with the monitoring info
+        select_info["monitor_files"] = monitor_files_
 
 
     return render(request, "settings.html", select_info)  # Process the blobs page

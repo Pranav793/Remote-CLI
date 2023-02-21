@@ -109,6 +109,31 @@
 
     <br/>
 
+    {% if monitor_files %}
+
+      <h2>Monitor</h2>
+
+      <br/>
+      <text>File:</text>
+
+    <!-- Print the options for monitoring files.  -->
+
+    <select id="m_file" name="m_file">
+
+    {% for entry in monitor_files %}
+         {% if entry.1 == cmd_type %}
+            <option selected value={{ entry.1 }}>&nbsp;{{ entry.0 }}</option>
+        {% else %}
+            <option value={{ entry.1 }}>&nbsp;{{ entry.0 }}</option>
+        {% endif %}
+
+    {%  endfor %}
+
+     </select>
+
+  {% endif %}
+
+
   </form>
 
   </body>

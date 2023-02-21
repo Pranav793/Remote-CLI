@@ -9,6 +9,11 @@
       "pem_file" : "ca-anylog-public-key.crt",
       "crt_file" : "server-acme-inc-public-key.crt",
       "key_file" : "server-acme-inc-private-key.key"
-  }
+  },
+
+  "monitor" : [
+    ["Monitor Operators", "monitor_operators.json"],
+    ["Monitor Members", "monitor_members.json"]
+  ]
 
 }
