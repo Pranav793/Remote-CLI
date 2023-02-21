@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
@@ -53,60 +54,13 @@
       <input type="hidden" id="command" name="command" value="{{command}}">
 
 
-
-
   <input type ="submit" name = "dummy" id="dummy" value="dummy" style="background:transparent; border:none; color:transparent; height:1px; width:1px" />
   <!input type ="submit" name = "Config" id="Config" value="Config" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
   <input type ="submit" name = "Setting" id="Setting" value="Setting" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
+  <input type ="submit" name = "Code" id="Code" value="Code" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
   <input type ="submit" name = "Blobs" id="Blobs" value="Blobs" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Monitor" id="Monitor" value="Monitor" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
   <input type ="submit" name = "Client" id="Client" value="Client" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
 
-
-    <br/>
-
-    <h2>AnyLog Command</h2>
-
-    <div>
-
-    <h3>{{ user_cmd }}</h3>
-
-    </div>
-
-    <br/>
-
-    <h2>cURL Command</h2>
-
-    <div>
-
-    <h3>{{ curl_cmd }}</h3>
-
-    </div>
-    <br/>
-
-   {% if win_curl_cmd %}
-
-        <h2>cURL Command (Windows)</h2>
-
-        <div>
-
-        <h3>{{ win_curl_cmd }}</h3>
-
-       </div>
-        <br/>
-
-   {%  endif  %}
-
-    <h2>QR Code</h2>
-
-    <div>
-
-    <img src="{{ qrcode }}" width=320 height=240 alt="{{ file_info.0 }}"  width="50" height="50"/>
-
-    </div>
-   &nbsp; &nbsp; &nbsp;
-
-      <a href="{{ qr_cmd }}" target="_blank">{{ qr_cmd }} </a>
 
   </form>
 

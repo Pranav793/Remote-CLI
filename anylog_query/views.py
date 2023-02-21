@@ -157,13 +157,19 @@ def form_request(request):
     config_button = request.POST.get("Config")  # The Config button was selected
     client_button = request.POST.get("Client")  # Client button was selected
     code_button = request.POST.get("Code")      # Create QrCode from the command
-    setting_button = request.POST.get("Setting")  # Create QrCode from the command
+    setting_button = request.POST.get("Setting")
+    monitor_button = request.POST.get("Monitor")
 
     if setting_button:
         # Update the setting form (settings.html)
         return setting_options(request)
 
     form_setting_info(request)      # Get info from the setting form (settings.html - if it was updated)
+
+    if monitor_button:
+        # Update the setting form (settings.html)
+        return monitor_nodes(request)
+
 
     if code_button:
         return code_options(request)
@@ -1411,3 +1417,17 @@ def form_setting_info(request):
 
     if post_data.get("m_file"):     # A file name for monitoring
         m_file_ = post_data.get("m_file")
+
+
+# -----------------------------------------------------------------------------------
+# Monitor data from aggregator node
+# -----------------------------------------------------------------------------------
+def monitor_nodes(request):
+
+    global m_file_
+
+    select_info = {}
+
+
+    return render(request, "monitor.html", select_info)  # Process the blobs page
+
