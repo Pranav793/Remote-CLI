@@ -25,6 +25,8 @@ blobs_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "sta
 keep_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "blobs" + os.sep + "keep"+ os.sep) # Dir for saved blobs - # Absolute path
 blobs_local_dir = "blobs/current/"
 
+m_file_ = None          # Updated with the file name with the monitoring options
+
 setting_info_, error_msg = json_api.load_json(setting_file)      # Read the setting.json file
 
 SETTING_CER = {}        # Maintain certificate info
@@ -1349,6 +1351,7 @@ def create_qr(url:str='https://anylog.co')->pyqrcode.QRCode:
 # -----------------------------------------------------------------------------------
 def setting_options(request):
 
+    global m_file_
 
     select_info = {}
 
@@ -1372,6 +1375,8 @@ def setting_options(request):
     if monitor_files_:
         # A json file name with the monitoring info
         select_info["monitor_files"] = monitor_files_
+        if m_file_:
+            select_info["m_file"] = m_file_     # Last file selected
 
 
     return render(request, "settings.html", select_info)  # Process the blobs page
@@ -1380,6 +1385,8 @@ def setting_options(request):
 # Setting Options like ssl - Exit from setting Form
 # -----------------------------------------------------------------------------------
 def form_setting_info(request):
+
+    global m_file_
 
     certificate_info = anylog_conn.get_certificate_info()
     post_data = request.POST
@@ -1402,3 +1409,5 @@ def form_setting_info(request):
         if key_file:
             certificate_info["key_file"] = key_file
 
+    if post_data.get("m_file"):     # A file name for monitoring
+        m_file_ = post_data.get("m_file")

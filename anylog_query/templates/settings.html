@@ -121,7 +121,7 @@
     <select id="m_file" name="m_file">
 
     {% for entry in monitor_files %}
-         {% if entry.1 == cmd_type %}
+         {% if entry.1 == m_file %}
             <option selected value={{ entry.1 }}>&nbsp;{{ entry.0 }}</option>
         {% else %}
             <option value={{ entry.1 }}>&nbsp;{{ entry.0 }}</option>
