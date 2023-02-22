@@ -1452,12 +1452,18 @@ def monitor_nodes(request):
             views = monitoring_info_["views"]
             views_list = []         # A list with all the monitoring pages definitions
             if isinstance(views, dict):
+                collection_key = None
                 for key, value in views.items():
                     if isinstance(value, dict):
                         if "title" in value:
                             views_list.append((value["title"], key))
-
+                            collection_key = key
+                            break
                 select_info["pages"] = views_list           # ALl the options for monitoring pages
+
+                if collection_key:
+                    monitor_info = value
+
 
 
     return render(request, "monitor.html", select_info)  # Process the blobs page
