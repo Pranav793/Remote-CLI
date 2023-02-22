@@ -85,6 +85,28 @@
 
      </select>
 
+     &nbsp
+      
+     <label for="connect_info">Connect info:</label>
+    {% if m_connect_info %}
+        <input type="text" id="m_connect_info" name="m_connect_info" value="{{m_connect_info}}">
+    {% else %}
+        <input type="text" id="m_connect_info" name="m_connect_info">
+    {% endif %}
+
+    &nbsp; &nbsp;
+
+    <label for="auth_usr">Auth user:</label>
+    <input type="text" id="m_auth_usr" name="m_auth_usr">
+
+    &nbsp; &nbsp;
+
+    <label for="auth_pass">Auth password:</label>
+    <input type="password" id="m_auth_pass" name="m_auth_pass">
+
+    &nbsp; &nbsp;
+
+
   {% endif %}
 
   </form>
