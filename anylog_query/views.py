@@ -17,7 +17,7 @@ import anylog_query.json_api as json_api
 import anylog_query.utils_io as utils_io
 import anylog_query.anylog_conn.anylog_conn as anylog_conn
 
-json_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep) # Absolute path
+json_dir_ = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep) # Absolute path
 setting_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "settings.json") # Absolute path
 pem_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "pem" + os.sep) # Absolute path to certificates
 
@@ -26,6 +26,7 @@ keep_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "stat
 blobs_local_dir = "blobs/current/"
 
 m_file_ = None          # Updated with the file name with the monitoring options
+monitoring_info_ = None  # The json file with the monitoring info
 
 setting_info_, error_msg = json_api.load_json(setting_file)      # Read the setting.json file
 
@@ -48,13 +49,16 @@ if setting_info_:
     if "monitor" in setting_info_:
         # Get the list of files that is with monitoring info
         monitor_files_ = setting_info_["monitor"]
+        if len(monitor_files_) and isinstance(monitor_files_, list) and isinstance(monitor_files_[0], list) and len(monitor_files_[0]) == 2:
+            m_file_ = monitor_files_[0][1]
+            monitoring_info_, error_msg = json_api.load_json(json_dir_ + m_file_)  # R
     else:
         monitor_files_ = None
 
 
 anylog_conn.set_certificate_info(SETTING_CER, pem_dir)       # Set the certificate info in anylog_conn.py
 
-json_file += commands_file_name         # Add the default name or the name derived from the setting.js file
+json_file = json_dir_ + commands_file_name         # Add the default name or the name derived from the setting.js file
 data, error_msg = json_api.load_json(json_file)
 
 if not error_msg:
@@ -1392,7 +1396,9 @@ def setting_options(request):
 # -----------------------------------------------------------------------------------
 def form_setting_info(request):
 
-    global m_file_
+    global m_file_      # The name of the monitoring file
+    global monitoring_info_ # The json file with the monitoring info
+    global json_dir_
 
     certificate_info = anylog_conn.get_certificate_info()
     post_data = request.POST
@@ -1416,7 +1422,11 @@ def form_setting_info(request):
             certificate_info["key_file"] = key_file
 
     if post_data.get("m_file"):     # A file name for monitoring
-        m_file_ = post_data.get("m_file")
+        file_name = post_data.get("m_file")
+        if not m_file_ or file_name != m_file_:
+            # Load the JSON file with the monitoring info
+            m_file_ = file_name
+            monitoring_info_, error_msg = json_api.load_json(json_dir_ + file_name)  # Read the setting.json file
 
 
 # -----------------------------------------------------------------------------------
@@ -1424,9 +1434,23 @@ def form_setting_info(request):
 # -----------------------------------------------------------------------------------
 def monitor_nodes(request):
 
-    global m_file_
+    global monitoring_info_
 
     select_info = {}
+
+    if monitoring_info_ and isinstance(monitoring_info_,dict):
+        # Test if dictionary
+        if "views" in monitoring_info_:
+            # get all monitoring reports keys + names
+            views = monitoring_info_["views"]
+            views_list = []         # A list with all the monitoring pages definitions
+            if isinstance(views, dict):
+                for key, value in views.items():
+                    if isinstance(value, dict):
+                        if "title" in value:
+                            views_list.append((value["title"], key))
+
+                select_info["pages"] = views_list           # ALl the options for monitoring pages
 
 
     return render(request, "monitor.html", select_info)  # Process the blobs page

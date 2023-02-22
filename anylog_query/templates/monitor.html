@@ -62,6 +62,32 @@
   <input type ="submit" name = "Client" id="Client" value="Client" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
 
 
+
+
+  {% if pages %}
+
+      <h2>Monitor</h2>
+
+      <br/>
+      <text>Collection:</text>
+
+    <!-- Print the options for monitoring files.  -->
+
+    <select id="collection" name="collection">
+
+    {% for entry in pages %}
+         {% if entry.1 == monitored %}
+            <option selected value={{ entry.1 }}>&nbsp;{{ entry.0 }}</option>
+        {% else %}
+            <option value={{ entry.1 }}>&nbsp;{{ entry.0 }}</option>
+        {% endif %}
+
+    {%  endfor %}
+
+     </select>
+
+  {% endif %}
+
   </form>
 
   </body>

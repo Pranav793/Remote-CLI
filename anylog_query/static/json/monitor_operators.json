@@ -1,6 +1,7 @@
 {
-  "Views": {
+  "views": {
     "operators": {
+      "title" : "Operators Status",
       "header": [
         "Node",
         "Node name",
