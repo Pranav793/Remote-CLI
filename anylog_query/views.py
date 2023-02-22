@@ -128,7 +128,8 @@ user_selections_ = [
         'network',
         'destination',
         'command',
-        'monitor'
+        'monitor',
+        'm_connect_info',       # Monitor page connect info
 ]
 
 url_chars_ = {
@@ -1171,6 +1172,9 @@ def transfer_selections(request, select_info):
             if CLIENT_INFO and entry in CLIENT_INFO:
                 select_info[entry] = CLIENT_INFO[entry]  # info passed to the new form from "setting.json" file
 
+    if not "m_connect_info" in select_info and "connect_info" in select_info:
+        # Use the default select info
+        select_info["m_connect_info"] = select_info["connect_info"]
 
 # -----------------------------------------------------------------------------------
 # Query Options:
@@ -1437,6 +1441,9 @@ def monitor_nodes(request):
     global monitoring_info_
 
     select_info = {}
+
+    transfer_selections(request, select_info)  # Move selections from old form to the current form
+
 
     if monitoring_info_ and isinstance(monitoring_info_,dict):
         # Test if dictionary
