@@ -1480,7 +1480,11 @@ def monitor_nodes(request):
                     if output:
                         json_struct, error_msg = json_api.string_to_json(output)
                         if json_struct:
-                            organize_monitor_info(select_info, monitor_instruct, json_struct) # Organize the output in a table structure
+                            aggregator_ip = select_info["m_connect_info"].split(":")[0]
+                            if aggregator_ip in json_struct:
+                                # The node info is assigned to the node IP
+                                json_struct = json_struct[aggregator_ip]
+                                organize_monitor_info(select_info, monitor_instruct, json_struct) # Organize the output in a table structure
 
 
     return render(request, "monitor.html", select_info)  # Process the blobs page
@@ -1535,6 +1539,8 @@ def organize_monitor_info(select_info, instruct_tree, json_struct):
         # Get the columns values
         for node_ip, node_info in json_struct.items():
             # Key is the node name and value is the second tier dictionary with the info
+            if node_ip == "Update time":
+                continue
             row_info = []
             if column_names_list[0] == "Node":
                 row_info.append((node_ip, False))  # First column is node name
