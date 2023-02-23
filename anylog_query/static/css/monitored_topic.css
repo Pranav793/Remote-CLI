@@ -1,0 +1,42 @@
+
+ /* https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Styling_tables */
+
+table {
+  table-layout: auto;
+  width: auto;
+  border-collapse: collapse;
+  border: 3px solid purple;
+
+}
+
+
+tr:hover {
+    background-color: #908686;
+}
+
+thead tr{
+    background-color:#1c1b1b;
+    color: white;
+    text-decoration: underline;
+}
+
+tbody tr{
+  background-color: #1c1b1b;
+  color: lawngreen;
+}
+.alert {
+    background-color: #d53d31;
+    color: white;
+    font-weight: bold;
+}
+
+.warning {
+    background-color: #fa8505;
+    color: white;
+    font-weight: bold;
+}
+
+
+th, td {
+  padding: 20px;
+}
