@@ -1478,9 +1478,9 @@ def monitor_nodes(request):
                     # Pull from the aggregator node
                     output= process_anylog(request, "get monitored %s" % collection_key, True)
                     if output:
-                        monitored_info, error_msg = json_api.string_to_json(output)
-                        if monitored_info:
-                            organize_monitor_info(monitor_instruct, monitored_info) # Organize the output in a table structure
+                        json_struct, error_msg = json_api.string_to_json(output)
+                        if json_struct:
+                            organize_monitor_info(select_info, monitor_instruct, json_struct) # Organize the output in a table structure
 
 
     return render(request, "monitor.html", select_info)  # Process the blobs page
@@ -1488,21 +1488,11 @@ def monitor_nodes(request):
 # -----------------------------------------------------------------------------------
 # Organize the monitored info for the form
 # -----------------------------------------------------------------------------------
-def organize_monitor_info(instruct, info):
+def organize_monitor_info(select_info, instruct_tree, json_struct):
     '''
     instruct - the instructions of what to present
-    info - the info returned from the aggregator node
+    json_struct - the info returned from the aggregator node
     '''
-
-
-'''
-def monitored_info():
-    json_struct = get_monitored_info(topic)
-
-    select_info = get_select_menu()
-    select_info['title'] = "Monitored %s" % topic
-    select_info['topic'] = topic
-
     if json_struct:
         # Transform the JSON to a table
         table_data = {}
@@ -1510,21 +1500,20 @@ def monitored_info():
         column_names_list = []
         totals = None
         alerts = None
-        if gui_sub_tree:
-            if 'header' in gui_sub_tree:
-                # User specified (in config file) columns to display
-                column_names_list = gui_sub_tree['header']
-                select_info['header'] = column_names_list
-            if 'totals' in gui_sub_tree:
-                totals = gui_sub_tree['totals']
-            if 'alerts' in gui_sub_tree:
-                alerts = gui_sub_tree['alerts']           # Test values as arrive
+        if 'header' in instruct_tree:
+            # User specified (in config file) columns to display
+            column_names_list = instruct_tree['header']
+            select_info['header'] = column_names_list
+        if 'totals' in instruct_tree:
+            totals = instruct_tree['totals']
+        if 'alerts' in instruct_tree:
+            alerts = instruct_tree['alerts']  # Test values as arrive
 
         if not len(column_names_list):
             # Get the columns names from the JSON data
             column_names_list.append("Node")
             # take all columns from the json
-            for node_name, node_info in  json_struct.items():
+            for node_name, node_info in json_struct.items():
                 # Key is the node name and value is the second tier dictionary with the info
                 for attr_name in node_info:
                     # The keys are the column names
@@ -1536,18 +1525,19 @@ def monitored_info():
         if totals:
             totals_row = []
             # Set an entry for each total
-            for column_name in  column_names_list:
+            for column_name in column_names_list:
                 if column_name in totals:
-                    totals_row.append([0, False, True])        # Values: Accumulates the total, Alert is false and shift_right is True
+                    totals_row.append(
+                        [0, False, True])  # Values: Accumulates the total, Alert is false and shift_right is True
                 else:
-                    totals_row.append(["", False, False])       # Print empty cell
+                    totals_row.append(["", False, False])  # Print empty cell
 
         # Get the columns values
-        for node_ip, node_info in  json_struct.items():
+        for node_ip, node_info in json_struct.items():
             # Key is the node name and value is the second tier dictionary with the info
             row_info = []
             if column_names_list[0] == "Node":
-                row_info.append((node_ip, False))      # First column is node name
+                row_info.append((node_ip, False))  # First column is node name
             for index, column_name in enumerate(column_names_list[1:]):
                 if column_name in node_info:
                     column_value = node_info[column_name]
@@ -1560,15 +1550,16 @@ def monitored_info():
                         formated_val = "{:,}".format(column_value)
                     elif isinstance(column_value, float):
                         data_type = "float"
-                        shift_right = True      # Shift right in the table cell
+                        shift_right = True  # Shift right in the table cell
                         formated_val = "{0:,.2f}".format(column_value)
                     else:
                         data_type = "str"
                         shift_right = False  # Shift left in the table cell
                         formated_val = str(column_value)
                         if not formated_val:
-                            row_info.append(("N/A", True, False, False))          # "N/A" - The value to print, is alert, shift, the last False means warning (True means alert - impacts the color)
-                            continue        # Empty string
+                            row_info.append(("N/A", True, False,
+                                             False))  # "N/A" - The value to print, is alert, shift, the last False means warning (True means alert - impacts the color)
+                            continue  # Empty string
 
                     if totals:
                         if totals_row[index + 1][0] != "":
@@ -1590,13 +1581,14 @@ def monitored_info():
                             try:
                                 alert_val = eval(alert_code)
                             except Exception as err_msg:
-                                flash("AnyLog: Error in alerts for topic '%s' evaluating: '%s' with error: %s" % (topic, alert_code, err_msg), category='error')
+                                pass
                             else:
                                 if alert_val:
                                     # Change color of display
                                     pass
 
-                    row_info.append((formated_val, alert_val, shift_right, True))      # The value to print, is alert, shift, the last True means Alert (False means warning - impacts the color)
+                    row_info.append((formated_val, alert_val, shift_right,
+                                     True))  # The value to print, is alert, shift, the last True means Alert (False means warning - impacts the color)
 
                 else:
                     row_info.append(("", False))
@@ -1613,4 +1605,3 @@ def monitored_info():
             table_rows.append(totals_row)
 
         select_info['rows'] = table_rows
-'''
