@@ -431,7 +431,7 @@ def client_processes(request, client_button):
             query_result = False
 
         # Process the command
-        output = process_anylog(request, user_cmd)        # SEND THE COMMAND TO DESTINATION NODE
+        output = process_anylog(request, user_cmd, False)        # SEND THE COMMAND TO DESTINATION NODE
 
 
         return print_network_reply(request, query_result, output, selection_output, get_columns, get_descr)
@@ -668,7 +668,7 @@ def add_sql_instructions(request, user_cmd):
 # ---------------------------------------------------------------------------------------
 # Process the AnyLog command form
 # ---------------------------------------------------------------------------------------
-def process_anylog(request, user_cmd):
+def process_anylog(request, user_cmd, is_monitored):
     '''
     :param request: The info needed to execute command to the AnyLog network
     :param user_cmd: The command issued by the user - it appears in requests (request.POST.get("command")), but maybe was modified by the caller
@@ -678,9 +678,20 @@ def process_anylog(request, user_cmd):
     post_data = request.POST
 
     # Get the needed info from the form
-    conn_info = post_data.get('connect_info').strip()
-    username = post_data.get('auth_usr').strip()
-    password = post_data.get('auth_pass').strip()
+    if is_monitored:
+        conn_info = post_data.get('m_connect_info')
+        username = post_data.get('m_auth_usr')
+        password = post_data.get('m_auth_pass')
+    else:
+        conn_info = post_data.get('connect_info')
+        username = post_data.get('auth_usr')
+        password = post_data.get('auth_pass')
+
+    conn_info = conn_info.strip() if conn_info != None else ""
+    username = username.strip() if username != None else ""
+    password = password.strip() if password != None else ""
+
+
     command = user_cmd
 
     timeout = post_data.get('timeout').strip()  # Change default timeout
@@ -701,7 +712,7 @@ def process_anylog(request, user_cmd):
         else:
             output = anylog_conn.get_cmd(conn=conn_info, command=command, authentication=authentication, remote=network, dest=destination, timeout=timeout, subset=subset)
     else:
-        output = "Missing commmand"
+        output = "Missing command"
 
     return output     # Data returned from AnyLog or an Error Message
 # -----------------------------------------------------------------------------------
@@ -1461,10 +1472,145 @@ def monitor_nodes(request):
                             break
                 select_info["pages"] = views_list           # ALl the options for monitoring pages
 
-                if collection_key:
-                    monitor_info = value
+                if collection_key and "m_connect_info" in select_info:
+                    monitor_instruct = value        # The info of interest to display
 
+                    # Pull from the aggregator node
+                    output= process_anylog(request, "get monitored %s" % collection_key, True)
+                    if output:
+                        monitored_info, error_msg = json_api.string_to_json(output)
+                        if monitored_info:
+                            organize_monitor_info(monitor_instruct, monitored_info) # Organize the output in a table structure
 
 
     return render(request, "monitor.html", select_info)  # Process the blobs page
 
+# -----------------------------------------------------------------------------------
+# Organize the monitored info for the form
+# -----------------------------------------------------------------------------------
+def organize_monitor_info(instruct, info):
+    '''
+    instruct - the instructions of what to present
+    info - the info returned from the aggregator node
+    '''
+
+
+'''
+def monitored_info():
+    json_struct = get_monitored_info(topic)
+
+    select_info = get_select_menu()
+    select_info['title'] = "Monitored %s" % topic
+    select_info['topic'] = topic
+
+    if json_struct:
+        # Transform the JSON to a table
+        table_data = {}
+        table_rows = []
+        column_names_list = []
+        totals = None
+        alerts = None
+        if gui_sub_tree:
+            if 'header' in gui_sub_tree:
+                # User specified (in config file) columns to display
+                column_names_list = gui_sub_tree['header']
+                select_info['header'] = column_names_list
+            if 'totals' in gui_sub_tree:
+                totals = gui_sub_tree['totals']
+            if 'alerts' in gui_sub_tree:
+                alerts = gui_sub_tree['alerts']           # Test values as arrive
+
+        if not len(column_names_list):
+            # Get the columns names from the JSON data
+            column_names_list.append("Node")
+            # take all columns from the json
+            for node_name, node_info in  json_struct.items():
+                # Key is the node name and value is the second tier dictionary with the info
+                for attr_name in node_info:
+                    # The keys are the column names
+                    if attr_name not in column_names_list:
+                        column_names_list.append(attr_name)
+
+        select_info['header'] = column_names_list
+
+        if totals:
+            totals_row = []
+            # Set an entry for each total
+            for column_name in  column_names_list:
+                if column_name in totals:
+                    totals_row.append([0, False, True])        # Values: Accumulates the total, Alert is false and shift_right is True
+                else:
+                    totals_row.append(["", False, False])       # Print empty cell
+
+        # Get the columns values
+        for node_ip, node_info in  json_struct.items():
+            # Key is the node name and value is the second tier dictionary with the info
+            row_info = []
+            if column_names_list[0] == "Node":
+                row_info.append((node_ip, False))      # First column is node name
+            for index, column_name in enumerate(column_names_list[1:]):
+                if column_name in node_info:
+                    column_value = node_info[column_name]
+                    if column_value == None:
+                        continue
+
+                    if isinstance(column_value, int):
+                        data_type = "int"
+                        shift_right = True  # Shift right in the table cell
+                        formated_val = "{:,}".format(column_value)
+                    elif isinstance(column_value, float):
+                        data_type = "float"
+                        shift_right = True      # Shift right in the table cell
+                        formated_val = "{0:,.2f}".format(column_value)
+                    else:
+                        data_type = "str"
+                        shift_right = False  # Shift left in the table cell
+                        formated_val = str(column_value)
+                        if not formated_val:
+                            row_info.append(("N/A", True, False, False))          # "N/A" - The value to print, is alert, shift, the last False means warning (True means alert - impacts the color)
+                            continue        # Empty string
+
+                    if totals:
+                        if totals_row[index + 1][0] != "":
+                            try:
+                                if data_type != "str":
+                                    totals_row[index + 1][0] += column_value
+                                elif column_value.is_digit():
+                                    totals_row[index + 1][0] += int(column_value)
+                                else:
+                                    totals_row[index + 1][0] += float(column_value)
+                            except:
+                                pass
+
+                    alert_val = False
+                    if alerts:
+                        # if column_name in alerts --> process alert to change display color
+                        if column_name in alerts:
+                            alert_code = alerts[column_name].replace("value", str(column_value))
+                            try:
+                                alert_val = eval(alert_code)
+                            except Exception as err_msg:
+                                flash("AnyLog: Error in alerts for topic '%s' evaluating: '%s' with error: %s" % (topic, alert_code, err_msg), category='error')
+                            else:
+                                if alert_val:
+                                    # Change color of display
+                                    pass
+
+                    row_info.append((formated_val, alert_val, shift_right, True))      # The value to print, is alert, shift, the last True means Alert (False means warning - impacts the color)
+
+                else:
+                    row_info.append(("", False))
+
+            table_rows.append(row_info)
+
+        if totals:
+            for entry in totals_row:
+                if isinstance(entry[0], int):
+                    entry[0] = "{:,}".format(entry[0])
+                elif isinstance(entry[0], float):
+                    entry[0] = "{0:,.2f}".format(entry[0])
+
+            table_rows.append(totals_row)
+
+        select_info['rows'] = table_rows
+'''
