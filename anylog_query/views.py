@@ -1463,17 +1463,16 @@ def monitor_nodes(request):
             views = monitoring_info_["views"]
             views_list = []         # A list with all the monitoring pages definitions
             if isinstance(views, dict):
-                collection_key = None
                 for key, value in views.items():
                     if isinstance(value, dict):
                         if "title" in value:
                             views_list.append((value["title"], key))
-                            collection_key = key
-                            break
+
                 select_info["pages"] = views_list           # ALl the options for monitoring pages
 
+                collection_key = request.POST.get("collection")
                 if collection_key and "m_connect_info" in select_info:
-                    monitor_instruct = value        # The info of interest to display
+                    monitor_instruct = views[collection_key]        # The info of interest to display
 
                     # Pull from the aggregator node
                     output= process_anylog(request, "get monitored %s" % collection_key, True)
