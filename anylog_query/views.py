@@ -1456,7 +1456,7 @@ def monitor_nodes(request):
 
     transfer_selections(request, select_info)  # Move selections from old form to the current form
 
-    refresh_ms = 0        # The screen refresh rate in ms
+    m_refresh = 0        # The screen refresh rate in ms
 
     if monitoring_info_ and isinstance(monitoring_info_,dict):
         # Test if dictionary
@@ -1488,11 +1488,16 @@ def monitor_nodes(request):
                                 organize_monitor_info(select_info, monitor_instruct, json_struct) # Organize the output in a table structure
                                 if "m_refresh" in select_info:
                                     try:
-                                        refresh_ms *= 1000      # Refresh rate in MS
+                                        m_refresh = int(select_info["m_refresh"])    # The screen refresh rate in ms
                                     except:
-                                        pass
+                                        m_refresh = 0
 
-    select_info["refresh_ms"] = refresh_ms                      # Transfer the refresh rate or 0 for none
+
+    # Set the refresh rate on the monitor and for the script in MS
+    select_info["m_refresh"] = m_refresh
+    refresh_ms = m_refresh * 1000
+    select_info["refresh_ms"] = refresh_ms                      # Transfer the refresh rate in MS or 0 for none
+
     return render(request, "monitor.html", select_info)  # Process the blobs page
 
 # -----------------------------------------------------------------------------------

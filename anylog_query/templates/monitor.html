@@ -32,7 +32,9 @@
 
           const myInterval = setInterval(locationreload, "{{refresh_ms}}");
             function locationreload() {
-                location.reload();  <!-- AUto refresh  -->
+                if ("{{refresh_ms}}" > 0) {
+                    location.reload();  <!-- AUto refresh  -->
+                }
         }
 
       </script>
@@ -141,13 +143,11 @@
     <label for="auth_pass">Auth password:</label>
     <input type="password" id="m_auth_pass" name="m_auth_pass">
 
+     &nbsp
 
     <label for="m_refresh">Refresh (sec):</label>
-    {% if m_refresh %}
-        <input type="number" id="m_refresh" name="m_refresh" value="{{m_connect_info}}">
-    {% else %}
-        <input type="number" id="m_refresh" name="m_refresh">
-    {% endif %}
+
+    <input type="number" id="m_refresh" min="0" name="m_refresh" step = "10" size = "5" value="{{m_refresh}}">
 
 
       <br/>   <br/>
