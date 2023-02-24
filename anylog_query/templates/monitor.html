@@ -30,11 +30,11 @@
 
       <script>
 
-          const myInterval = setInterval(locationreload, 30000);
+          const myInterval = setInterval(locationreload, "{{refresh_ms}}");
             function locationreload() {
                 location.reload();  <!-- AUto refresh  -->
-
         }
+
       </script>
       <script>
       // function saves scroll position
@@ -140,6 +140,15 @@
 
     <label for="auth_pass">Auth password:</label>
     <input type="password" id="m_auth_pass" name="m_auth_pass">
+
+
+    <label for="m_refresh">Refresh (sec):</label>
+    {% if m_refresh %}
+        <input type="number" id="m_refresh" name="m_refresh" value="{{m_connect_info}}">
+    {% else %}
+        <input type="number" id="m_refresh" name="m_refresh">
+    {% endif %}
+
 
       <br/>   <br/>
 

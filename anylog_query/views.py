@@ -130,6 +130,7 @@ user_selections_ = [
         'command',
         'monitor',
         'm_connect_info',       # Monitor page connect info
+        'm_refresh',            # Monitor refresh rate in seconds
 ]
 
 url_chars_ = {
@@ -1455,6 +1456,7 @@ def monitor_nodes(request):
 
     transfer_selections(request, select_info)  # Move selections from old form to the current form
 
+    refresh_ms = 0        # The screen refresh rate in ms
 
     if monitoring_info_ and isinstance(monitoring_info_,dict):
         # Test if dictionary
@@ -1484,8 +1486,13 @@ def monitor_nodes(request):
                                 # The node info is assigned to the node IP
                                 json_struct = json_struct[aggregator_ip]
                                 organize_monitor_info(select_info, monitor_instruct, json_struct) # Organize the output in a table structure
+                                if "m_refresh" in select_info:
+                                    try:
+                                        refresh_ms *= 1000      # Refresh rate in MS
+                                    except:
+                                        pass
 
-
+    select_info["refresh_ms"] = refresh_ms                      # Transfer the refresh rate or 0 for none
     return render(request, "monitor.html", select_info)  # Process the blobs page
 
 # -----------------------------------------------------------------------------------
