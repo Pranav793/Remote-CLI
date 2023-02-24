@@ -17,7 +17,7 @@ tr:hover {
 thead tr{
     background-color:#1c1b1b;
     color: white;
-    text-decoration: underline;
+    font-weight: bold;
 }
 
 tbody tr{
