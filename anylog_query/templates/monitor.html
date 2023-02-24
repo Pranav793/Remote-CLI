@@ -10,6 +10,9 @@
     <link rel='stylesheet' href="{% static 'css/default.css' %}">
     <link rel='stylesheet' href="{% static 'css/monitored_topic.css' %}">
 
+
+
+
     <meta charset="UTF-8">
     <title>AnyLog</title>
 
@@ -25,6 +28,14 @@
         }
     </style>
 
+      <script>
+
+          const myInterval = setInterval(locationreload, 30000);
+            function locationreload() {
+                location.reload();  <!-- AUto refresh  -->
+
+        }
+      </script>
 
   </head>
   <body>
