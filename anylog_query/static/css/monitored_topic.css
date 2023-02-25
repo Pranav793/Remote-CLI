@@ -5,8 +5,8 @@ table {
   table-layout: auto;
   width: auto;
   border-collapse: collapse;
-  border: 3px solid purple;
-
+  /* border: 3px solid purple; */
+  border: 3pt ridge lightgrey
 }
 
 
@@ -14,15 +14,20 @@ tr:hover {
     background-color: #908686;
 }
 
+
 thead tr{
-    background-color:#1c1b1b;
-    color: white;
+    /*background-color: #1c1b1b; */
+    /*    color: white; */
+    background-color: rgba(28, 27, 27, 0.16);
+    color: darkgreen;
     font-weight: bold;
 }
 
 tbody tr{
-  background-color: #1c1b1b;
-  color: lawngreen;
+    /*background-color: #1c1b1b; */
+    /*color: lawngreen; */
+  background-color: white;
+  color: black;
 }
 .alert {
     background-color: #d53d31;
