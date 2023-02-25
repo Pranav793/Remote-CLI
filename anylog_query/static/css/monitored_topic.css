@@ -36,7 +36,8 @@ tbody tr{
 }
 
 .warning {
-    background-color: #fa8505;
+    /*background-color: #fa8505;*/
+    background-color: #929385;
     color: white;
     font-weight: bold;
 }
