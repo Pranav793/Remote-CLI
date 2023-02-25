@@ -1474,6 +1474,7 @@ def monitor_nodes(request):
 
                 collection_key = request.POST.get("collection")
                 if collection_key and "m_connect_info" in select_info:
+                    select_info["collection"] = collection_key
                     monitor_instruct = views[collection_key]        # The info of interest to display
 
                     # Pull from the aggregator node

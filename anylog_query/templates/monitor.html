@@ -114,7 +114,7 @@
     <select id="collection" name="collection">
 
     {% for entry in pages %}
-         {% if entry.1 == monitored %}
+         {% if entry.1 == collection %}
             <option selected value={{ entry.1 }}>&nbsp;{{ entry.0 }}</option>
         {% else %}
             <option value={{ entry.1 }}>&nbsp;{{ entry.0 }}</option>
