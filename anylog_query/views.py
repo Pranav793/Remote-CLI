@@ -1482,16 +1482,12 @@ def monitor_nodes(request):
                     if output:
                         json_struct, error_msg = json_api.string_to_json(output)
                         if json_struct:
-                            aggregator_ip = select_info["m_connect_info"].split(":")[0]
-                            if aggregator_ip in json_struct:
-                                # The node info is assigned to the node IP
-                                json_struct = json_struct[aggregator_ip]
-                                organize_monitor_info(select_info, monitor_instruct, json_struct) # Organize the output in a table structure
-                                if "m_refresh" in select_info:
-                                    try:
-                                        m_refresh = int(select_info["m_refresh"])    # The screen refresh rate in ms
-                                    except:
-                                        m_refresh = 0
+                            organize_monitor_info(select_info, monitor_instruct, json_struct) # Organize the output in a table structure
+                            if "m_refresh" in select_info:
+                                try:
+                                    m_refresh = int(select_info["m_refresh"])    # The screen refresh rate in ms
+                                except:
+                                    m_refresh = 0
 
 
     # Set the refresh rate on the monitor and for the script in MS
