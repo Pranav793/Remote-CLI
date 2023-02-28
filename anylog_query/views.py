@@ -698,7 +698,12 @@ def process_anylog(request, user_cmd, is_monitored):
     timeout = post_data.get('timeout').strip()  # Change default timeout
     subset = post_data.get('subset') == "on" # Returns reply even if not oll nodes replied
 
-    network = post_data.get('network') == "on"
+    if is_monitored:
+        # Ignore the network flag - always on the local node
+        network == False
+    else:
+        network = post_data.get('network') == "on"
+
     rest_call = post_data.get('rest_call')
 
     destination =  post_data.get('destination').strip()
