@@ -700,7 +700,7 @@ def process_anylog(request, user_cmd, is_monitored):
 
     if is_monitored:
         # Ignore the network flag - always on the local node
-        network == False
+        network = False
     else:
         network = post_data.get('network') == "on"
 
