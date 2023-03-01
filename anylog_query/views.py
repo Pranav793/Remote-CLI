@@ -1561,6 +1561,7 @@ def organize_monitor_info(select_info, instruct_tree, json_struct):
                 if column_name in node_info:
                     column_value = node_info[column_name]
                     if column_value == None:
+                        row_info.append(("", False))
                         continue
 
                     if isinstance(column_value, int):
