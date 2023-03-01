@@ -10,7 +10,10 @@
         "Events/sec",
         "Total events",
         "Free space %",
-        "CPU %"
+        "CPU %",
+        "Packets Recv",
+        "Packets Sent",
+        "Network Error"
       ],
       "totals": [
         "Events/sec",

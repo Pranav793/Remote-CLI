@@ -159,47 +159,22 @@
       "group": "Demo"
     },
     {
-            "button": "Video",
-            "command": "sql edgex extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), num_cars, speed from videos where start_ts > '2022-11-01 00:36:29' and end_ts > '2022-11-30 06:55:07' order by speed --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
-            "type": "GET",
-            "group": "Demo"
-    },
-    {
-	    "button": "Logical View",
-	    "command": "get data nodes",
-	    "type": "GET",
-	    "group": "NTT"
-    },
-    {
-      "button": "Sensor Example",
-      "command": "sql litsanleandro format=table and include=(percentagecpu_sensor) and extend=(@table_name as table) \"select increments(minute, 1, timestamp), device_name, min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value from ping_sensor where timestamp >= NOW() - 1hour GROUP BY device_name ORDER BY min_ts DESC\"",
+      "button": "Video",
+      "command": "sql dmci extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), num_cars, speed from video where start_ts >= NOW() - 1 hour and end_ts <= NOW() order by speed --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
       "type": "GET",
-      "group": "NTT"
-    },
-
-    {
-            "button": "NTT-Deeptector",
-	    "command": "sql ntt extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone=Europe/Dublin  select  timestamp, file, class, bbox, score, status  from deeptector where timestamp > now() - 5 minutes order by timestamp desc --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: bbox as shape.rect and score)",
-            "type": "GET",
-            "group": "NTT"
+      "group": "Demo"
     },
     {
-            "button": "Deeptector Summry",
-	    "command": "sql ntt format=table  and timezone=Europe/Dublin select  timestamp::ljust(19), bbox, score::float(2) from deeptector where timestamp >= NOW() - 1 hour ORDER BY timestamp DESC",
-            "type": "GET",
-            "group": "NTT"
+      "button": "Image",
+      "command": "sql dmci extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone=Europe/Dublin  select  timestamp, file, class, bbox, score, status  from image where timestamp >= now() - 1 hour and timestamp <= NOW() order by timestamp desc --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: bbox as shape.rect and score)",
+      "type": "GET",
+      "group": "Demo"
     },
     {
-    	"button": "Deeptector Count",
-	"command": "sql ntt format=table  and extend=(+node_name, +external_ip)  and timezone=Europe/Dublin select max(timestamp) as timestamp, count(*) as row_count from deeptector", 
-    	"type": "GET",
-    	"group": "NTT"
-    },    
-    {
-            "button": "Traffic Example",
-            "command": "sql edgex extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), num_cars, speed from videos where start_ts > '2022-11-01 00:36:29' and end_ts > '2022-11-30 06:55:07' order by speed --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
-            "type": "GET",
-            "group": "NTT"
+      "button": "Fledge - OpenWeather",
+      "command": "sql dmci format=table select * from openweathermap where timestamp >= NOW() - 120 seconds limit 15;",
+      "type": "GET",
+      "group": "Demo"
     }
   ]
 }
