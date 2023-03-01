@@ -18,7 +18,7 @@
       ],
       "alerts": {
         "Events/sec": "value < 1500",
-        "Free space %": "value > 50",
+        "Free space %": "value < 50",
         "CPU %": "value > 80"
       }
     },
