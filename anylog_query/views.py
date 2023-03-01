@@ -886,6 +886,8 @@ def add_form_value(select_info, request):
         select_info[key] = value
     if  "rest_call" in select_info and select_info["rest_call"] == "post":
         select_info["rest_call"] = None
+    else:
+        select_info["rest_call"] = "get"
     if  "out_format" in select_info and select_info["out_format"] == "json":
         select_info["out_format"] = None
 
