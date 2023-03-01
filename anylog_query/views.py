@@ -1156,8 +1156,11 @@ def get_blobs(request):
                     info_needed = False
 
                 if operator_dbms and operator_file:
-                    #command = f"file get !!blobs_dir/{operator_dbms}.{operator_table}.{operator_file} {blobs_dir}{operator_file}"
-                    command = f"file get (dbms = blobs_{operator_dbms} and table = {operator_table} and id = {operator_file} and date = {file_date}) {blobs_dir}{operator_dbms}.{operator_table}.{operator_file}"
+                    command = f"file get (dbms = blobs_{operator_dbms} and table = {operator_table} and id = {operator_file}"
+                    if file_date:
+                        # Needed if file is not in a database - the date determines location on the file system - add the date to retrieve from the date folder
+                        command += f" and date = {file_date}"
+                    command+= f") {blobs_dir}{operator_dbms}.{operator_table}.{operator_file}"  # Add file full path and name for the destination on THIS MACHINE
                 else:
                     info_needed = False
 
