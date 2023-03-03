@@ -242,6 +242,12 @@
         {{ node_reply }}<br>
     </p>
 
+   {% elif help_url %}
+   <p>
+    <br/>
+       <text>Help Link: </text>
+       <a href="{{help_url}}">{{help_url}}</a>
+   </p>
    {% endif %}
 
    {% block content %} {% endblock content %} <!-- Extended by other html like output tree  -->

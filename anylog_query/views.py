@@ -593,7 +593,14 @@ def command_button_selected(request, command_button):
         if "help_url" in cmd_info and cmd_info["help_url"]:
             help_url += cmd_info["help_url"]
 
-        webbrowser.open(help_url)
+        if setting_info_ and "client" in setting_info_ and "help" in setting_info_["client"]:
+            help_type = setting_info_["client"]["help"]     # Should be url (show the url) or open (open the url)
+        else:
+            help_type = "url"       # Default show the URL
+        if help_type == "open":
+            webbrowser.open(help_url)               # Form will open the help page
+        else:
+            select_info["help_url"] = help_url      # Form will print URL
     else:
         user_cmd = cmd_info["command"]  # Set the command
 
