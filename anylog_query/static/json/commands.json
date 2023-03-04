@@ -1,10 +1,43 @@
 
 {
   "commands" : [
-      {"button": "Node Status",       "command": "get status", "type": "GET", "group" : "Status", "help_url" : "blob/master/monitoring%20nodes.md#the-get-status-command" },
-      {"button": "Get Processes",     "command": "get processes", "type": "GET", "group" : "Status", "help_url" : "blob/master/monitoring%20nodes.md#the-get-processes-command" },
-      {"button": "Get Dictionary",    "command": "get dictionary", "type": "GET", "group" : "Status", "help_url" : "blob/master/monitoring%20nodes.md#the-get-dictionary-command" },
-      {"button": "Get Timezone",      "command": "get timezone info", "type": "GET", "group" : "Status", "help_url" : "blob/master/anylog%20commands.md#get-command" },
+      {"button": "Node Status",       "command": "get status", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-status-command" },
+      {"button": "Get Processes",     "command": "get processes", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-processes-command" },
+      {"button": "Get Dictionary",    "command": "get dictionary", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-dictionary-command" },
+      {"button": "Disk Usage",        "command": "get disk usage .", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands" },
+      {"button": "Disk Counters",     "command": "get node info disk_io_counters", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-node-info-command" },
+      {"button": "CPU Usage",         "command": "get cpu usage", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands" },
+      {"button": "Platform Info",     "command": "get platform info", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands" },
+      {"button": "Memory Info",       "command": "get memory info", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands" },
+      {"button": "Network Info",      "command": "get node info net_io_counters", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-node-info-command" },
+      {"button": "Swap Memory",       "command": "get node info swap_memory", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-node-info-command" },
+    {
+      "button": "Members List",
+      "command": "blockchain get (operator, publisher, query) bring.table [*][name] [*][country] [*][city] [*][ip] [*][port]",
+      "type": "GET",
+      "group": "Monitor"
+    },
+    {
+      "button": "US Members",
+      "command":  "blockchain get (operator, publisher, query) where [country] contains US bring.table [*][name] [*][country] [*][city] [*][ip] [*][port]",
+      "type": "GET",
+      "group": "Monitor"
+    },
+    {
+      "button": "AFG Operators",
+      "command": "blockchain get operator where [company] contains AFG bring.table [*][name] [*][country] [*][city] [*][ip] [*][port]",
+      "type": "GET",
+      "group": "Monitor"
+    },
+
+    {
+      "button": "Target AFG Operators",
+      "command": "blockchain get operator where [company] contains AFG bring [operator][ip] : [operator][port]  separator = ,",
+      "type": "GET",
+      "group": "Monitor"
+    },
+
+
 
       {"button": "Event Log",         "command": "get event log where format=json", "type": "GET", "group" : "Logs", "help_url" : "blob/master/logging%20events.md#the-event-log" },
       {"button": "Error Log",         "command": "get error log where format=json", "type": "GET", "group" : "Logs", "help_url" : "blob/master/logging%20events.md#the-error-log" },
