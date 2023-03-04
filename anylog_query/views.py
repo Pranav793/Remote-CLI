@@ -619,10 +619,6 @@ def command_button_selected(request, command_button):
             # Add output format
             user_cmd = add_sql_instructions(request, user_cmd) # Add format and timezone
 
-
-        else:
-            select_info["network"] = False
-
         select_info["command"] = user_cmd
         rest_call = cmd_info["type"]
         if rest_call == "GET":
