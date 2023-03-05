@@ -18,8 +18,14 @@
       "group": "Monitor"
     },
     {
-      "button": "US Members",
+      "button": "USA Members",
       "command":  "blockchain get (operator, publisher, query) where [country] contains US bring.table [*][name] [*][country] [*][city] [*][ip] [*][port]",
+      "type": "GET",
+      "group": "Monitor"
+    },
+    {
+      "button": "Target USA",
+      "command":  "blockchain get (operator, publisher, query) where [country] contains US  bring [*][ip] : [*][port]  separator = ,",
       "type": "GET",
       "group": "Monitor"
     },
@@ -31,7 +37,7 @@
     },
 
     {
-      "button": "Target AFG Operators",
+      "button": "Target AFG",
       "command": "blockchain get operator where [company] contains AFG bring [operator][ip] : [operator][port]  separator = ,",
       "type": "GET",
       "group": "Monitor"
