@@ -28,7 +28,7 @@ ul.tree li {
  line-height: 20px;
  color: #369;
  font-weight: bold;
- border-left:1px solid rgb(100,100,100);
+ border-left:1px solid rgb(100, 100, 100);
 
 }
 ul.tree li:last-child {
@@ -49,6 +49,15 @@ ul.tree li:last-child:before {
   border-left:1px solid rgb(100,100,100);
 }
 
+.value {
+ margin: 0;
+ padding: 0 7px;
+ line-height: 20px;
+ color: #369;
+ font-weight: bold;
+ border-left:1px solid rgb(100, 100, 100);
+
+}
 
 .floatleft{
     float:left;

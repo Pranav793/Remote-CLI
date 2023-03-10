@@ -22,7 +22,11 @@
         {% if entry.key  %}
             {{entry.key}}  &nbsp : &nbsp
              <span class="key">
-            {{entry.value}}
+            {{entry.value}}         <!-- Dictionary Value  -->
+            </span>
+        {% elif entry.value  %}
+             <span class="value">
+            {{entry.value}}         <!-- List Value  -->
             </span>
         {% endif %}
 
