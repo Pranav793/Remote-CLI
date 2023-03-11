@@ -20,9 +20,12 @@
         {% endif %}
 
         {% if entry.key  %}
-            {{entry.key}}  &nbsp : &nbsp
+            {{entry.key}}
              <span class="key">
-            {{entry.value}}         <!-- Dictionary Value  -->
+            {% if entry.value  %}
+                 &nbsp : &nbsp
+                {{entry.value}}         <!-- Dictionary Value  -->
+            {% endif %}
             </span>
         {% elif entry.value  %}
              <span class="value">
