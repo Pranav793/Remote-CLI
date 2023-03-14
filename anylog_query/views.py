@@ -1,17 +1,13 @@
 import sys
 import os
-from pathlib import Path
-from django.shortcuts import render
 
 import pyqrcode
-import base64
 
 # Import necessary modules
 from django.shortcuts import render
-from django.http import HttpResponse
 import webbrowser
 
-from djangoProject.settings import BASE_DIR
+from anylog_query.settings import BASE_DIR
 
 import anylog_query.json_api as json_api
 import anylog_query.utils_io as utils_io
