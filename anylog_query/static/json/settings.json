@@ -2,7 +2,10 @@
 {
   "client" : {
     "connect_info": "23.239.12.151:32349",
-    "buttons" : "commands.json",
+    "buttons" : [
+      "commands.json",
+      "poc_commands.json"
+    ],
     "help" : "link"
   },
   "certificates" : {

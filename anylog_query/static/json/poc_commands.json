@@ -25,13 +25,13 @@
     },
     {
       "button": "Target Memebers",
-      "command":  "blockchain get (operator, master, query) where [company] contains socnoc  bring.ip_port",
+      "command":  "blockchain get (operator, master, query) where [company] contains test  bring.ip_port",
       "type": "GET",
       "group": "Monitor"
     },
     {
       "button": "My Operators",
-      "command": "blockchain get operator where [company] contains socnoc bring.table [*][name] [*][country] [*][city] [*][ip] [*][port]",
+      "command": "blockchain get operator where [company] contains test bring.table [*][name] [*][country] [*][city] [*][ip] [*][port]",
       "type": "GET",
       "group": "Monitor"
     },
@@ -185,19 +185,19 @@
     },
    {
       "button": "Sensor Summary",
-      "command": "sql socnoc format=table and extend=(+node_name) \"select min(timestamp), max(timestamp), min(value), max(value), avg(value), count(*) from rand_data;\"",
+      "command": "sql test format=table and extend=(+node_name) \"select min(timestamp), max(timestamp), min(value), max(value), avg(value), count(*) from rand_data;\"",
       "type": "GET",
       "group": "Demo"
     },
     {
       "button": "Sensor Q1",
-      "command": "sql socnoc format=table \"select increments(minute, 1, timestamp),  min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value from rand_data where timestamp >= NOW() - 1 hour ORDER BY min_ts DESC\"",
+      "command": "sql test format=table \"select increments(minute, 1, timestamp),  min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value from rand_data where timestamp >= NOW() - 1 hour ORDER BY min_ts DESC\"",
       "type": "GET",
       "group": "Demo"
     },
     {
       "button": "Sensor Q2",
-      "command": "sql socnoc format=table \"select timestamp::ljust(19), value from rand_data where timestamp >= NOW() - 10 minutes ORDER BY timestamp\"",
+      "command": "sql test format=table \"select timestamp::ljust(19), value from rand_data where timestamp >= NOW() - 10 minutes ORDER BY timestamp\"",
       "type": "GET",
       "group": "Demo"
     }
