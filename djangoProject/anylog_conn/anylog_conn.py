@@ -1,5 +1,5 @@
 import requests
-import anylog_query.anylog_conn.other as other
+import djangoProject.anylog_conn.other as other
 
 
 cert_info_ = None       # Info at https://docs.python-requests.org/en/latest/user/advanced/

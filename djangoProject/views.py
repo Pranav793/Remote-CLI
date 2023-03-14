@@ -7,18 +7,18 @@ import pyqrcode
 from django.shortcuts import render
 import webbrowser
 
-from anylog_query.settings import BASE_DIR
+from djangoProject.settings import BASE_DIR
 
-import anylog_query.json_api as json_api
-import anylog_query.utils_io as utils_io
-import anylog_query.anylog_conn.anylog_conn as anylog_conn
+import djangoProject.json_api as json_api
+import djangoProject.utils_io as utils_io
+import djangoProject.anylog_conn.anylog_conn as anylog_conn
 
-json_dir_ = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep) # Absolute path
-setting_file = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "json" + os.sep + "settings.json") # Absolute path
-pem_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "pem" + os.sep) # Absolute path to certificates
+json_dir_ = os.path.join(str(BASE_DIR) + os.sep + "djangoProject" + os.sep + "static" + os.sep + "json" + os.sep) # Absolute path
+setting_file = os.path.join(str(BASE_DIR) + os.sep + "djangoProject" + os.sep + "static" + os.sep + "json" + os.sep + "settings.json") # Absolute path
+pem_dir = os.path.join(str(BASE_DIR) + os.sep + "djangoProject" + os.sep + "static" + os.sep + "pem" + os.sep) # Absolute path to certificates
 
-blobs_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "blobs" + os.sep + "current"+ os.sep) # Absolute path
-keep_dir = os.path.join(str(BASE_DIR) + os.sep + "anylog_query" + os.sep + "static" + os.sep + "blobs" + os.sep + "keep"+ os.sep) # Dir for saved blobs - # Absolute path
+blobs_dir = os.path.join(str(BASE_DIR) + os.sep + "djangoProject" + os.sep + "static" + os.sep + "blobs" + os.sep + "current"+ os.sep) # Absolute path
+keep_dir = os.path.join(str(BASE_DIR) + os.sep + "djangoProject" + os.sep + "static" + os.sep + "blobs" + os.sep + "keep"+ os.sep) # Dir for saved blobs - # Absolute path
 blobs_local_dir = "blobs/current/"
 
 m_file_ = None          # Updated with the file name with the monitoring options
