@@ -6,6 +6,43 @@
       {"button": "Get Dictionary",    "command": "get dictionary", "type": "GET", "group" : "Status", "help_url" : "blob/master/monitoring%20nodes.md#the-get-dictionary-command" },
       {"button": "Get Timezone",      "command": "get timezone info", "type": "GET", "group" : "Status", "help_url" : "blob/master/anylog%20commands.md#get-command" },
 
+      {"button": "Node Status",       "command": "get status", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-status-command" },
+      {"button": "Get Processes",     "command": "get processes", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-processes-command" },
+      {"button": "Get Dictionary",    "command": "get dictionary", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-dictionary-command" },
+      {"button": "Disk Usage",        "command": "get disk usage .", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands" },
+      {"button": "Disk Counters",     "command": "get node info disk_io_counters", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-node-info-command" },
+      {"button": "CPU Usage",         "command": "get cpu usage", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands" },
+      {"button": "Platform Info",     "command": "get platform info", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands" },
+      {"button": "Memory Info",       "command": "get memory info", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands" },
+      {"button": "Network Info",      "command": "get node info net_io_counters", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-node-info-command" },
+      {"button": "Swap Memory",       "command": "get node info swap_memory", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-node-info-command" },
+
+    {
+      "button": "Members List",
+      "command": "blockchain get (operator, master, query) bring.table [*][name] [*][country] [*][city] [*][ip] [*][port] [*][rest_port] [*][cluster]",
+      "type": "GET",
+      "group": "Monitor"
+    },
+    {
+      "button": "Target Memebers",
+      "command":  "blockchain get (operator, master, query) where [company] contains test  bring.ip_port",
+      "type": "GET",
+      "group": "Monitor"
+    },
+    {
+      "button": "My Operators",
+      "command": "blockchain get operator where [company] contains test bring.table [*][name] [*][country] [*][city] [*][ip] [*][port]",
+      "type": "GET",
+      "group": "Monitor"
+    },
+
+    {
+      "button": "Target A Operator",
+      "command": "blockchain get operator where [name] contains 2 bring [operator][ip] : [operator][port]  separator = ,",
+      "type": "GET",
+      "group": "Monitor"
+    },
+
       {"button": "Event Log",         "command": "get event log where format=json", "type": "GET", "group" : "Logs", "help_url" : "blob/master/logging%20events.md#the-event-log" },
       {"button": "Error Log",         "command": "get error log where format=json", "type": "GET", "group" : "Logs", "help_url" : "blob/master/logging%20events.md#the-error-log" },
       {"button": "Streaming Log",     "command": "get streaming log where format=json", "type": "GET", "group" : "Logs", "help_url" : "blob/master/logging%20events.md#the-streaming-log" },
@@ -62,6 +99,107 @@
       {"button": "CPU Info", "command": "get cpu info", "type": "GET", "group" : "Other", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
       {"button": "Disk Info", "command": "get disk usage .", "type": "GET", "group" : "Other", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
       {"button": "Timezone Info", "command": "get timezone info", "type": "GET", "group" : "Other", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
-      {"button": "Date Time", "command": "get datetime pt now()", "type": "GET", "group" : "Other", "help_url" : "blob/master/queries.md#get-datetime-command"}
-    ]
+      {"button": "Date Time", "command": "get datetime pt now()", "type": "GET", "group" : "Other", "help_url" : "blob/master/queries.md#get-datetime-command"},
+
+     {"button": "Edgex",
+       "command": "sql edgex extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), num_cars, speed from videos where start_ts > '2022-08-06 00:00:00' and end_ts < '2022-08-06 23:59:59' order by speed --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)", "type": "GET",
+       "group" : "Video",
+       "help_url" : "blob/master/queries.md#queries"},
+    {"button": "Generic",
+       "command": "sql [DBMS] extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), num_cars, speed from [TABLE] where start_ts > '2022-08-06 00:00:00' and end_ts < '2022-08-06 23:59:59' order by speed --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)", "type": "GET",
+       "group" : "Video",
+       "help_url" : "blob/master/queries.md#queries"},
+
+     {"button": "Data Nodes",
+       "command": "get data nodes", "type": "GET",
+       "group" : "Performance",
+       "help_url" : "blob/master/high%20availability.md#view-the-distribution-of-data-to-clusters"},
+
+     {"button": "Query Status",
+       "command": "query status", "type": "GET",
+       "group" : "Performance",
+       "help_url" : "blob/master/profiling%20and%20monitoring%20queries.md#command-options-for-profiling-and-monitoring-queries"},
+
+   {"button": "Query 1",
+       "command": "sql [DBMS] format=table and extend=(+ip, +node_name) \"select min(insert_timestamp), max(insert_timestamp), count(*)::format(:,) from [TABLE];\"", "type": "GET",
+       "group" : "Performance",
+       "help_url" : "blob/master/queries.md#queries"},
+
+    {"button": "Query 2",
+       "command": "sql [DBMS] format=table  select increments(hour, 1, timestamp), min(timestamp), max(timestamp), min(value), avg(\nvalue), max(value), count(*)::format(:,) from [TABLE];", "type": "GET",
+       "group" : "Performance",
+       "help_url" : "blob/master/queries.md#queries"},
+    {
+      "button": "Operators Info",
+      "command": "blockchain get operator bring.table [operator][name] [operator][country] [operator][city] [operator][ip] [operator][port]",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Bring Operator 2 Info",
+      "command":  "blockchain get operator where [name] contains 2 bring.table [operator][name] [operator][country] [operator][city] [operator][ip] [operator][port]",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Target Operator",
+      "command": "blockchain get operator where [name] contains 2 bring.ip_port",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Disk Usage",
+      "command": "get disk usage .",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Processes",
+      "command": "get processes",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Platform",
+      "command": "get platform info",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "CPU",
+      "command": "get cpu usage",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Data Nodes",
+      "command": "get data nodes",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Virtualized Tables",
+      "command": "get virtual tables",
+      "type": "GET",
+      "group": "Demo"
+    },
+   {
+      "button": "Sensor Summary",
+      "command": "sql test format=table and extend=(+node_name) \"select min(timestamp), max(timestamp), min(value), max(value), avg(value), count(*) from rand_data;\"",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Sensor Q1",
+      "command": "sql test format=table \"select increments(minute, 1, timestamp),  min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value from rand_data where timestamp >= NOW() - 1 hour ORDER BY min_ts DESC\"",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Sensor Q2",
+      "command": "sql test format=table \"select timestamp::ljust(19), value from rand_data where timestamp >= NOW() - 10 minutes ORDER BY timestamp\"",
+      "type": "GET",
+      "group": "Demo"
+    }
+  ]
 }

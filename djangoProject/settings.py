@@ -55,7 +55,7 @@ ROOT_URLCONF = 'djangoProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'anylog_query/templates', BASE_DIR / 'djangoProject/templates'],
+        'DIRS': [BASE_DIR / 'djangoProject/templates', BASE_DIR / 'djangoProject/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -122,5 +122,5 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "anylog_query/static"),
+    os.path.join(BASE_DIR, "djangoProject/static"),
 )

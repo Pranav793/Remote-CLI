@@ -1,6 +1,6 @@
 .idea/
 __pycache__/
 anylog_deploy/configs/*
-anylog_query/static/blobs/*
+djangoProject/static/blobs/*
 .*.swp
-anylog_query/static/pem/*
+djangoProject/static/pem/*

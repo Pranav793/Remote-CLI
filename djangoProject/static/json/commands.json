@@ -1,4 +1,219 @@
 
 {
-  "test" : 123
+  "commands" : [
+      {"button": "Node Status",       "command": "get status", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-status-command" },
+      {"button": "Get Processes",     "command": "get processes", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-processes-command" },
+      {"button": "Get Dictionary",    "command": "get dictionary", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-dictionary-command" },
+      {"button": "Disk Usage",        "command": "get disk usage .", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands" },
+      {"button": "Disk Counters",     "command": "get node info disk_io_counters", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-node-info-command" },
+      {"button": "CPU Usage",         "command": "get cpu usage", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands" },
+      {"button": "Platform Info",     "command": "get platform info", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands" },
+      {"button": "Memory Info",       "command": "get memory info", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands" },
+      {"button": "Network Info",      "command": "get node info net_io_counters", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-node-info-command" },
+      {"button": "Swap Memory",       "command": "get node info swap_memory", "type": "GET", "group" : "Monitor", "help_url" : "blob/master/monitoring%20nodes.md#the-get-node-info-command" },
+    {
+      "button": "Members List",
+      "command": "blockchain get (operator, publisher, query) bring.table [*][name] [*][country] [*][city] [*][ip] [*][port]",
+      "type": "GET",
+      "group": "Monitor"
+    },
+    {
+      "button": "USA Members",
+      "command":  "blockchain get (operator, publisher, query) where [country] contains US bring.table [*][name] [*][country] [*][city] [*][ip] [*][port]",
+      "type": "GET",
+      "group": "Monitor"
+    },
+    {
+      "button": "Target USA",
+      "command":  "blockchain get (operator, publisher, query) where [country] contains US  bring [*][ip] : [*][port]  separator = ,",
+      "type": "GET",
+      "group": "Monitor"
+    },
+    {
+      "button": "AFG Operators",
+      "command": "blockchain get operator where [company] contains AFG bring.table [*][name] [*][country] [*][city] [*][ip] [*][port]",
+      "type": "GET",
+      "group": "Monitor"
+    },
+
+    {
+      "button": "Target AFG",
+      "command": "blockchain get operator where [company] contains AFG bring [operator][ip] : [operator][port]  separator = ,",
+      "type": "GET",
+      "group": "Monitor"
+    },
+
+
+
+      {"button": "Event Log",         "command": "get event log where format=json", "type": "GET", "group" : "Logs", "help_url" : "blob/master/logging%20events.md#the-event-log" },
+      {"button": "Error Log",         "command": "get error log where format=json", "type": "GET", "group" : "Logs", "help_url" : "blob/master/logging%20events.md#the-error-log" },
+      {"button": "Streaming Log",     "command": "get streaming log where format=json", "type": "GET", "group" : "Logs", "help_url" : "blob/master/logging%20events.md#the-streaming-log" },
+      {"button": "Query Log",         "command": "get query log where format=json", "type": "GET", "group" : "Logs", "help_url" : "blob/master/logging%20events.md#the-query-log" },
+      {"button": "Reset Error Log", "command": "reset error log", "type": "POST", "group": "Logs", "help_url" : "blob/master/logging%20events.md#reset-the-log-data" },
+      {"button": "Reset Streaming Log", "command": "reset streaming log", "type": "POST", "group": "Logs", "help_url" : "blob/master/logging%20events.md#reset-the-log-data" },
+      {"button": "Streaming Log on", "command": "set rest log on", "type": "POST", "group": "Logs", "help_url" : "blob/master/logging%20events.md#the-streaming-log" },
+      {"button": "Streaming Log off", "command": "set rest log off", "type": "POST", "group": "Logs", "help_url" : "blob/master/logging%20events.md#the-streaming-log" },
+
+      {"button": "Get REST calls",    "command": "get rest calls", "type": "GET", "group" : "Southbound", "help_url" : "blob/master/monitoring%20calls.md#get-rest-calls"},
+      {"button": "Get Streaming",     "command": "get streaming format = json", "type": "GET", "group" : "Southbound", "help_url" : "blob/master/monitoring%20calls.md#get-streaming"},
+      {"button": "Get MSG Clients",   "command": "get msg clients", "type": "GET", "group" : "Southbound", "help_url" : "blob/master/monitoring%20calls.md#get-msg-clients"},
+      {"button": "Get Operator",      "command": "get operator", "type": "GET", "group" : "Southbound", "help_url" : "blob/master/monitoring%20calls.md#get-operator"},
+      {"button": "REST Server Info",  "command": "get rest server info", "type": "GET", "group" : "Southbound", "help_url" : "blob/master/monitoring%20calls.md#rest-server-configuration"},
+      {"button": "Data Nodes", "command": "get data nodes", "type": "GET", "group" : "Southbound", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-data-commands"},
+
+
+      {"button": "Queries Status",  "command": "query status all", "type": "GET", "group" : "Northbound", "help_url" : "blob/master/profiling%20and%20monitoring%20queries.md#command-options-for-profiling-and-monitoring-queries"},
+      {"button": "Get Last Query Status",     "command": "query status", "type": "GET", "group" : "Northbound", "help_url" : "blob/master/profiling%20and%20monitoring%20queries.md#command-options-for-profiling-and-monitoring-queries"},
+      {"button": "Get Rows Count",            "command": "get rows count", "type": "GET", "group" : "Northbound", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-data-commands"},
+      {"button": "Get Rows Count by Table",   "command": "get rows count where group=table", "type": "GET", "group" : "Northbound", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-data-commands"},
+
+      {"button": "Blockchain Operators",      "command": "blockchain get operator", "type": "GET", "group" : "Blockchain", "help_url" : "blob/master/blockchain%20commands.md"},
+      {"button": "Blockchain Publishers",     "command": "blockchain get publisher", "type": "GET", "group" : "Blockchain", "help_url" : "blob/master/blockchain%20commands.md"},
+      {"button": "Blockchain Queries",        "command": "blockchain get query", "type": "GET", "group" : "Blockchain", "help_url" : "blob/master/blockchain%20commands.md"},
+      {"button": "Blockchain Tables",         "command": "blockchain get table", "type": "GET", "group" : "Blockchain", "help_url" : "blob/master/blockchain%20commands.md"},
+      {"button": "Tables List",               "command": "blockchain get table bring.table.sort [table][dbms] [table][name]", "type": "GET", "group" : "Blockchain", "help_url" : "blob/master/blockchain%20commands.md"},
+      {"button": "Cluster Table",             "command": "blockchain get cluster bring.table.sort [cluster][name] [cluster][table]", "type": "GET", "group" : "Blockchain", "help_url" : "blob/master/blockchain%20commands.md"},
+
+      {"button": "QUERY Count",
+       "command": "sql [DBMS] SELECT count(*) from [TABLE]", "type": "GET",
+       "group" : "Queries",
+       "help_url" : "blob/master/queries.md#queries"},
+
+      {"button": "QUERY Minute",
+       "command": "sql [DBMS] SELECT timestamp, value FROM [TABLE] WHERE timestamp > NOW() - 1 minute", "type": "GET",
+       "group" : "Queries",
+       "help_url" : "blob/master/queries.md#queries"},
+
+      {"button": "QUERY Increments",
+       "command": "sql [DBMS] select increments(day, 1, timestamp), min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value, count(*) as row_count from [TABLE] limit 10",
+       "type": "GET", "group" : "Queries",
+       "help_url" : "blob/master/queries.md#queries"},
+
+      {"button": "QUERY Period",
+       "command": "sql [DBMS] select  max(timestamp), avg(value) from [TABLE] where period ( minute, 1, NOW(), timestamp)", "type": "GET",
+       "group" : "Queries",
+       "help_url" : "blob/master/queries.md#queries"},
+
+      {"button": "Help Get", "command": "help get", "type": "GET", "group" : "Other", "help_url" : ""},
+      {"button": "Help Blockchain", "command": "help blockchain", "type": "GET", "group" : "Other", "help_url" : ""},
+      {"button": "Platform Info", "command": "get platform info", "type": "GET", "group" : "Other", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
+      {"button": "Memory Info", "command": "get memory info", "type": "GET", "group" : "Other", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
+      {"button": "CPU Info", "command": "get cpu info", "type": "GET", "group" : "Other", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
+      {"button": "Disk Info", "command": "get disk usage .", "type": "GET", "group" : "Other", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
+      {"button": "Timezone Info", "command": "get timezone info", "type": "GET", "group" : "Other", "help_url" : "blob/master/monitoring%20nodes.md#monitoring-state-commands"},
+      {"button": "Date Time", "command": "get datetime pt now()", "type": "GET", "group" : "Other", "help_url" : "blob/master/queries.md#get-datetime-command"},
+
+     {"button": "Edgex",
+       "command": "sql edgex extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), num_cars, speed from videos where start_ts > '2022-08-06 00:00:00' and end_ts < '2022-08-06 23:59:59' order by speed --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)", "type": "GET",
+       "group" : "Video",
+       "help_url" : "blob/master/queries.md#queries"},
+    {"button": "Generic",
+       "command": "sql [DBMS] extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), num_cars, speed from [TABLE] where start_ts > '2022-08-06 00:00:00' and end_ts < '2022-08-06 23:59:59' order by speed --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)", "type": "GET",
+       "group" : "Video",
+       "help_url" : "blob/master/queries.md#queries"},
+
+     {"button": "Data Nodes",
+       "command": "get data nodes", "type": "GET",
+       "group" : "Performance",
+       "help_url" : "blob/master/high%20availability.md#view-the-distribution-of-data-to-clusters"},
+
+     {"button": "Query Status",
+       "command": "query status", "type": "GET",
+       "group" : "Performance",
+       "help_url" : "blob/master/profiling%20and%20monitoring%20queries.md#command-options-for-profiling-and-monitoring-queries"},
+
+   {"button": "Query 1",
+       "command": "sql [DBMS] format=table and extend=(+ip, +node_name) \"select min(insert_timestamp), max(insert_timestamp), count(*)::format(:,) from [TABLE];\"", "type": "GET",
+       "group" : "Performance",
+       "help_url" : "blob/master/queries.md#queries"},
+
+    {"button": "Query 2",
+       "command": "sql [DBMS] format=table  select increments(hour, 1, timestamp), min(timestamp), max(timestamp), min(value), avg(\nvalue), max(value), count(*)::format(:,) from [TABLE];", "type": "GET",
+       "group" : "Performance",
+       "help_url" : "blob/master/queries.md#queries"},
+    {
+      "button": "Operators Info",
+      "command": "blockchain get operator bring.table [operator][name] [operator][country] [operator][city] [operator][ip] [operator][port]",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "US Operators",
+      "command":  "blockchain get operator where [country] contains US bring.table [operator][name] [operator][country] [operator][city] [operator][ip] [operator][port]",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Target Operators",
+      "command": "blockchain get operator where [company] contains AFG bring [operator][ip] : [operator][port]  separator = ,",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Disk Usage",
+      "command": "get disk usage .",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Processes",
+      "command": "get processes",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Platform",
+      "command": "get platform info",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "CPU",
+      "command": "get cpu usage",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Data Nodes",
+      "command": "get data nodes",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Virtualized Tables",
+      "command": "get virtual tables",
+      "type": "GET",
+      "group": "Demo"
+    },
+   {
+      "button": "Sensor Q1",
+      "command": "sql litsanleandro format=table and include=(percentagecpu_sensor) and extend=(@table_name as table) \"select increments(minute, 1, timestamp), device_name, min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value from ping_sensor where timestamp >= NOW() - 1hour GROUP BY device_name ORDER BY min_ts DESC\"",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Sensor Q2",
+      "command": "sql litsanleandro format=table and include=(percentagecpu_sensor) \"select increments(minute, 1, timestamp), device_name, min(timestamp)::ljust(19)::rjust(8) as timestamp, min(value) as min, max(value) as max,  avg(value)::float(2) as avg, from ping_sensor where timestamp >= NOW() - 1hour GROUP BY device_name ORDER BY timestamp DESC\"",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Video",
+      "command": "sql dmci extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), num_cars, speed from video where start_ts >= NOW() - 1 hour and end_ts <= NOW() order by speed --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Image",
+      "command": "sql dmci extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone=Europe/Dublin  select  timestamp, file, class, bbox, score, status  from image where timestamp >= now() - 1 hour and timestamp <= NOW() order by timestamp desc --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: bbox as shape.rect and score)",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Fledge - OpenWeather",
+      "command": "sql dmci format=table select * from openweathermap where timestamp >= NOW() - 120 seconds limit 15;",
+      "type": "GET",
+      "group": "Demo"
+    }
+  ]
 }

@@ -10,6 +10,9 @@
 }
 
 
+.square_color {
+  border: 1px solid red;
+  }
 
 ul.tree, ul.tree ul {
 list-style: none;
@@ -25,7 +28,7 @@ ul.tree li {
  line-height: 20px;
  color: #369;
  font-weight: bold;
- border-left:1px solid rgb(100,100,100);
+ border-left:1px solid rgb(100, 100, 100);
 
 }
 ul.tree li:last-child {
@@ -46,6 +49,14 @@ ul.tree li:last-child:before {
   border-left:1px solid rgb(100,100,100);
 }
 
+.value {
+ margin: 0;
+ padding: 0 7px;
+ line-height: 20px;
+ color: #369;
+ font-weight: bold;
+ border-left:1px solid rgb(100, 100, 100);
+}
 
 .floatleft{
     float:left;
@@ -60,4 +71,13 @@ ul.tree li:last-child:before {
 .networktext {
   font-size: 20px;
   padding-left: 20px;
+}
+
+@keyframes blink {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1
+  }
 }
