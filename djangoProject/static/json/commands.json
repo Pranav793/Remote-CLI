@@ -210,8 +210,14 @@
       "group": "Demo"
     },
     {
-      "button": "Fledge - OpenWeather",
-      "command": "sql dmci format=table select * from openweathermap where timestamp >= NOW() - 120 seconds limit 15;",
+      "button": "Fleet CMD All",
+      "command": "sql nvidia format=table \"select id, timestamp, caller, component, release, target_namespace, resource, version, info, app, helm_release, streams, source, helm_component, system, location, remote_ip, remote_port, message_size, message_id, source_input, accounted_message_size, pod, namespace, container, source_node, action, phase, revision, succeed, kustomization_cfg, kustomization_path, kustomize_hook, kustomize_hook_path, using_post_renderer, warning, name, check_sum_updated, loop, msg, latest, url  from fleet_command limit 100;\"",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Fleet CMD Sum",
+      "command": "sql nvidia format=table \"select component, release, system, version,  helm_release, info, count(*) as num_info from  fleet_command WHERE period(day, 1, '2022-05-29 23:46:33.176572476', timestamp) GROUP by component, release, system, version,  helm_release, info ORDER BY info;\"",
       "type": "GET",
       "group": "Demo"
     }
