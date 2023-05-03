@@ -420,6 +420,8 @@ Format 2:
 # ---------------------------------------------------------------------------------------
 def get_bbox_val(width, height, function, values_str):
     coordinates = "0,0,0,0"
+    natural_height = 720
+    natural_width = 576
     if function == "shape.rect" and width and height:       # Avoid division by 0 (if width or height are 0)
         coords = [width,height,width,height]
         if values_str[0] == "[" and values_str[-1] == "]":
@@ -431,25 +433,27 @@ def get_bbox_val(width, height, function, values_str):
                     # Option 1
                     for index, entry in enumerate(values_list):
                         if isinstance(entry, float) or isinstance(entry, int):
-                            coords[index] = entry / coords[index]
+                            coords[index] = entry
 
                 elif isinstance(values_list[0], dict) and isinstance(values_list[3], dict):
+                    # Temp work arround -  "600,0,700,200" from:
+                    # 	[{`x`: 278.6972961426, `y`: 165.1059417725}, {`x`: 278.6972961426, `y`: 576.0}, {`x`: 715.8059692383, `y`: 165.1059417725}, {`x`: 715.8059692383, `y`: 576.0}]
+
                     # Get the values from Top-left : (x_min, y_min) and Bottom-right: (x_max, y_max)
                     if isinstance(values_list[0], dict) and 'x' in values_list[0] and 'y' in values_list[0]:
                         dict_val = values_list[0]['x']
                         if isinstance(dict_val, float) or isinstance(dict_val, int):
-                            coords[0] = dict_val / coords[0]
+                            coords[0] = (dict_val * (600 /278))
                         dict_val = values_list[0]['y']
                         if isinstance(dict_val, float) or isinstance(dict_val, int):
-                            coords[1] = dict_val / coords[1]
+                            coords[1] = (dict_val * (1 /165))
                     if isinstance(values_list[3], dict) and 'x' in values_list[3] and 'y' in values_list[3]:
                         dict_val = values_list[3]['x']
                         if isinstance(dict_val, float) or isinstance(dict_val, int):
-                            coords[2] = dict_val / coords[2]
+                            coords[2] = (dict_val * (700 /715))
                         dict_val = values_list[3]['y']
                         if isinstance(dict_val, float) or isinstance(dict_val, int):
-                            coords[3] = dict_val / coords[3]
-
+                            coords[3] = (dict_val * (200 /576))
 
             coordinates = str(coords)[1:-1]
 
