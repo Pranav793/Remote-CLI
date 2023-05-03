@@ -378,8 +378,7 @@ def blobs_processes(request, blobs_button):
                                                 if function.startswith("shape."):
                                                     if value:
                                                         # If coordinates are provided
-                                                        if value[0] == "[" and value[-1] == "]":
-                                                            value = value[1:-1].strip()     # remove paren
+                                                        value = get_bbox_val(width, height, function, value)
                                                         selected_file[4].append((function, value))  # Add bbox*shape.rect + value
                                                 break
                     break
@@ -403,6 +402,58 @@ def blobs_processes(request, blobs_button):
 
 
     return render(request, "blobs.html", select_info) # Process the blobs page
+# ---------------------------------------------------------------------------------------
+# Get the BBOX Value - bounding box coordinates
+# Transform the value string to the shape proportional to the size of the image
+# https://nanonets.com/blog/image-processing-and-bounding-boxes-for-ocr/#:~:text=They%20use%20four%20values%20to,%3D%20543%2C%20y2%3D%20213.
+# https://www.quackit.com/html/tags/html_area_tag.cfm
+
+'''
+Format 1: [X1, Y1, X2, Y2] - example: 666, 291, 682, 306 ( left, top, right, bottom)
+Format 2: 
+    Top-left : (x_min, y_min)
+    Top-right: (x_max, y_min)
+    Bottom-left:(x_min, y_max)
+    Bottom-right: (x_max, y_max)
+    Example: [{`x`: 278.6972961426, `y`: 165.1059417725}, {`x`: 278.6972961426, `y`: 576.0}, {`x`: 715.8059692383, `y`: 165.1059417725}, {`x`: 715.8059692383, `y`: 576.0}]
+'''
+# ---------------------------------------------------------------------------------------
+def get_bbox_val(width, height, function, values_str):
+    coordinates = "0,0,0,0"
+    if function == "shape.rect" and width and height:       # Avoid division by 0 (if width or height are 0)
+        coords = [width,height,width,height]
+        if values_str[0] == "[" and values_str[-1] == "]":
+            values_list, error_msg = json_api.string_to_list(values_str.replace('`','"'))
+            if values_list and len(values_list) == 4:
+                # 4 coordinates - either in format 1 or format 2
+
+                if isinstance(values_list[0], float) or isinstance(values_list[0], int):
+                    # Option 1
+                    for index, entry in enumerate(values_list):
+                        if isinstance(entry, float) or isinstance(entry, int):
+                            coords[index] = entry / coords[index]
+
+                elif isinstance(values_list[0], dict) and isinstance(values_list[3], dict):
+                    # Get the values from Top-left : (x_min, y_min) and Bottom-right: (x_max, y_max)
+                    if isinstance(values_list[0], dict) and 'x' in values_list[0] and 'y' in values_list[0]:
+                        dict_val = values_list[0]['x']
+                        if isinstance(dict_val, float) or isinstance(dict_val, int):
+                            coords[0] = dict_val / coords[0]
+                        dict_val = values_list[0]['y']
+                        if isinstance(dict_val, float) or isinstance(dict_val, int):
+                            coords[1] = dict_val / coords[1]
+                    if isinstance(values_list[3], dict) and 'x' in values_list[3] and 'y' in values_list[3]:
+                        dict_val = values_list[3]['x']
+                        if isinstance(dict_val, float) or isinstance(dict_val, int):
+                            coords[2] = dict_val / coords[2]
+                        dict_val = values_list[3]['y']
+                        if isinstance(dict_val, float) or isinstance(dict_val, int):
+                            coords[3] = dict_val / coords[3]
+
+
+            coordinates = str(coords)[1:-1]
+
+    return coordinates
 
 # ---------------------------------------------------------------------------------------
 # Client processes - the main form interacting with the network
