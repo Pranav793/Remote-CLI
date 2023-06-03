@@ -79,57 +79,19 @@
 
     <br/> <br/> <br/>
 
+      <div>
 
-    <div>
+        {% for url_cmd in destinations %}
 
-        <video width="640" height="480" controls autoplay>
-        <source src="http://10.0.0.78:7849/?User-Agent=AnyLog/1.23?command=stream" type="video/mp4">
-        </video>
+            <video width="640" height="480" controls autoplay>
+            <source src="{{ url_cmd }}" type="video/mp4">
+            </video>
 
-        {% for stream_info in watch_mp4s %}
 
         {% endfor %}
 
 
-  </div>
-
-
-
-   <br/> <br/>  <br/>
-
-
-    <table border="1">
-    <tr style="background-color: azure">    <!-- table row  -->
-        {% for col_name in column_names %}
-            <td>{{col_name}}</td> <!-- table cell  -->
-        {% endfor %}
-
-    </tr>
-    {% for row in rows %}
-    <tr>
-        {% for col_val in row %}
-            <td>{{ col_val }}</td>
-        {% endfor %}
-        <td><label><input type="checkbox" name="file@{{ row.0 }}" value="True"/></label></td> <!-- The selection column: -->
-
-    </tr>
-    {% endfor %}
-
-    </table>
-
-  <br/>  <br/>
-      <input type ="submit" name = "Watch" value="Watch"/>
-
-      <input type ="submit" name = "Refresh" value="Refresh"/>
-
-         &nbsp;
-    <input type ="submit" name = "Keep" value="Keep"/>
-
-        &nbsp;
-
-    <input type ="submit" name = "Delete" value="Delete"/>
-
-     &nbsp; &nbsp;
+      </div>
 
 
 

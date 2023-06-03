@@ -268,7 +268,7 @@ def stream_processes(request):
                 source_url = f"http://{ip}:{port}/?User-Agent=AnyLog/1.23?command=stream/{dbms}/{table}/{file}"
                 stream_list.append(source_url)
 
-    select_info["destination"] = stream_list     # Destination and command
+    select_info["destinations"] = stream_list     # Destination and command
 
     return render(request, "streaming.html", select_info)  # Process the blobs page
 # ---------------------------------------------------------------------------------------
