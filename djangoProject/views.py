@@ -156,6 +156,7 @@ def form_request(request):
     form = request.POST.get("Form")         # The form used
 
     blobs_button = request.POST.get("Blobs")    # The blobs button was selected
+    stream_button = request.POST.get("Stream")  # The stream button was selected
     config_button = request.POST.get("Config")  # The Config button was selected
     client_button = request.POST.get("Client")  # Client button was selected
     code_button = request.POST.get("Code")      # Create QrCode from the command
@@ -179,6 +180,10 @@ def form_request(request):
     if blobs_button or (form == "Blobs" and not client_button and not config_button):
         # Either the blobs Button was selected (on a different form) or the blobs Page is processed.
         return blobs_processes(request, blobs_button)
+
+    if stream_button:
+        # Stream the data from the servers
+        return stream_processes(request)
 
     if config_button:
         # config button was selected - go to the config page
@@ -226,6 +231,46 @@ def form_request(request):
 
     return client_processes(request, client_button)    # Client processes - the main form interacting with the network
 
+# ---------------------------------------------------------------------------------------
+# Stream MP4 to stdout
+# ---------------------------------------------------------------------------------------
+def stream_processes(request):
+    select_info = {}
+    transfer_selections(request, select_info)  # Move selections from old form to the current form
+
+    select_info["width"] = 320
+    select_info["height"] = 240
+
+    post_data = request.POST
+
+    stream_list = []        # List of files to stream
+    for key in post_data:
+        if key.startswith("get@+ip@"):
+            # File info to stream
+            ip = port = dbms = table = file = None
+
+            file_info = key.split('+')
+            if len(file_info) > 5:
+                for entry in file_info:
+                    if len(entry) > 3 and entry.startswith("ip@"):
+                        ip = entry[3:]
+                    elif len(entry) > 5 and entry.startswith("port@"):
+                        port = entry[5:]
+                    elif len(entry) > 5 and entry.startswith("dbms@"):
+                        dbms = entry[5:]
+                    elif len(entry) > 6 and entry.startswith("table@"):
+                        table = entry[6:]
+                    elif len(entry) > 5 and entry.startswith("file@"):
+                        file = entry[5:]
+
+            # Represent the source server and the file to get
+            if ip and port and dbms and table and file:
+                source_url = f"http://{ip}:{port}/?User-Agent=AnyLog/1.23?command=stream/{dbms}/{table}/{file}"
+                stream_list.append(source_url)
+
+    select_info["destination"] = stream_list     # Destination and command
+
+    return render(request, "streaming.html", select_info)  # Process the blobs page
 # ---------------------------------------------------------------------------------------
 # Client processes - the main form interacting with the network
 # Base64 info - https://stackabuse.com/encoding-and-decoding-base64-strings-in-python/
