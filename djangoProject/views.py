@@ -266,7 +266,8 @@ def stream_processes(request):
             # Represent the source server and the file to get
             # The Command to use is: file retrieve where dbms = blobs_edgex and table = image and id = 51af9cb18d9a7f0fe46a0718c8ca4096.jpeg and stream = true
             if ip and port and dbms and table and file:
-                source_url = f"http://{ip}:{port}/?User-Agent=AnyLog/1.23?command=file retrieve where dbms={dbms} and table={table} and id={file} and stream = true"
+                source_url = f"http://10.0.0.78:7849/?User-Agent=AnyLog/1.23?command=file retrieve where dbms={dbms} and table={table} and id={file} and stream = true"
+                #source_url = f"http://{ip}:{port}/?User-Agent=AnyLog/1.23?command=file retrieve where dbms={dbms} and table={table} and id={file} and stream = true"
                 stream_list.append(source_url)
 
     select_info["destinations"] = stream_list     # Destination and command
