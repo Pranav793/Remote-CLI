@@ -187,7 +187,7 @@
     },
     {
       "button": "Get Columns",
-      "command": "get columns where dbms=[DBMS] and table=[TABLE]",
+      "command": "get columns where dbms=edgex and table=kwh",
       "type": "GET",
       "group": "Demo"
     },
@@ -217,13 +217,13 @@
     },
     {
       "button": "Table View",
-      "command": "sql edgex format=table and include=(kwh) and extend=(@table_name as table)  \"select reading_id, timestamp, units, value FROM avgtemp WHERE period(minute, 1, NOW(), timestamp) ORDER BY timestamp;\"",
+      "command": "sql edgex format=table and include=(kwh) and extend=(@table_name as table)  \"select reading_id, timestamp, units, value FROM avgtemp WHERE period(minute, 15, NOW(), timestamp) ORDER BY timestamp;\"",
       "type": "GET",
       "group": "Demo"
     },
     {
       "button": "Source View",
-      "command": "sql edgex format=table and include=(kwh) and extend=(+node_name as node, @table_name as table)  \"select reading_id, timestamp, units, value FROM avgtemp WHERE period(minute, 1, NOW(), timestamp) ORDER BY timestamp;\"",
+      "command": "sql edgex format=table and include=(kwh) and extend=(+node_name as node, @table_name as table)  \"select reading_id, timestamp, units, value FROM avgtemp WHERE period(minute, 15, NOW(), timestamp) ORDER BY timestamp;\"",
       "type": "GET",
       "group": "Demo"
     },
