@@ -2,3 +2,4 @@ django
 requests
 pyqrcode[pi] 
 pypng
+#webbrowser
