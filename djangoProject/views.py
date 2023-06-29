@@ -1,6 +1,5 @@
 import sys
 import os
-import re
 
 import pyqrcode
 
@@ -521,20 +520,9 @@ def client_processes(request, client_button):
         # SEND THE COMMAND TO DESTINATION NODE
 
         user_cmd = request.POST.get("command").strip()
-
-        # add dbms name and table name (if specified on the form)
-        dbms_name = request.POST.get('dbms')
-        table_name = request.POST.get('table')
-
-        if dbms_name:
-            pattern = re.compile(re.escape("[DBMS]"), re.IGNORECASE)
-            user_cmd = pattern.sub(dbms_name, user_cmd)
-        if table_name:
-            pattern = re.compile(re.escape("[TABLE]"), re.IGNORECASE)
-            user_cmd = pattern.sub(table_name, user_cmd)
-
         if len(user_cmd) > 5 and user_cmd[:4].lower() == "sql ":
             query_result = True
+
 
             user_cmd, selection_output, get_columns, get_descr = get_additional_instructions(user_cmd)
         else:
@@ -715,6 +703,15 @@ def command_button_selected(request, command_button):
 
         if len(user_cmd) > 5 and user_cmd[:4].lower().startswith("sql "):
             select_info["network"] = True  # Used to Flag the network bool on the page
+
+            # add dbms name and table name
+            dbms_name = request.POST.get('dbms')
+            table_name = request.POST.get('table')
+
+            if dbms_name:
+                user_cmd = user_cmd.replace("[DBMS]", dbms_name, 1)
+            if table_name:
+                user_cmd = user_cmd.replace("[TABLE]", table_name, 1)
 
             # Add output format
             user_cmd = add_sql_instructions(request, user_cmd) # Add format and timezone
