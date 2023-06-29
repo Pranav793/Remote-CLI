@@ -1,5 +1,6 @@
 import sys
 import os
+import re
 
 import pyqrcode
 
@@ -156,6 +157,7 @@ def form_request(request):
     form = request.POST.get("Form")         # The form used
 
     blobs_button = request.POST.get("Blobs")    # The blobs button was selected
+    stream_button = request.POST.get("Stream")  # The stream button was selected
     config_button = request.POST.get("Config")  # The Config button was selected
     client_button = request.POST.get("Client")  # Client button was selected
     code_button = request.POST.get("Code")      # Create QrCode from the command
@@ -179,6 +181,10 @@ def form_request(request):
     if blobs_button or (form == "Blobs" and not client_button and not config_button):
         # Either the blobs Button was selected (on a different form) or the blobs Page is processed.
         return blobs_processes(request, blobs_button)
+
+    if stream_button:
+        # Stream the data from the servers
+        return stream_processes(request)
 
     if config_button:
         # config button was selected - go to the config page
@@ -226,6 +232,47 @@ def form_request(request):
 
     return client_processes(request, client_button)    # Client processes - the main form interacting with the network
 
+# ---------------------------------------------------------------------------------------
+# Stream MP4 to stdout
+# ---------------------------------------------------------------------------------------
+def stream_processes(request):
+    select_info = {}
+    transfer_selections(request, select_info)  # Move selections from old form to the current form
+
+    select_info["width"] = 320
+    select_info["height"] = 240
+
+    post_data = request.POST
+
+    stream_list = []        # List of files to stream
+    for key in post_data:
+        if key.startswith("get@+ip@"):
+            # File info to stream
+            ip = port = dbms = table = file = None
+
+            file_info = key.split('+')
+            if len(file_info) > 5:
+                for entry in file_info:
+                    if len(entry) > 3 and entry.startswith("ip@"):
+                        ip = entry[3:]
+                    elif len(entry) > 5 and entry.startswith("port@"):
+                        port = entry[5:]
+                    elif len(entry) > 5 and entry.startswith("dbms@"):
+                        dbms = entry[5:]
+                    elif len(entry) > 6 and entry.startswith("table@"):
+                        table = entry[6:]
+                    elif len(entry) > 5 and entry.startswith("file@"):
+                        file = entry[5:]
+
+            # Represent the source server and the file to get
+            # The Command to use is: file retrieve where dbms = blobs_edgex and table = image and id = 51af9cb18d9a7f0fe46a0718c8ca4096.jpeg and stream = true
+            if ip and port and dbms and table and file:
+                source_url = f"http://{ip}:{port}/?User-Agent=AnyLog/1.23?command=file retrieve where dbms={dbms} and table={table} and id={file} and stream = true"
+                stream_list.append(source_url)
+
+    select_info["destinations"] = stream_list     # Destination and command
+
+    return render(request, "streaming.html", select_info)  # Process the blobs page
 # ---------------------------------------------------------------------------------------
 # Client processes - the main form interacting with the network
 # Base64 info - https://stackabuse.com/encoding-and-decoding-base64-strings-in-python/
@@ -378,8 +425,7 @@ def blobs_processes(request, blobs_button):
                                                 if function.startswith("shape."):
                                                     if value:
                                                         # If coordinates are provided
-                                                        if value[0] == "[" and value[-1] == "]":
-                                                            value = value[1:-1].strip()     # remove paren
+                                                        value = get_bbox_val(width, height, function, value)
                                                         selected_file[4].append((function, value))  # Add bbox*shape.rect + value
                                                 break
                     break
@@ -403,6 +449,62 @@ def blobs_processes(request, blobs_button):
 
 
     return render(request, "blobs.html", select_info) # Process the blobs page
+# ---------------------------------------------------------------------------------------
+# Get the BBOX Value - bounding box coordinates
+# Transform the value string to the shape proportional to the size of the image
+# https://nanonets.com/blog/image-processing-and-bounding-boxes-for-ocr/#:~:text=They%20use%20four%20values%20to,%3D%20543%2C%20y2%3D%20213.
+# https://www.quackit.com/html/tags/html_area_tag.cfm
+
+'''
+Format 1: [X1, Y1, X2, Y2] - example: 666, 291, 682, 306 ( left, top, right, bottom)
+Format 2: 
+    Top-left : (x_min, y_min)
+    Top-right: (x_max, y_min)
+    Bottom-left:(x_min, y_max)
+    Bottom-right: (x_max, y_max)
+    Example: [{`x`: 278.6972961426, `y`: 165.1059417725}, {`x`: 278.6972961426, `y`: 576.0}, {`x`: 715.8059692383, `y`: 165.1059417725}, {`x`: 715.8059692383, `y`: 576.0}]
+'''
+# ---------------------------------------------------------------------------------------
+def get_bbox_val(width, height, function, values_str):
+    coordinates = "0,0,0,0"
+    natural_height = 720
+    natural_width = 576
+    if function == "shape.rect" and width and height:       # Avoid division by 0 (if width or height are 0)
+        coords = [width,height,width,height]
+        if values_str[0] == "[" and values_str[-1] == "]":
+            values_list, error_msg = json_api.string_to_list(values_str.replace('`','"'))
+            if values_list and len(values_list) == 4:
+                # 4 coordinates - either in format 1 or format 2
+
+                if isinstance(values_list[0], float) or isinstance(values_list[0], int):
+                    # Option 1
+                    for index, entry in enumerate(values_list):
+                        if isinstance(entry, float) or isinstance(entry, int):
+                            coords[index] = entry
+
+                elif isinstance(values_list[0], dict) and isinstance(values_list[3], dict):
+                    # Temp work arround -  "600,0,700,200" from:
+                    # 	[{`x`: 278.6972961426, `y`: 165.1059417725}, {`x`: 278.6972961426, `y`: 576.0}, {`x`: 715.8059692383, `y`: 165.1059417725}, {`x`: 715.8059692383, `y`: 576.0}]
+
+                    # Get the values from Top-left : (x_min, y_min) and Bottom-right: (x_max, y_max)
+                    if isinstance(values_list[0], dict) and 'x' in values_list[0] and 'y' in values_list[0]:
+                        dict_val = values_list[0]['x']
+                        if isinstance(dict_val, float) or isinstance(dict_val, int):
+                            coords[0] = (dict_val * (600 /278))
+                        dict_val = values_list[0]['y']
+                        if isinstance(dict_val, float) or isinstance(dict_val, int):
+                            coords[1] = (dict_val * (1 /165))
+                    if isinstance(values_list[3], dict) and 'x' in values_list[3] and 'y' in values_list[3]:
+                        dict_val = values_list[3]['x']
+                        if isinstance(dict_val, float) or isinstance(dict_val, int):
+                            coords[2] = (dict_val * (700 /715))
+                        dict_val = values_list[3]['y']
+                        if isinstance(dict_val, float) or isinstance(dict_val, int):
+                            coords[3] = (dict_val * (200 /576))
+
+            coordinates = str(coords)[1:-1]
+
+    return coordinates
 
 # ---------------------------------------------------------------------------------------
 # Client processes - the main form interacting with the network
@@ -419,9 +521,20 @@ def client_processes(request, client_button):
         # SEND THE COMMAND TO DESTINATION NODE
 
         user_cmd = request.POST.get("command").strip()
+
+        # add dbms name and table name (if specified on the form)
+        dbms_name = request.POST.get('dbms')
+        table_name = request.POST.get('table')
+
+        if dbms_name:
+            pattern = re.compile(re.escape("[DBMS]"), re.IGNORECASE)
+            user_cmd = pattern.sub(dbms_name, user_cmd)
+        if table_name:
+            pattern = re.compile(re.escape("[TABLE]"), re.IGNORECASE)
+            user_cmd = pattern.sub(table_name, user_cmd)
+
         if len(user_cmd) > 5 and user_cmd[:4].lower() == "sql ":
             query_result = True
-
 
             user_cmd, selection_output, get_columns, get_descr = get_additional_instructions(user_cmd)
         else:
@@ -602,15 +715,6 @@ def command_button_selected(request, command_button):
 
         if len(user_cmd) > 5 and user_cmd[:4].lower().startswith("sql "):
             select_info["network"] = True  # Used to Flag the network bool on the page
-
-            # add dbms name and table name
-            dbms_name = request.POST.get('dbms')
-            table_name = request.POST.get('table')
-
-            if dbms_name:
-                user_cmd = user_cmd.replace("[DBMS]", dbms_name, 1)
-            if table_name:
-                user_cmd = user_cmd.replace("[TABLE]", table_name, 1)
 
             # Add output format
             user_cmd = add_sql_instructions(request, user_cmd) # Add format and timezone
