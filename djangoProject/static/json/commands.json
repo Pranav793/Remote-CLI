@@ -232,18 +232,6 @@
       "command": "sql edgex info = (dest_type = rest) and extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), people_count, confidence from videos where start_ts >= NOW() - 1 hour and end_ts <= NOW() order by people_count, confidence --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
       "type": "GET",
       "group": "Demo"
-    },
-    {
-      "button": "Fleet CMD All",
-      "command": "sql nvidia format=j \"select id, timestamp, caller, component, release, target_namespace, resource, version, info, app, helm_release, streams, source, helm_component, system, location, remote_ip, remote_port, message_size, message_id, source_input, accounted_message_size, pod, namespace, container, source_node, action, phase, revision, succeed, kustomization_cfg, kustomization_path, kustomize_hook, kustomize_hook_path, using_post_renderer, warning, name, check_sum_updated, loop, msg, latest, url  from fleet_command limit 100;\"",
-      "type": "GET",
-      "group": "Demo"
-    },
-    {
-      "button": "Fleet CMD Sum",
-      "command": "sql nvidia format=table \"select component, release, system, version,  helm_release, info, count(*) as num_info from  fleet_command WHERE period(day, 1, '2022-05-29 23:46:33.176572476', timestamp) GROUP by component, release, system, version,  helm_release, info ORDER BY info;\"",
-      "type": "GET",
-      "group": "Demo"
     }
   ]
 }
