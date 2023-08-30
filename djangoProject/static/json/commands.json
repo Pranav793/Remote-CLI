@@ -232,6 +232,66 @@
       "command": "sql edgex info = (dest_type = rest) and extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), people_count, confidence from people_video     where start_ts >= NOW() - 1 hour and end_ts <= NOW() order by people_count, confidence --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
       "type": "GET",
       "group": "Demo"
+    },
+    {
+      "button": "Node Status",
+      "command": "get status",
+      "type": "GET",
+      "group": "Training"
+    },
+    {
+      "button": "Node Connections",
+      "command": "get connections",
+      "type": "GET",
+      "group": "Training"
+    },
+    {
+      "button": "Node Processes",
+      "command": "get processes",
+      "type": "GET",
+      "group": "Training"
+    },
+    {
+      "button": "Connected Database",
+      "command": "get databases",
+      "type": "GET",
+      "group": "Training"
+    },
+    {
+      "button": "Query Status",
+      "command": "query status",
+      "type": "GET",
+      "group": "Training"
+    },
+    {
+      "button": "Blockchain",
+      "command": "blockchain get *",
+      "type": "GET",
+      "group": "Training"
+    },
+    {
+      "button": "Basic Query",
+      "command": "sql test format=table \"select count(*) from ping_sensor\"",
+      "type": "GET",
+      "group": "Training"
+    },
+    {
+      "button": "Basic Query with LIMIT",
+      "command": "sql test format=table \"select insert_timestamp, tsd_name, device_name, timestamp, value  from ping_sensor limit 10\"",
+      "type": "GET",
+      "group": "Training"
+    },
+    {
+      "button": "Query with Increments",
+      "command": "sql test format=table \"select increments(minute, 1, timestamp), device_name, min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value from ping_sensor where timestamp >= NOW() - 1hour GROUP BY device_name ORDER BY min_ts DESC\"",
+      "type": "GET",
+      "group": "Training"
+    },
+    {
+      "button": "Query with Period",
+      "command": "sql test format=table and extend=(+node_name as node) \"select device_name, timestamp, value,  from ping_sensor where period(minute, 10, now(), timestamp)\"",
+      "type": "GET",
+      "group": "Training"
     }
   ]
 }
