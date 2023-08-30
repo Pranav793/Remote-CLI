@@ -1,24 +1,24 @@
-FROM alpine:latest AS build
+FROM python:3.9-alpine
 
 # declare params
-ENV ANYLOG_ROOT_DIR=/app \
-    DEBIAN_FRONTEND=noninteractive \
-    CONN_IP=0.0.0.0 \
-    CLI_PORT=8000
+ENV ANYLOG_ROOT_DIR=/app
+ENV DEBIAN_FRONTEND=noninteractive
+ENV CONN_IP=0.0.0.0 
+ENV CLI_PORT=8000 
 
 WORKDIR $ANYLOG_ROOT_DIR
-COPY manage.py Remote-CLI/manage.py
-COPY djangoProject R
+COPY . Remote-CLI
+RUN mkdir -p $ANYLOG_ROOT_DIR/Remote-CLI/djangoProject/static/blobs/current/
+RUN chmod 775 $ANYLOG_ROOT_DIR
 
+RUN apk update 
+RUN apk upgrade
+RUN apk add bash-completion
+RUN apk update
 
-RUN mkdir -p $ANYLOG_ROOT_DIR/Remote-CLI/djangoProject/static/blobs/current/ && \
-    chmod 775 $ANYLOG_ROOT_DIR && \
-    apk update && apk upgrade && apk add --no-cache python3 py3-pip && apk update && \
-    python3 -m pip install --upgrade pip && \
-    python3 -m pip install --upgrade -r $ANYLOG_ROOT_DIR/Remote-CLI/requirements.txt || true && \
-    apk update
+RUN python3.9 -m pip install --upgrade pip
+RUN python3.9 -m pip install --upgrade -r $ANYLOG_ROOT_DIR/Remote-CLI/requirements.txt || true
+RUN apk update
 
-
-FROM build as deployment
-CMD ["sh", "-c", "python3 manage.py migrate"]
-ENTRYPOINT python3 /app/Remote-CLI/manage.py runserver ${CONN_IP}:${CLI_PORT}
+RUN python3.9 /app/Remote-CLI/manage.py migrate
+ENTRYPOINT python3.9 /app/Remote-CLI/manage.py runserver ${CONN_IP}:${CLI_PORT}

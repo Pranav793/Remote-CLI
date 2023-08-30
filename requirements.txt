@@ -1,5 +1,5 @@
-django
+django 
 requests
-pyqrcode[pi]
+pyqrcode[pi] 
 pypng
 #webbrowser
