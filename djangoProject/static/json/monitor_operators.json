@@ -1,12 +1,12 @@
 {
   "views": {
     "operators": {
-      "title" : "Operators Status",
+      "title": "Operators Status",
       "header": [
         "Node",
         "Node name",
         "Operational time",
-        "Delta time",
+        "Elapsed time",
         "Events/sec",
         "Total events",
         "Free space %",
@@ -22,31 +22,9 @@
       "alerts": {
         "Events/sec": "value < 5",
         "Free space %": "value < 50",
-        "CPU %": "value > 80"
-      }
-    },
-    "members": {
-      "title" : "Members Status",
-      "header": [
-        "Node",
-        "Node name",
-        "Operational time",
-        "Delta time",
-        "Events/sec",
-        "Total events",
-        "Free space %",
-        "CPU %"
-      ],
-      "totals": [
-        "Events/sec",
-        "Total events"
-      ],
-      "alerts": {
-        "Events/sec": "value < 1500",
-        "Free space %": "value > 50",
-        "CPU %": "value > 80"
+        "CPU %": "value > 80",
+        "Elapsed time": "'value' > '00:00:60'"
       }
     }
-
   }
 }
