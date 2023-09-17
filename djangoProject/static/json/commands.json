@@ -304,12 +304,6 @@
       "command": "sql !default_dbms format=table and extend=(+node_name as node) \"select timestamp, value  from lightout1 where period(minute, 10, now(), timestamp)\"",
       "type": "GET",
       "group": "Training"
-    },
-    {
-      "button": "Summary per Table",
-      "command": "sql !default_dbms format=table and include=(lightout2, lightout3, lightout4) and extend=(@table_name as table) \"select min(timestamp), max(timestamp), min(value), avg(value) , max(value), count(*)   from lightout1\"",
-      "type": "GET",
-      "group": "Training"
     }
   ]
 }
