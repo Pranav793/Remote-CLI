@@ -11,7 +11,6 @@ COPY djangoProject $ROOT_DIR/Remote-CLI/djangoProject
 COPY manage.py $ROOT_DIR/Remote-CLI/manage.py
 COPY requirements.txt $ROOT_DIR/Remote-CLI/requirements.txt
 
-WORKDIR $ROOT_DIR/Remote-CLI
 RUN mkdir -p $ROOT_DIR/Remote-CLI/djangoProject/static/blobs/current/ && \
     chmod 775 $ROOT_DIR && \
     apk update && apk upgrade && \
@@ -25,8 +24,7 @@ RUN mkdir -p $ROOT_DIR/Remote-CLI/djangoProject/static/blobs/current/ && \
 
 # Stage 2: Deployment
 FROM base as deployment
-WORKDIR /app/Remote-CLI
 
 # Perform migrations and run the server in the background and redirect output
-CMD ["sh", "-c", "python3 manage.py migrate"]
-ENTRYPOINT python3 manage.py runserver ${CONN_IP}:${CLI_PORT}
+CMD ["sh", "-c", "python3 $ROOT_DIR/Remote-CLI/manage.py migrate"]
+ENTRYPOINT python3 $ROOT_DIR/Remote-CLI/manage.py runserver ${CONN_IP}:${CLI_PORT}
