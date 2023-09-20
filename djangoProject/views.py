@@ -1,6 +1,7 @@
 import sys
 import os
 import re
+import time
 
 import pyqrcode
 
@@ -1620,7 +1621,6 @@ def organize_monitor_info(select_info, instruct_tree, json_struct):
     '''
     if json_struct:
         # Transform the JSON to a table
-        table_data = {}
         table_rows = []
         column_names_list = []
         totals = None
@@ -1633,6 +1633,12 @@ def organize_monitor_info(select_info, instruct_tree, json_struct):
             totals = instruct_tree['totals']
         if 'alerts' in instruct_tree:
             alerts = instruct_tree['alerts']  # Test values as arrive
+        if "down" in instruct_tree:
+            down_time = instruct_tree["down"]   # Number of seconds without a response to trigger node is down flag
+            if not isinstance(down_time, int):
+                down_time = 0
+        else:
+            down_time = 0
 
         if not len(column_names_list):
             # Get the columns names from the JSON data
@@ -1662,6 +1668,20 @@ def organize_monitor_info(select_info, instruct_tree, json_struct):
             # Key is the node name and value is the second tier dictionary with the info
             if node_ip == "Update time":
                 continue
+
+            node_down_alert = False
+            if down_time:
+                # determine if node did not provide info for down_time seconds
+                if "Query timestamp" in node_info:
+                    try:
+                        curent_time = int(time.time())
+                        time_diff = curent_time - node_info["Query timestamp"]
+                        if time_diff > down_time:
+                            node_down_alert = True      # Too long without a response
+                    except:
+                        node_down_alert = True
+
+
             row_info = []
             if column_names_list[0] == "Node":
                 row_info.append((node_ip, False))  # First column is node name
@@ -1706,14 +1726,18 @@ def organize_monitor_info(select_info, instruct_tree, json_struct):
                         # if column_name in alerts --> process alert to change display color
                         if column_name in alerts:
                             alert_code = alerts[column_name].replace("value", str(column_value))
-                            try:
-                                alert_val = eval(alert_code)
-                            except Exception as err_msg:
-                                pass
+                            if alert_code == "down":
+                                # test if node did not send data for down_time seconds
+                                alert_val = node_down_alert
                             else:
-                                if alert_val:
-                                    # Change color of display
+                                try:
+                                    alert_val = eval(alert_code)
+                                except Exception as err_msg:
                                     pass
+                                else:
+                                    if alert_val:
+                                        # Change color of display
+                                        pass
 
                     row_info.append((formated_val, alert_val, shift_right,
                                      True))  # The value to print, is alert, shift, the last True means Alert (False means warning - impacts the color)
