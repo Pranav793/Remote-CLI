@@ -1350,7 +1350,16 @@ def make_curl_cmd(request, select_info):
         wind_curl_cmd = None
 
     linux_cmd = user_cmd.replace('"', '\\"')  # Set double quotes in windows
-    curl_cmd += f"--header \"command: {linux_cmd}\" "
+
+    if linux_cmd.find('!') != -1 and linux_cmd.find("'") == -1:
+        # Linux ignores exclamation point in curl
+        if not wind_curl_cmd:
+            # WIll be with a difference to Linux because of the change below
+            wind_curl_cmd = curl_cmd +  f"--header \"command: {user_cmd}\" "
+        curl_cmd += f"--header 'command: {linux_cmd}' " # Single quotation keeps the exclamation point
+    else:
+        curl_cmd += f"--header \"command: {linux_cmd}\" "
+
     network = post_data.get('network') == "on"
     if network:
         destination = post_data.get('destination').strip()
