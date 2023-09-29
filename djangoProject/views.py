@@ -1,5 +1,7 @@
 import sys
 import os
+import re
+import time
 
 import pyqrcode
 
@@ -520,9 +522,20 @@ def client_processes(request, client_button):
         # SEND THE COMMAND TO DESTINATION NODE
 
         user_cmd = request.POST.get("command").strip()
+
+        # add dbms name and table name (if specified on the form)
+        dbms_name = request.POST.get('dbms')
+        table_name = request.POST.get('table')
+
+        if dbms_name:
+            pattern = re.compile(re.escape("[DBMS]"), re.IGNORECASE)
+            user_cmd = pattern.sub(dbms_name, user_cmd)
+        if table_name:
+            pattern = re.compile(re.escape("[TABLE]"), re.IGNORECASE)
+            user_cmd = pattern.sub(table_name, user_cmd)
+
         if len(user_cmd) > 5 and user_cmd[:4].lower() == "sql ":
             query_result = True
-
 
             user_cmd, selection_output, get_columns, get_descr = get_additional_instructions(user_cmd)
         else:
@@ -703,15 +716,6 @@ def command_button_selected(request, command_button):
 
         if len(user_cmd) > 5 and user_cmd[:4].lower().startswith("sql "):
             select_info["network"] = True  # Used to Flag the network bool on the page
-
-            # add dbms name and table name
-            dbms_name = request.POST.get('dbms')
-            table_name = request.POST.get('table')
-
-            if dbms_name:
-                user_cmd = user_cmd.replace("[DBMS]", dbms_name, 1)
-            if table_name:
-                user_cmd = user_cmd.replace("[TABLE]", table_name, 1)
 
             # Add output format
             user_cmd = add_sql_instructions(request, user_cmd) # Add format and timezone
@@ -1617,7 +1621,6 @@ def organize_monitor_info(select_info, instruct_tree, json_struct):
     '''
     if json_struct:
         # Transform the JSON to a table
-        table_data = {}
         table_rows = []
         column_names_list = []
         totals = None
@@ -1630,6 +1633,12 @@ def organize_monitor_info(select_info, instruct_tree, json_struct):
             totals = instruct_tree['totals']
         if 'alerts' in instruct_tree:
             alerts = instruct_tree['alerts']  # Test values as arrive
+        if "down" in instruct_tree:
+            down_time = instruct_tree["down"]   # Number of seconds without a response to trigger node is down flag
+            if not isinstance(down_time, int):
+                down_time = 0
+        else:
+            down_time = 0
 
         if not len(column_names_list):
             # Get the columns names from the JSON data
@@ -1659,6 +1668,20 @@ def organize_monitor_info(select_info, instruct_tree, json_struct):
             # Key is the node name and value is the second tier dictionary with the info
             if node_ip == "Update time":
                 continue
+
+            node_down_alert = False
+            if down_time:
+                # determine if node did not provide info for down_time seconds
+                if "Query timestamp" in node_info:
+                    try:
+                        curent_time = int(time.time())
+                        time_diff = curent_time - node_info["Query timestamp"]
+                        if time_diff > down_time:
+                            node_down_alert = True      # Too long without a response
+                    except:
+                        node_down_alert = True
+
+
             row_info = []
             if column_names_list[0] == "Node":
                 row_info.append((node_ip, False))  # First column is node name
@@ -1703,14 +1726,18 @@ def organize_monitor_info(select_info, instruct_tree, json_struct):
                         # if column_name in alerts --> process alert to change display color
                         if column_name in alerts:
                             alert_code = alerts[column_name].replace("value", str(column_value))
-                            try:
-                                alert_val = eval(alert_code)
-                            except Exception as err_msg:
-                                pass
+                            if alert_code == "down":
+                                # test if node did not send data for down_time seconds
+                                alert_val = node_down_alert
                             else:
-                                if alert_val:
-                                    # Change color of display
+                                try:
+                                    alert_val = eval(alert_code)
+                                except Exception as err_msg:
                                     pass
+                                else:
+                                    if alert_val:
+                                        # Change color of display
+                                        pass
 
                     row_info.append((formated_val, alert_val, shift_right,
                                      True))  # The value to print, is alert, shift, the last True means Alert (False means warning - impacts the color)

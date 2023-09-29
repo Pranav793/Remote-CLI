@@ -276,8 +276,20 @@
       "group": "Training"
     },
     {
+      "button": "Data Nodes",
+      "command": "get data nodes",
+      "type": "GET",
+      "group": "Training"
+    },
+    {
       "button": "Blockchain",
       "command": "blockchain get *",
+      "type": "GET",
+      "group": "Training"
+    },
+    {
+      "button": "Network Nodes",
+      "command": "blockchain get (operator, query, master) bring.table [*][id] [*][name] [*][ip] [*][port] [*][rest_port]",
       "type": "GET",
       "group": "Training"
     },
@@ -288,8 +300,14 @@
       "group": "Training"
     },
     {
+      "button": "Data Summary",
+      "command": "sql !default_dbms format=table and extend=(+node_name as node) \"select min(timestamp), max(timestamp), min(value), avg(value), max(value), count(*) from lightout1;\"",
+      "type": "GET",
+      "group": "Training"
+    },
+    {
       "button": "Basic Query with LIMIT",
-      "command": "sql !default_dbms format=table \"select insert_timestamp, tsd_name, timestamp, value  from lightout1 limit 10\"",
+      "command": "sql !default_dbms format=table \"select insert_timestamp, tsd_name, timestamp, value  from lightout1 limit 100\"",
       "type": "GET",
       "group": "Training"
     },

@@ -7,7 +7,7 @@
         "Node name",
         "Operational time",
         "Elapsed time",
-        "Events/sec",
+        "New events",
         "Total events",
         "Free space %",
         "CPU %",
@@ -16,11 +16,14 @@
         "Network Error"
       ],
       "totals": [
-        "Events/sec",
+        "New events",
         "Total events"
       ],
+      "down" : 60,
       "alerts": {
-        "Events/sec": "value < 5",
+        "Node" : "down",
+        "Node name" : "down",
+        "Events/sec": "value < 3",
         "Free space %": "value < 50",
         "CPU %": "value > 80",
         "Elapsed time": "'value' > '00:00:60'"
