@@ -322,6 +322,91 @@
       "command": "sql !default_dbms format=table and extend=(+node_name as node) \"select timestamp, value  from lightout1 where period(minute, 10, now(), timestamp)\"",
       "type": "GET",
       "group": "Training"
+    },
+
+    {
+      "button": "Node Status",
+      "command": "get status",
+      "type": "GET",
+      "group": "EdgeX Demo"
+    },
+    {
+      "button": "Node Connections",
+      "command": "get connections",
+      "type": "GET",
+      "group": "EdgeX Demo"
+    },
+    {
+      "button": "Node Processes",
+      "command": "get processes",
+      "type": "GET",
+      "group": "EdgeX Demo"
+    },
+    {
+      "button": "Connected Database",
+      "command": "get databases",
+      "type": "GET",
+      "group": "EdgeX Demo"
+    },
+    {
+      "button": "Query Status",
+      "command": "query status",
+      "type": "GET",
+      "group": "EdgeX Demo"
+    },
+    {
+      "button": "Data Nodes",
+      "command": "get data nodes",
+      "type": "GET",
+      "group": "EdgeX Demo"
+    },
+    {
+      "button": "Blockchain",
+      "command": "blockchain get *",
+      "type": "GET",
+      "group": "EdgeX Demo"
+    },
+    {
+      "button": "Network Nodes",
+      "command": "blockchain get (operator, query, master) bring.table [*][id] [*][name] [*][ip] [*][port] [*][rest_port]",
+      "type": "GET",
+      "group": "EdgeX Demo"
+    },
+    {
+      "button": "Basic Query",
+      "command": "sql !default_dbms format=table \"select count(*) from random_float_device\"",
+      "type": "GET",
+      "group": "EdgeX Demo"
+    },
+    {
+      "button": "Data Summary",
+      "command": "sql !default_dbms format=table and extend=(+node_name as node) \"select min(timestamp), max(timestamp), min(value), avg(value), max(value), count(*) from random_float_device;\"",
+      "type": "GET",
+      "group": "EdgeX Demo"
+    },
+    {
+      "button": "Data Summary per Table",
+      "command": "sql !default_dbms format=table and extend=(+node_name as node) \"select min(timestamp), max(timestamp), min(value), avg(value), max(value), count(*) from random_float_device;\"",
+      "type": "GET",
+      "group": "EdgeX Demo"
+    },
+    {
+      "button": "Basic Query with LIMIT",
+      "command": "sql !default_dbms format=table \"select insert_timestamp, tsd_name, timestamp, value  from random_float_device limit 100\"",
+      "type": "GET",
+      "group": "EdgeX Demo"
+    },
+    {
+      "button": "Query with Increments",
+      "command": "sql !default_dbms format=table \"select increments(minute, 1, timestamp), min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value from random_float_device where timestamp >= NOW() - 1hour ORDER BY min_ts DESC\"",
+      "type": "GET",
+      "group": "EdgeX Demo"
+    },
+    {
+      "button": "Query with Period",
+      "command": "sql !default_dbms format=table and extend=(+node_name as node) \"select timestamp, value  from random_float_device where period(minute, 10, now(), timestamp)\"",
+      "type": "GET",
+      "group": "EdgeX Demo"
     }
   ]
 }
