@@ -95,9 +95,9 @@
 
     {% for entry in commands_groups %}
          {% if entry == cmd_type %}
-            <option selected value={{ entry }}>&nbsp;{{ entry }}</option>
+            <option selected value="{{ entry }}">&nbsp;{{ entry }}</option>
         {% else %}
-            <option value={{ entry }}>&nbsp;{{ entry }}</option>
+            <option value="{{ entry }}">&nbsp;{{ entry }}</option>
         {% endif %}
 
     {%  endfor %}
