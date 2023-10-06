@@ -222,7 +222,7 @@
       "group": "Demo"
     },
     {
-      "button": "Source View",
+      "button": "Source Data",
       "command": "sql edgex format=table and include=(freezertemp2) and extend=(+node_name as node, @table_name as table)  \"select reading_id, timestamp, units, value FROM freezertemp1 WHERE period(minute, 15, NOW(), timestamp) ORDER BY timestamp;\"",
       "type": "GET",
       "group": "Demo"
@@ -234,7 +234,7 @@
       "group": "Demo"
     },
     {
-      "button": "Per node Count",
+      "button": "Per Node summary",
       "command": "sql edgex format=table and extend=(+node_name, +ip)  \"SELECT MIN(timestamp), MAX(timestamp),  MIN(value), MAX(value), AVG(value), COUNT(*)  FROM  lightout1 WHERE period(minute, 15, now(), timestamp);\"",
       "type": "GET",
       "group": "Demo"
@@ -407,6 +407,36 @@
       "command": "sql !default_dbms format=table and extend=(+node_name as node) \"select timestamp, value  from random_float_device where period(minute, 10, now(), timestamp)\"",
       "type": "GET",
       "group": "EdgeX"
+    },
+    {
+      "button": "Source Data",
+       "command": "sql edgex format=table and include=(freezertemp2) and extend=(+node_name as node, @table_name as table)  \"select reading_id, timestamp, units, value FROM freezertemp1 WHERE period(minute, 15, NOW(), timestamp) ORDER BY timestamp;\"",
+      "type": "GET",
+      "group": "Webinar"
+    },
+    {
+      "button": "Threshold",
+      "command": "sql edgex format=table and include=(freezertemp2) and extend=(+node_name as node, @table_name as table)  \"select reading_id, timestamp, units, value FROM freezertemp1 WHERE period(minute, 15, NOW(), timestamp) and value > 30 ORDER BY timestamp;\"",
+      "type": "GET",
+      "group": "Webinar"
+    },
+    {
+      "button": "Per Node summary",
+      "command": "sql edgex format=table and extend=(+node_name, +ip)  \"SELECT MIN(timestamp), MAX(timestamp),  MIN(value), MAX(value), AVG(value), COUNT(*)  FROM  lightout1 WHERE period(minute, 15, now(), timestamp);\"",
+      "type": "GET",
+      "group": "Webinar"
+    },
+    {
+      "button": "Table summary",
+      "command": "sql edgex format=table \"select min(timestamp), max(timestamp), min(value), avg(value), max(value), count(*) from lightout1;\"",
+      "type": "GET",
+      "group": "Webinar"
+    },
+    {
+      "button": "Streaming Video",
+      "command": "sql edgex info = (dest_type = rest) and extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), people_count, confidence from people_video     where start_ts >= NOW() - 1 hour and end_ts <= NOW() order by people_count, confidence --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
+      "type": "GET",
+      "group": "Webinar"
     }
   ]
 }
