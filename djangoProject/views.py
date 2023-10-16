@@ -1628,7 +1628,7 @@ def organize_monitor_info(select_info, instruct_tree, json_struct):
     instruct - the instructions of what to present
     json_struct - the info returned from the aggregator node
     '''
-    if json_struct:
+    if json_struct and not "err_code" in json_struct:
         # Transform the JSON to a table
         table_rows = []
         column_names_list = []
