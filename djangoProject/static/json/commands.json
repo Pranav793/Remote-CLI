@@ -298,7 +298,7 @@
       "group": "Training"
     },
     {
-      "button": "Data Summary",
+      "button": "Data Summary 2",
       "command": "sql !default_dbms format=table and extend=(+node_name as node) \"select min(timestamp), max(timestamp), min(value), avg(value), max(value), count(*) from lightout1;\"",
       "type": "GET",
       "group": "Training"
@@ -426,7 +426,7 @@
     },
     {
       "button": "Table summary",
-      "command": "sql edgex format=table \"select min(timestamp), max(timestamp), min(value)::float(3), max(value)::float(3), avg(value)::float(3), count(*) from freezertemp1;\"",
+      "command": "sql edgex format=table \"select min(timestamp), max(timestamp), min(value)::float(3), max(value)::float(3), avg(value)::float(3), count(*) from freezertemp1 WHERE period(minute, 15, now(), timestamp);\"",
       "type": "GET",
       "group": "Webinar"
     },
