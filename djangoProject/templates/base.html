@@ -228,7 +228,7 @@
 
     {% for entry in commands_list %}
         {% if cmd_type == "All" %}
-            <input type ="submit" name = "button" value="{{entry.button}}"/>
+            <input type ="submit" name = "button" value="({{entry.group}}) {{entry.button}}"/>
         {% elif cmd_type == entry.group %}
             <input type ="submit" name = "button" value="{{entry.button}}"/>
         {%  endif %}
