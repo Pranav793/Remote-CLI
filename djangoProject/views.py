@@ -73,7 +73,7 @@ must_have_keys = [      # These keys are tested in each coimmand in the JSON fil
     'help_url'
 ]
 
-COMMANDS_GROUPS = ["All"]
+COMMANDS_GROUPS = []
 if ANYLOG_COMMANDS:
     for command_ in ANYLOG_COMMANDS:
         for key in must_have_keys:
@@ -86,7 +86,7 @@ if ANYLOG_COMMANDS:
                 if not value in COMMANDS_GROUPS:
                     COMMANDS_GROUPS.append(command_[key])
 
-
+COMMANDS_GROUPS.append("All")
 '''
 COMMANDS_GROUPS = [
     "All",
@@ -102,7 +102,8 @@ COMMANDS_GROUPS = [
 
 COMMAND_BY_BUTTON = {}
 for index, entry in enumerate(ANYLOG_COMMANDS):
-    COMMAND_BY_BUTTON[entry['button']] = index     # Organize commands as f(button)
+    # Add ID as f(group) + button name
+    COMMAND_BY_BUTTON[entry['group'] + '.' + entry['button']] = index     # Organize commands as f(button)
 
 conf_file_names = [
     "Autoexec",
@@ -567,7 +568,7 @@ def client_processes(request, client_button):
                 if buttons_type:
                     select_info["cmd_type"] = buttons_type  # These are the type of commands buttons that will be displayed
                 else:
-                    select_info["cmd_type"] = "Logs"  # These are the type of commands buttons that will be displayed
+                    select_info["cmd_type"] = COMMANDS_GROUPS[0]  # These are the type of commands buttons that will be displayed
 
         # Add info which is not selected but is used by the form
         select_info["commands_list"] = ANYLOG_COMMANDS
@@ -693,39 +694,49 @@ def command_button_selected(request, command_button):
 
     # AnyLog command button was selected
     add_form_value(select_info, request)
-    command_id = COMMAND_BY_BUTTON[command_button]
-    cmd_info = ANYLOG_COMMANDS[command_id]
 
-    if request.POST.get("help"):
-        # Open the URL for help
-        select_info["help"] = True
-        help_url = "https://github.com/AnyLog-co/documentation/"
-        if "help_url" in cmd_info and cmd_info["help_url"]:
-            help_url += cmd_info["help_url"]
-
-        if setting_info_ and "client" in setting_info_ and "help" in setting_info_["client"]:
-            help_type = setting_info_["client"]["help"]     # Should be url (show the url) or open (open the url)
-        else:
-            help_type = "url"       # Default show the URL
-        if help_type == "open":
-            webbrowser.open(help_url)               # Form will open the help page
-        else:
-            select_info["help_url"] = help_url      # Form will print URL
+    cmd_type = select_info["cmd_type"]      # This is the group of commands
+    if cmd_type != "All":
+        command_key = f"{cmd_type}.{command_button}"        # Needs to be group dot name
     else:
-        user_cmd = cmd_info["command"]  # Set the command
+        # Remove the parenthesis and add a dot: (demo) query1 --> demo.query1
+        command_key = command_button.replace("(", "")
+        command_key = command_key.replace(") ", ".")
 
-        if len(user_cmd) > 5 and user_cmd[:4].lower().startswith("sql "):
-            select_info["network"] = True  # Used to Flag the network bool on the page
+    if command_key in COMMAND_BY_BUTTON:
+        command_id = COMMAND_BY_BUTTON[command_key]
+        cmd_info = ANYLOG_COMMANDS[command_id]
 
-            # Add output format
-            user_cmd = add_sql_instructions(request, user_cmd) # Add format and timezone
+        if request.POST.get("help"):
+            # Open the URL for help
+            select_info["help"] = True
+            help_url = "https://github.com/AnyLog-co/documentation/"
+            if "help_url" in cmd_info and cmd_info["help_url"]:
+                help_url += cmd_info["help_url"]
 
-        select_info["command"] = user_cmd
-        rest_call = cmd_info["type"]
-        if rest_call == "GET":
-            select_info["rest_call"] = rest_call  # Set Put or Get
+            if setting_info_ and "client" in setting_info_ and "help" in setting_info_["client"]:
+                help_type = setting_info_["client"]["help"]     # Should be url (show the url) or open (open the url)
+            else:
+                help_type = "url"       # Default show the URL
+            if help_type == "open":
+                webbrowser.open(help_url)               # Form will open the help page
+            else:
+                select_info["help_url"] = help_url      # Form will print URL
         else:
-            select_info["rest_call"] = None
+            user_cmd = cmd_info["command"]  # Set the command
+
+            if len(user_cmd) > 5 and user_cmd[:4].lower().startswith("sql "):
+                select_info["network"] = True  # Used to Flag the network bool on the page
+
+                # Add output format
+                user_cmd = add_sql_instructions(request, user_cmd) # Add format and timezone
+
+            select_info["command"] = user_cmd
+            rest_call = cmd_info["type"]
+            if rest_call == "GET":
+                select_info["rest_call"] = rest_call  # Set Put or Get
+            else:
+                select_info["rest_call"] = None
 
     return select_info
 

@@ -220,6 +220,12 @@
       "command": "sql nvidia format=table \"select component, release, system, version,  helm_release, info, count(*) as num_info from  fleet_command WHERE period(day, 1, '2022-05-29 23:46:33.176572476', timestamp) GROUP by component, release, system, version,  helm_release, info ORDER BY info;\"",
       "type": "GET",
       "group": "Demo"
+    },
+    {
+      "button": "Fleet CMD Sum",
+      "command": "get status",
+      "type": "GET",
+      "group": "test"
     }
   ]
 }
