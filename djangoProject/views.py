@@ -1642,7 +1642,7 @@ def organize_monitor_info(select_info, instruct_tree, json_struct):
     if json_struct and not "err_code" in json_struct:
         # Transform the JSON to a table
         table_rows = []
-        column_names_list = []
+        column_names_list = []      # The names that make the title on the web page
         totals = None
         alerts = None
         if 'header' in instruct_tree:
@@ -1702,10 +1702,14 @@ def organize_monitor_info(select_info, instruct_tree, json_struct):
                         node_down_alert = True
 
 
+            # Get the JSON attr name if specified in "attr". If not specified, use column_names_list
+            attr_name_list = instruct_tree['attr'] if "attr" in instruct_tree else column_names_list
+
             row_info = []
-            if column_names_list[0] == "Node":
+            if attr_name_list[0] == "Node":
                 row_info.append((node_ip, False))  # First column is node name
-            for index, column_name in enumerate(column_names_list[1:]):
+
+            for index, column_name in enumerate(attr_name_list[1:]):
                 if column_name in node_info:
                     column_value = node_info[column_name]
                     if column_value == None:

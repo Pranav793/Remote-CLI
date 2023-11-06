@@ -15,6 +15,19 @@
         "Packets Sent",
         "Network Error"
       ],
+      "attr": [
+        "Node",
+        "node name",
+        "operational time",
+        "elapsed time",
+        "new rows",
+        "total rows",
+        "Free space %",
+        "CPU %",
+        "Packets Recv",
+        "Packets Sent",
+        "Network Error"
+      ],
       "totals": [
         "New events",
         "Total events"
