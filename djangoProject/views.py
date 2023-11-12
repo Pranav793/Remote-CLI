@@ -1352,6 +1352,15 @@ def make_curl_cmd(request, select_info):
 
     curl_cmd += "--header \"User-Agent: AnyLog/1.23\" "
 
+    if request.POST.get('subset') == "on":
+        curl_cmd += "--header \"subset: true\" "
+
+    if request.POST.get('timeout'):
+        # Change the timeout in seconds
+        timeout = request.POST.get('timeout').strip()
+        if timeout.isdigit():  # Seconds to timeout
+            curl_cmd += f"--header \"timeout: {timeout}\" "
+
     user_cmd = post_data.get("command").strip()
 
     if '"' in user_cmd:
@@ -1399,7 +1408,23 @@ def make_anylog_cmd(request, select_info):
 
     network = request.POST.get('network') == "on"
     if network:
-        destination =  request.POST.get('destination').strip()
+        destination =  request.POST.get('destination').strip() # List of destinations nodes
+
+        if request.POST.get('subset') == "on":
+            if destination:
+                destination += ",subset=true"
+            else:
+                destination = "subset=true"
+
+        if request.POST.get('timeout'):
+            # Change the timeout in seconds
+            timeout = request.POST.get('timeout').strip()
+            if timeout.isdigit():   # Seconds to timeout
+                if destination:
+                    destination += f",timeout={timeout}"
+                else:
+                    destination = f"timeout={timeout}"
+
         if destination:
             user_cmd = "run client (%s) %s" % (destination, user_cmd)
         else:
@@ -1438,10 +1463,20 @@ def make_qrcode(request, select_info):
 
 
     if request.POST.get('network') == "on":
+        # Flagged to send data to the network or specific nodes in the network
         destination = request.POST.get('destination').strip()
         if not destination:
             destination = "network"
         url_string += f"?destination={destination}"
+
+    if request.POST.get('subset') == "on":
+        # Allow subset of data
+        url_string += "?subset=true"
+
+    if request.POST.get('timeout'):
+        # Change the timeout in seconds
+        timeout = request.POST.get('timeout').strip()
+        url_string += f"?timeout={timeout}"
 
 
     url_string += '?command='
