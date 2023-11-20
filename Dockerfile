@@ -9,7 +9,7 @@ ENV ROOT_DIR=/app \
 WORKDIR $ROOT_DIR
 COPY djangoProject $ROOT_DIR/Remote-CLI/djangoProject
 COPY setup.py $ROOT_DIR/Remote-CLI/setup.py
-COPY manage_old.py $ROOT_DIR/Remote-CLI/manage.py
+COPY manage.py $ROOT_DIR/Remote-CLI/manage.py
 COPY setup.cfg $ROOT_DIR/Remote-CLI/setup.cfg
 COPY requirements.txt $ROOT_DIR/Remote-CLI/requirements.txt
 
