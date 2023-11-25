@@ -323,89 +323,97 @@
     },
 
     {
-      "button": "Node Status",
-      "command": "get status",
+      "button": "Tables",
+      "command": "get virtual tables",
       "type": "GET",
-      "group": "EdgeX"
+      "group": "Dynics"
     },
     {
-      "button": "Node Connections",
-      "command": "get connections",
+      "button": "Columns Substation",
+      "command": "get columns where dbms=dynics and table=substation_events",
       "type": "GET",
-      "group": "EdgeX"
+      "group": "Dynics"
     },
     {
-      "button": "Node Processes",
-      "command": "get processes",
+      "button": "Columns Health",
+      "command": "get columns where dbms=dynics and table=health",
       "type": "GET",
-      "group": "EdgeX"
+      "group": "Dynics"
     },
     {
-      "button": "Connected Database",
-      "command": "get databases",
-      "type": "GET",
-      "group": "EdgeX"
-    },
-    {
-      "button": "Query Status",
-      "command": "query status",
-      "type": "GET",
-      "group": "EdgeX"
-    },
-    {
-      "button": "Data Nodes",
+      "button": "Distribution",
       "command": "get data nodes",
       "type": "GET",
-      "group": "EdgeX"
+      "group": "Dynics"
     },
     {
-      "button": "Blockchain",
-      "command": "blockchain get *",
+      "button": "US Nodes",
+      "command": "blockchain get (operator, publisher, query) where [country] contains US bring.table [*][name] [*][country] [*][city] [*][ip] [*][port]",
       "type": "GET",
-      "group": "EdgeX"
+      "group": "Dynics"
     },
     {
-      "button": "Network Nodes",
-      "command": "blockchain get (operator, query, master) bring.table [*][id] [*][name] [*][ip] [*][port] [*][rest_port]",
+      "button": "Target US",
+      "command": "blockchain get (operator, publisher, query) where [country] contains US bring.ip_port",
       "type": "GET",
-      "group": "EdgeX"
+      "group": "Dynics"
     },
     {
-      "button": "Basic Query",
-      "command": "sql !default_dbms format=table \"select count(*) from random_float_device\"",
+      "button": "Network Info",
+      "command": "get node info net_io_counters",
       "type": "GET",
-      "group": "EdgeX"
+      "group": "Dynics"
     },
     {
-      "button": "Data Summary",
-      "command": "sql !default_dbms format=table and extend=(+node_name as node) \"select min(timestamp), max(timestamp), min(value), avg(value), max(value), count(*) from random_float_device;\"",
+      "button": "Disk Usage",
+      "command": "get disk usage .",
       "type": "GET",
-      "group": "EdgeX"
+      "group": "Dynics"
     },
     {
-      "button": "Data Summary per Table",
-      "command": "sql !default_dbms format=table and extend=(+node_name as node) \"select min(timestamp), max(timestamp), min(value), avg(value), max(value), count(*) from random_float_device;\"",
+      "button": "Query Sensor",
+      "command": "sql litsanleandro format=table and include=(percentagecpu_sensor) and extend=(@table_name as table) \"select increments(minute, 1, timestamp), device_name, min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value from ping_sensor where timestamp >= NOW() - 1hour GROUP BY device_name ORDER BY min_ts DESC\"",
       "type": "GET",
-      "group": "EdgeX"
+      "group": "Dynics"
     },
     {
-      "button": "Basic Query with LIMIT",
-      "command": "sql !default_dbms format=table \"select insert_timestamp, tsd_name, timestamp, value  from random_float_device limit 100\"",
+      "button": "Query Substations",
+      "command": "sql dynics format=table and extend=(+node_name) \"select * from substation_events where eventdate >= '2022-01-01 00:00:00' and eventdate < '2023-01-01 00:00:00'' order by eventdate\"",
       "type": "GET",
-      "group": "EdgeX"
+      "group": "Dynics"
     },
     {
-      "button": "Query with Increments",
-      "command": "sql !default_dbms format=table \"select increments(minute, 1, timestamp), min(timestamp) as min_ts, max(timestamp) as max_ts, min(value) as min_value, avg(value) as avg_value, max(value) as max_value from random_float_device where timestamp >= NOW() - 1hour ORDER BY min_ts DESC\"",
+      "button": "Query Substations - 5 min",
+      "command": "sql dynics format=table \"select * from substation_events where period(minute, 5, now(), insert_timestamp)\"",
       "type": "GET",
-      "group": "EdgeX"
+      "group": "Dynics"
     },
     {
-      "button": "Query with Period",
-      "command": "sql !default_dbms format=table and extend=(+node_name as node) \"select timestamp, value  from random_float_device where period(minute, 10, now(), timestamp)\"",
+      "button": "Query Substations - 30 day",
+      "command": "sql dynics format=table \"select * from substation_events where period(day, 30, now(), eventdate) and substation='Elm Street Substation'\"",
       "type": "GET",
-      "group": "EdgeX"
+      "group": "Dynics"
     },
+    {
+      "button": "Query Event Summary",
+      "command": "sql dynics format=table \"select substationid, substation, eventdescription, max(eventdate) as lastest_ts, count(eventdescription) as counter from substation_events group by substationid, substation, eventdescription\"",
+      "type": "GET",
+      "group": "Dynics"
+    },
+    {
+      "button": "Query Health",
+      "command": "sql dynics format=table \"select name, insert_timestamp, cpu::float(3), memorytotal, memoryavailable from health where period(second, 1, now(), insert_timestamp) order by insert_timestamp;\"",
+      "type": "GET",
+      "group": "Dynics"
+    },
+    {
+      "button": "Query Health - CPU",
+      "command": "sql dynics format=table \"select INCREMENTS(minute, 1, insert_timestamp), min(insert_timestamp), max(insert_timestamp), min(cpu)::float(3), avg(cpu)::float(3), max(cpu)::float(3) from health where insert_timestamp >= NOW() - 1 hour\"",
+      "type": "GET",
+      "group": "Dynics"
+    },
+
+
     {
       "button": "Source Data",
        "command": "sql edgex format=table and include=(freezertemp2) and extend=(+node_name as node, @table_name as table)  \"select reading_id, timestamp, units, value::float(3) FROM freezertemp1 WHERE period(minute, 15, NOW(), timestamp) ORDER BY timestamp;\"",
