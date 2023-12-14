@@ -61,7 +61,7 @@ def get_cmd(conn:str, command:str, authentication:tuple=(), remote:bool=False, d
     if timeout:
         headers['timeout'] = timeout        # Change default timeout on the AnyLog Node
         try:
-            client_timeout = int(timeout) + 5        # Add 5 sec to the node timeout for the browser to checkout
+            client_timeout = int(timeout) + 15        # Add 15 sec to the node timeout for the browser to checkout
         except:
             client_timeout = 30             # Revert to the default
     else:
