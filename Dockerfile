@@ -1,27 +1,30 @@
-FROM python:3.9-alpine
+FROM python:3.11-alpine as base
 
 # declare params
-ENV ANYLOG_ROOT_DIR=/app
-ENV DEBIAN_FRONTEND=noninteractive
-ENV CONN_IP=0.0.0.0 
-ENV CLI_PORT=8000 
+ENV ROOT_DIR=/app \
+    DEBIAN_FRONTEND=noninteractive \
+    CONN_IP=0.0.0.0 \
+    CLI_PORT=8000
 
-RUN apk update 
-RUN apk upgrade
-RUN apk add bash-completion
-RUN apk update
+WORKDIR $ROOT_DIR
+COPY djangoProject $ROOT_DIR/Remote-CLI/djangoProject
+COPY manage.py $ROOT_DIR/Remote-CLI/manage.py
+COPY requirements.txt $ROOT_DIR/Remote-CLI/requirements.txt
 
-RUN python3.9 -m pip install --upgrade pip
+RUN mkdir -p $ROOT_DIR/Remote-CLI/djangoProject/static/blobs/current/ && \
+    chmod 775 $ROOT_DIR && \
+    apk update && apk upgrade && \
+    apk update && \
+    python3 -m pip install --upgrade pip && \
+    python3 -m pip install --upgrade -r $ROOT_DIR/Remote-CLI/requirements.txt || true && \
+    apk del py3-pip && \
+    apk update && \
+    rm -rf $ROOT_DIR/Remote-CLI/requirements.txt $ROOT_DIR/Remote-CLI/json/commands_orig.json $ROOT_DIR/Remote-CLI/json/nvidia.json \
+           $ROOT_DIR/Remote-CLI/json/nvidia.json
 
-RUN python3.9 -m pip install django 
-RUN python3.9 -m pip install requests
-RUN python3.9 -m pip install pyqrcode[pi] 
-RUN python3.9 -m pip install pypng
-RUN apk update
+# Stage 2: Deployment
+FROM base as deployment
 
-WORKDIR $ANYLOG_ROOT_DIR
-COPY . Remote-CLI
-RUN chmod 775 $ANYLOG_ROOT_DIR
-
-RUN python3.9 /app/Remote-CLI/manage.py migrate
-ENTRYPOINT python3.9 /app/Remote-CLI/manage.py runserver ${CONN_IP}:${CLI_PORT}
+# Perform migrations and run the server in the background and redirect output
+CMD ["sh", "-c", "python3 $ROOT_DIR/Remote-CLI/manage.py migrate"]
+ENTRYPOINT python3 $ROOT_DIR/Remote-CLI/manage.py runserver ${CONN_IP}:${CLI_PORT}
