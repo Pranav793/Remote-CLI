@@ -14,7 +14,7 @@
 
   "monitor" : [
     ["Monitor Operators", "monitor_operators.json"],
-    ["Monitor Members", "monitor_members.json"]
+    ["Monitor ALerts", "monitor_alerts.json"]
   ]
 
 }

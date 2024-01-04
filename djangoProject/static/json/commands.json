@@ -435,6 +435,114 @@
       "command": "sql edgex info = (dest_type = rest) and extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), people_count, confidence::float(3) from people_video     where start_ts >= NOW() - 1 hour and end_ts <= NOW() order by people_count, confidence --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
       "type": "GET",
       "group": "Webinar"
+    },
+    {
+    "button": "Tables",
+    "command": "get tables where dbms = kubearmor",
+    "type": "GET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "Columns",
+    "command": "get  columns where table = network and dbms = kubearmor",
+    "type": "GET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "Virtual",
+    "command": "get virtual tables",
+    "type": "GET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "Data Nodes",
+    "command": "get data nodes",
+    "type": "GET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "Test Network",
+    "command": "test network",
+    "type": "GET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "D. File",
+    "command": "sql kubearmor format = json \"select * from file limit 10\"",
+    "type": "GET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "D. Network",
+    "command": "sql kubearmor format = json \"select * from network limit 10\"",
+    "type": "GET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "D. Process",
+    "command": "sql kubearmor format = json \"select * from process limit 10\"",
+    "type": "GET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "D. Syscall",
+    "command": "sql kubearmor format = json \"select * from syscall limit 10\"",
+    "type": "GET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "Mapping Policy",
+    "command": "blockchain get mapping where id = kubearmor-system-policy",
+    "type": "GET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "gRPC",
+    "command": "get grpc  clients",
+    "type": "GET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "Streaming",
+    "command": "get streaming",
+    "type": "GET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "Operator",
+    "command": "get operator",
+    "type": "GET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "Operators IP",
+    "command": " blockchain get operator bring.ip_port",
+    "type": "GET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "Set Flag",
+    "command": "set alert_flag_1 = true",
+    "type": "SET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "Set Leve",
+    "command": "set alert_level = 5",
+    "type": "SET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "Monitored Topics",
+    "command": "get monitored",
+    "type": "GET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "Topic Alerts",
+    "command": "get monitored alerts",
+    "type": "GET",
+    "group": "KubeArmor "
     }
   ]
 }
