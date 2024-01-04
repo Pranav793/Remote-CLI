@@ -378,7 +378,7 @@
     },
     {
       "button": "Query Substations",
-      "command": "sql dynics format=table \"select * from substation_events where eventdate >= '2023-01-01 00:00:00' and eventdate < '2024-01-01 00:00:00'\"",
+      "command": "sql dynics format=table and extend=(+node_name) \"select * from substation_events where eventdate >= '2022-01-01 00:00:00' and eventdate < '2023-01-01 00:00:00'' order by eventdate\"",
       "type": "GET",
       "group": "Dynics"
     },
