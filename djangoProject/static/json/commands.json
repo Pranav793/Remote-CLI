@@ -467,25 +467,25 @@
     "group": "KubeArmor "
     },
     {
-    "button": "D. File",
+    "button": "Q. File",
     "command": "sql kubearmor format = json \"select * from file limit 10\"",
     "type": "GET",
     "group": "KubeArmor "
     },
     {
-    "button": "D. Network",
+    "button": "Q. Network",
     "command": "sql kubearmor format = json \"select * from network limit 10\"",
     "type": "GET",
     "group": "KubeArmor "
     },
     {
-    "button": "D. Process",
+    "button": "Q. Process",
     "command": "sql kubearmor format = json \"select * from process limit 10\"",
     "type": "GET",
     "group": "KubeArmor "
     },
     {
-    "button": "D. Syscall",
+    "button": "Q. Syscall",
     "command": "sql kubearmor format = json \"select * from syscall limit 10\"",
     "type": "GET",
     "group": "KubeArmor "
@@ -521,14 +521,34 @@
     "group": "KubeArmor "
     },
     {
-    "button": "Set Flag",
-    "command": "set alert_flag_1 = true",
+    "button": "Disable Flag",
+    "command": "set alert_flag_1 = false",
     "type": "SET",
     "group": "KubeArmor "
     },
     {
-    "button": "Set Leve",
-    "command": "set alert_level = 5",
+    "button": "Enable Flag",
+    "command": "set alert_flag_1 = true",
+    "type": "SET",
+    "group": "KubeArmor "
+    },
+
+    {
+    "button": "Reset Level",
+    "command": "set alert_level = 0",
+
+    "type": "SET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "Set Level",
+    "command": "set alert_level = 6",
+    "type": "SET",
+    "group": "KubeArmor "
+    },
+    {
+    "button": "Set Level 3",
+    "command": "set alert_level = 3",
     "type": "SET",
     "group": "KubeArmor "
     },
