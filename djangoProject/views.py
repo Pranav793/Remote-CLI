@@ -842,17 +842,19 @@ def process_anylog(request, user_cmd, is_monitored):
 # Option 2 - a table
 # Option 3 - text
 # -----------------------------------------------------------------------------------
-
-def print_network_reply(request, query_result, data, selection_output, get_columns, get_descr):
+def print_network_reply(request, query_result, msg_text, selection_output, get_columns, get_descr):
     '''
     request - the form info
     query_result - a True/False value representing SQL query data set returned
-    data - the query or command result
+    msg_text - the query or command result
     selection_output - user issued a SQL statement with "> selection" at the end - indicating output to a selection table
     get_columns - the name of the columns that includes the IP, Port, dbms name and file name to retrieve he file
     get_descr - additional columns to describe the blobs
 
     '''
+
+
+    data = msg_text.replace("\":0}", "\":\"0\"}")  # Because 0 as an int creates issues on the html (not printed when value is validated)"
 
     select_info = {}
     add_form_value(select_info, request)        # add the values of the last form to the select_info
@@ -860,6 +862,7 @@ def print_network_reply(request, query_result, data, selection_output, get_colum
     select_info['title'] = 'Network Command'
     select_info["commands_list"] = ANYLOG_COMMANDS
     select_info["commands_groups"] = COMMANDS_GROUPS
+
 
     if not data:
         if query_result:
@@ -1018,7 +1021,6 @@ def format_message_reply(msg_text):
     '''
 
     # If the message is a dictionary or a list - return the dictionary or the list
-
     policy = None
     error_msg = None
     if msg_text[0] == '{' and msg_text[-1] == '}':
