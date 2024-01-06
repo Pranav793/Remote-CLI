@@ -15,6 +15,12 @@
   "monitor" : [
     ["Monitor Operators", "monitor_operators.json"],
     ["Monitor ALerts", "monitor_alerts.json"]
+  ],
+
+  "nodes" : [
+    ["local Node (10.0.0.78:7849)", "10.0.0.78:7849"],
+    ["Demo Node (104.197.100.222:32349)", "104.197.100.222:32349"]
   ]
+
 
 }
