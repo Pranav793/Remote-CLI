@@ -1306,6 +1306,8 @@ def transfer_selections(request, select_info):
 
     global user_selections_     # The entries to pass from form to form
     global CLIENT_INFO          # Defaults from the setting.json file
+    global s_node_              # Node selected on the monitoring options
+
 
     previous_form = request.POST
 
@@ -1317,8 +1319,11 @@ def transfer_selections(request, select_info):
             if CLIENT_INFO and entry in CLIENT_INFO:
                 select_info[entry] = CLIENT_INFO[entry]  # info passed to the new form from "setting.json" file
 
+    if s_node_:     # A node was selected from the nodes list in setting - use this node for the connect_info
+        select_info["connect_info"] = s_node_
+
     if not "m_connect_info" in select_info and "connect_info" in select_info:
-        # Use the default select info
+        # Use the default select info for the monitor page
         select_info["m_connect_info"] = select_info["connect_info"]
 
 # -----------------------------------------------------------------------------------
@@ -1596,6 +1601,8 @@ def setting_options(request):
 def form_setting_info(request):
 
     global m_file_      # The name of the monitoring file
+    global s_node_      # Node selected on the monitoring options
+
     global monitoring_info_ # The json file with the monitoring info
     global json_dir_
 
@@ -1627,6 +1634,8 @@ def form_setting_info(request):
             m_file_ = file_name
             monitoring_info_, error_msg = json_api.load_json(json_dir_ + file_name)  # Read the setting.json file
 
+    if post_data.get("s_node"):     # A different node is selected for connect_info
+        s_node_ = post_data.get("s_node")
 
 # -----------------------------------------------------------------------------------
 # Monitor data from aggregator node
