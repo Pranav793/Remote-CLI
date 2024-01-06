@@ -134,6 +134,33 @@
 
   {% endif %}
 
+  <br/>
+  <br/>
+
+  {% if nodes_list %}
+
+      <h2>Nodes List</h2>
+
+      <br/>
+      <text>Nodes:</text>
+
+    <!-- Print the options for nodes to use (will change the connect info node).  -->
+
+    <select id="s_node" name="s_node">
+
+    {% for entry in nodes_list %}
+         {% if entry.1 == s_node %}
+            <option selected value={{ entry.1 }}>&nbsp;{{ entry.0 }}</option>
+        {% else %}
+            <option value={{ entry.1 }}>&nbsp;{{ entry.0 }}</option>
+        {% endif %}
+
+    {%  endfor %}
+
+     </select>
+
+  {% endif %}
+
 
   </form>
 
