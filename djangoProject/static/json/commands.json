@@ -143,7 +143,7 @@
     },
     {
       "button": "Target Operators",
-      "command": "blockchain get operator where [company] contains AFG bring [operator][ip] : [operator][port]  separator = ,",
+      "command": "blockchain get operator where [company] contains IoTech bring [operator][ip] : [operator][port]  separator=,",
       "type": "GET",
       "group": "Demo"
     },
@@ -209,7 +209,7 @@
     },
     {
       "button": "Image",
-      "command": "sql edgex extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone=Europe/Dublin  select  timestamp, file, class, bbox, score, status  from images where timestamp >= now() - 1 hour and timestamp <= NOW() order by timestamp desc --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: bbox as shape.rect and score)",
+      "command": "sql edgex extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone=Europe/Dublin  select  timestamp, file, class, bbox, status  from images where timestamp >= now() - 1 hour and timestamp <= NOW() order by timestamp desc --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: bbox as shape.rect)",
       "type": "GET",
       "group": "Demo"
     },
@@ -243,6 +243,25 @@
       "type": "GET",
       "group": "Demo"
     },
+    {
+      "button": "Q. File",
+      "command": "sql kubearmor format=table \"select increments(hour, 1, updated_timestamp), result, min(updated_timestamp) as min_ts, max(updated_timestamp) as max_ts, count(*) as row_count from file group by result ORDER by min_ts;\"",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Q. Network",
+      "command": "sql kubearmor format=json \"select timestamp, updated_timestamp, cluster_name, hostname, namespace, pod_name, container_id, container_name, host_pid, ppid, pid, type, resource, data, result, container_image, process_name, host_ppid, labels, owner_ref, owner_name, owner_namespace, source, parent_process_name, uid from network limit 10\"",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Q. Process",
+      "command": "sql kubearmor format=json and extend=(+node_name as node) \"select * from process where period(minute, 1, now(), timestamp) order by timestamp\"",
+      "type": "GET",
+      "group": "Demo"
+    },
+
     {
       "button": "Node Status",
       "command": "get status",
