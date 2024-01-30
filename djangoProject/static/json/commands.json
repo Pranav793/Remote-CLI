@@ -245,19 +245,19 @@
     },
     {
       "button": "Q. File",
-      "command": "sql kubearmor format=table \"select increments(hour, 1, updated_timestamp), result, min(updated_timestamp) as min_ts, max(updated_timestamp) as max_ts, count(*) as row_count from file group by result ORDER by min_ts;\"",
+      "command": "sql kubearmor format=table \"select increments(hour, 1, updated_timestamp), result, min(updated_timestamp) as min_ts, max(updated_timestamp) as max_ts, count(*) as row_count from logs where operation='File' group by result ORDER by min_ts;\"",
       "type": "GET",
       "group": "Demo"
     },
     {
       "button": "Q. Network",
-      "command": "sql kubearmor format=json \"select timestamp, updated_timestamp, cluster_name, hostname, namespace, pod_name, container_id, container_name, host_pid, ppid, pid, type, resource, data, result, container_image, process_name, host_ppid, labels, owner_ref, owner_name, owner_namespace, source, parent_process_name, uid from network limit 10\"",
+      "command": "sql kubearmor format=json \"select timestamp, updated_timestamp, cluster_name, hostname, pod_name, container_id, container_name, host_pid, ppid, pid, type, resource, data, result, container_image, process_name, host_ppid, labels, owner_ref, owner_name, owner_namespace, source, parent_process_name, uid from logs WHERE operation='Network' limit 10\"",
       "type": "GET",
       "group": "Demo"
     },
     {
       "button": "Q. Process",
-      "command": "sql kubearmor format=json and extend=(+node_name as node) \"select * from process where period(minute, 1, now(), timestamp) order by timestamp\"",
+      "command": "sql kubearmor format=json and extend=(+node_name as node) \"select * from logs where period(minute, 1, now(), timestamp) and operation='Process' order by timestamp\"",
       "type": "GET",
       "group": "Demo"
     },
