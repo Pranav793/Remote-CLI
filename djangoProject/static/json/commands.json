@@ -261,7 +261,24 @@
       "type": "GET",
       "group": "Demo"
     },
-
+    {
+      "button": "Syslog Status",
+      "command": "get msg rules",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Syslog Count",
+      "command": "sql syslog_dbms format=table and include=(kubearmor.syslog, litsanleandro.syslog, edgex.syslog) and extend=(@dbms_name as dbms) \"select hostname, count(*) from syslog group by hostname\"",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "5 minute Syslog",
+      "command": "sql syslog_dbms format=table and include=(kubearmor.syslog, litsanleandro.syslog, edgex.syslog) \"select timestamp, hostname, priority, tag, message from syslog where period(minute, 5, now(), timestamp);\"",
+      "type": "GET",
+      "group": "Demo"
+    },
     {
       "button": "Node Status",
       "command": "get status",
