@@ -5,3 +5,4 @@ djangoProject/static/blobs/*
 .*.swp
 djangoProject/static/pem/*
 .DS_Store
+venv/
