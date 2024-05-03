@@ -6,3 +6,4 @@ djangoProject/static/blobs/*
 djangoProject/static/pem/*
 .DS_Store
 venv/
+settings.json
