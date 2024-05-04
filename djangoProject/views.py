@@ -427,6 +427,7 @@ def blobs_processes(request, blobs_button):
                                     name_func = name_val[0].split('*')
                                     if len (name_func) == 2:
                                         # Include a function like: bbox as shape.rect (bbox*shape.rect)
+                                        #  each value represents a fraction of the total width or height of the image.
                                         function = name_func[1]
                                         for selected_file in files_list:
                                             if selected_file[0].startswith(file_name):
@@ -488,7 +489,14 @@ def get_bbox_val(width, height, function, values_str):
                     # Option 1
                     for index, entry in enumerate(values_list):
                         if isinstance(entry, float) or isinstance(entry, int):
-                            coords[index] = entry
+                            if entry <= 1:
+                                if index == 0 or index == 2:
+                                    position = entry * width
+                                else:
+                                    position = entry * height
+                            else:
+                                position = entry
+                            coords[index] = position
 
                 elif isinstance(values_list[0], dict) and isinstance(values_list[3], dict):
                     # Temp work arround -  "600,0,700,200" from:
