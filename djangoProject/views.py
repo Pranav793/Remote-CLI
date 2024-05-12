@@ -456,9 +456,12 @@ def blobs_processes(request, blobs_button):
 
     select_info["watch"] = files_list           # The files selected to watch
 
+    '''
+    Temp test code for bounding box
     if "file" in  select_info and len(files_list):
         select_info["file"] = files_list[0][2]  # The files selected to watch
         return render(request, "bbox.html", select_info)  # Process the blobs page
+    '''
 
     return render(request, "blobs.html", select_info) # Process the blobs page
 # ---------------------------------------------------------------------------------------
