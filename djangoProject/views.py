@@ -23,15 +23,6 @@ blobs_dir = os.path.join(str(BASE_DIR) + os.sep + "djangoProject" + os.sep + "st
 keep_dir = os.path.join(str(BASE_DIR) + os.sep + "djangoProject" + os.sep + "static" + os.sep + "blobs" + os.sep + "keep"+ os.sep) # Dir for saved blobs - # Absolute path
 blobs_local_dir = "blobs/current/"
 
-if os.path.exists('/.dockerenv'):
-    json_dir_ = os.sep + os.path.join('app', 'djangoProject', 'static', 'json')
-    pem_dir = os.sep + os.path.join('app', 'djangoProject', 'static', 'pem') + os.sep
-    setting_file = os.path.join(json_dir_, 'settings.py')
-
-    blobs_dir = os.sep + os.path.join('app', 'djangoProject', 'static', 'bobs', 'current') + os.sep
-    keep_dir = os.sep + os.path.join('app', 'djangoProject', 'static', 'bobs', 'keep') + os.sep
-    blobs_local_dir = os.path.join("blobs", "current") + os.sep
-
 m_file_ = None          # Updated with the file name with the monitoring options
 s_node_ = None          # Node selected on the monitoring options
 monitoring_info_ = None  # The json file with the monitoring info
