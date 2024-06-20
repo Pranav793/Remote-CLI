@@ -106,6 +106,9 @@ COMMANDS_GROUPS = [
 ]
 '''
 
+pattern_dbms_name_ = re.compile(re.escape("[DBMS]"), re.IGNORECASE)
+pattern_table_name_ = re.compile(re.escape("[TABLE]"), re.IGNORECASE)
+
 COMMAND_BY_BUTTON = {}
 for index, entry in enumerate(ANYLOG_COMMANDS):
     # Add ID as f(group) + button name
@@ -544,17 +547,6 @@ def client_processes(request, client_button):
 
         user_cmd = request.POST.get("command").strip()
 
-        # add dbms name and table name (if specified on the form)
-        dbms_name = request.POST.get('dbms')
-        table_name = request.POST.get('table')
-
-        if dbms_name:
-            pattern = re.compile(re.escape("[DBMS]"), re.IGNORECASE)
-            user_cmd = pattern.sub(dbms_name, user_cmd)
-        if table_name:
-            pattern = re.compile(re.escape("[TABLE]"), re.IGNORECASE)
-            user_cmd = pattern.sub(table_name, user_cmd)
-
         if len(user_cmd) > 5 and user_cmd[:4].lower() == "sql ":
             query_result = True
 
@@ -744,6 +736,14 @@ def command_button_selected(request, command_button):
                 select_info["help_url"] = help_url      # Form will print URL
         else:
             user_cmd = cmd_info["command"]  # Set the command
+            # add dbms name and table name (if specified on the form)
+            dbms_name = request.POST.get('dbms')
+            table_name = request.POST.get('table')
+
+            if dbms_name:
+                user_cmd = pattern_dbms_name_.sub(dbms_name, user_cmd)
+            if table_name:
+                user_cmd = pattern_table_name_.sub(table_name, user_cmd)
 
             if len(user_cmd) > 5 and user_cmd[:4].lower().startswith("sql "):
                 select_info["network"] = True  # Used to Flag the network bool on the page
