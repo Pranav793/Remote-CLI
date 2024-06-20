@@ -474,6 +474,12 @@
       "group": "Webinar"
     },
     {
+      "button": "tables columns",
+      "command": "get tables where dbms=[DBMS]",
+      "type": "GET",
+      "group": "smart-city"
+    },
+    {
       "button": "table columns",
       "command": "get columns where dbms=[DBMS] and table=[TABLE]",
       "type": "GET",
