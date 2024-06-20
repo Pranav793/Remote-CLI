@@ -1,7 +1,7 @@
 
 {
   "client" : {
-    "connect_info": "0.0.0.0:32349",
+    "connect_info": "10.0.0.78:7849",
     "buttons" : "commands.json",
     "help" : "link"
   },
@@ -14,7 +14,13 @@
 
   "monitor" : [
     ["Monitor Operators", "monitor_operators.json"],
-    ["Monitor Members", "monitor_members.json"]
+    ["Monitor Alerts", "monitor_alerts.json"]
+  ],
+
+  "nodes" : [
+    ["local Node (10.0.0.78:7849)", "10.0.0.78:7849"],
+    ["Demo Node (104.197.100.222:32349)", "104.197.100.222:32349"]
   ]
+
 
 }

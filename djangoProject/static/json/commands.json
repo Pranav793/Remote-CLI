@@ -143,7 +143,7 @@
     },
     {
       "button": "Target Operators",
-      "command": "blockchain get operator where [company] contains AFG bring [operator][ip] : [operator][port]  separator = ,",
+      "command": "blockchain get operator where [company] contains IoTech bring [operator][ip] : [operator][port]  separator=,",
       "type": "GET",
       "group": "Demo"
     },
@@ -208,38 +208,74 @@
       "group": "Demo"
     },
     {
-      "button": "Image",
-      "command": "sql edgex extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone=Europe/Dublin  select  timestamp, file, class, bbox, score, status  from images where timestamp >= now() - 1 hour and timestamp <= NOW() order by timestamp desc --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: bbox as shape.rect and score)",
+      "button": "Factory Images",
+      "command": "sql edgex extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone=Europe/Dublin  select  timestamp, file, class, bbox, status  from factory_imgs where timestamp >= now() - 1 hour and timestamp <= NOW() order by timestamp desc --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: bbox as shape.rect)",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Images",
+      "command": "sql ibm extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone=Europe/Dublin  select  timestamp, file, class, bbox from video_imgs where period(minute, 5, now(), timestamp) --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: bbox as shape.rect)",
       "type": "GET",
       "group": "Demo"
     },
     {
       "button": "Table View",
-      "command": "sql edgex format=table and include=(freezertemp2) and extend=(+node_name as node, @table_name as table)  \"select reading_id, timestamp, units, value FROM freezertemp1 WHERE period(minute, 15, NOW(), timestamp) ORDER BY timestamp;\"",
-      "type": "GET",
-      "group": "Demo"
-    },
-    {
-      "button": "Source Data",
-      "command": "sql edgex format=table and include=(freezertemp2) and extend=(+node_name as node, @table_name as table)  \"select reading_id, timestamp, units, value FROM freezertemp1 WHERE period(minute, 15, NOW(), timestamp) ORDER BY timestamp;\"",
+      "command": "sql edgex format=table and extend=(+node_name as node)  \"select timestamp, value FROM rand_data WHERE period(minute, 15, NOW(), timestamp) ORDER BY timestamp;\"",
       "type": "GET",
       "group": "Demo"
     },
     {
       "button": "Streaming Video",
-      "command": "sql edgex info = (dest_type = rest) and extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), people_count, confidence from people_video     where start_ts >= NOW() - 1 hour and end_ts <= NOW() order by people_count, confidence --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
+      "command": "sql edgex info = (dest_type = rest) and extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), people_count, confidence from people_counter     where start_ts >= NOW() - 1 hour and end_ts <= NOW() order by people_count, confidence --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
       "type": "GET",
       "group": "Demo"
     },
     {
       "button": "Per Node summary",
-      "command": "sql edgex format=table and extend=(+node_name, +ip)  \"SELECT MIN(timestamp), MAX(timestamp),  MIN(value), MAX(value), AVG(value), COUNT(*)  FROM  lightout1 WHERE period(minute, 15, now(), timestamp);\"",
+      "command": "sql edgex format=table and extend=(+node_name, +ip)  \"SELECT MIN(timestamp), MAX(timestamp),  MIN(value), MAX(value), AVG(value), COUNT(*)  FROM  rand_data WHERE period(minute, 15, now(), timestamp);\"",
       "type": "GET",
       "group": "Demo"
     },
     {
       "button": "Per Node Data",
-      "command": "sql edgex format=table and extend=(+node_name, +ip)  \"SELECT timestamp,  value FROM  lightout1 WHERE timestamp >= NOW() - 15 minutes ORDER BY timestamp;\"",
+      "command": "sql edgex format=table and extend=(+node_name, +ip)  \"SELECT timestamp,  value FROM  rand_data WHERE timestamp >= NOW() - 15 minutes ORDER BY timestamp;\"",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Q. File",
+      "command": "sql kubearmor format=table \"select increments(hour, 1, updated_timestamp), result, min(updated_timestamp) as min_ts, max(updated_timestamp) as max_ts, count(*) as row_count from logs where operation='File' group by result ORDER by min_ts;\"",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Q. Network",
+      "command": "sql kubearmor format=json \"select timestamp, updated_timestamp, cluster_name, hostname, pod_name, container_id, container_name, host_pid, ppid, pid, type, resource, data, result, container_image, process_name, host_ppid, labels, owner_ref, owner_name, owner_namespace, source, parent_process_name, uid from logs WHERE operation='Network' limit 10\"",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Q. Process",
+      "command": "sql kubearmor format=json and extend=(+node_name as node) \"select * from logs where period(minute, 1, now(), timestamp) and operation='Process' order by timestamp\"",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Syslog Status",
+      "command": "get msg rules",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "Syslog Count",
+      "command": "sql edgelake format=table and include=(edgex.syslog, kubearmor.syslog, litsanleandro.syslog) \"select hostname, count(*) from syslog group by hostname\"",
+      "type": "GET",
+      "group": "Demo"
+    },
+    {
+      "button": "5 minute Syslog",
+      "command": "sql edgelake format=table and include=(kubearmor.syslog, litsanleandro.syslog, edgex.syslog) and extend=(@dbms_name as dbms) \"select timestamp, hostname, priority, tag, message from syslog where period(minute, 5, now(), timestamp);\"",
       "type": "GET",
       "group": "Demo"
     },
@@ -432,7 +468,7 @@
     },
     {
       "button": "Streaming Video",
-      "command": "sql edgex info = (dest_type = rest) and extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), people_count, confidence::float(3) from people_video     where start_ts >= NOW() - 1 hour and end_ts <= NOW() order by people_count, confidence --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
+      "command": "sql edgex info = (dest_type = rest) and extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), people_count, confidence::float(3) from people_counter     where start_ts >= NOW() - 1 hour and end_ts <= NOW() order by people_count, confidence --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
       "type": "GET",
       "group": "Webinar"
     },
@@ -463,7 +499,163 @@
       "type": "GET",
       "group": "smart-city"
     },
+    {
+      "button": "Tables",
+      "command": "get tables where dbms = kubearmor",
+      "type": "GET",
+      "group": "KubeArmor"
+    },
+    {
+    "button": "Columns",
+    "command": "get  columns where table = network and dbms = kubearmor",
+    "type": "GET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "Virtual",
+    "command": "get virtual tables",
+    "type": "GET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "Data Nodes",
+    "command": "get data nodes",
+    "type": "GET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "Test Network",
+    "command": "test network",
+    "type": "GET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "Q. File",
+    "command": "sql kubearmor format=table \"select increments(hour, 1, updated_timestamp), result, min(updated_timestamp) as min_ts, max(updated_timestamp) as max_ts, count(*) as row_count from file group by result ORDER by min_ts;\"",
+    "type": "GET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "Q. Network",
+    "command": "sql kubearmor format=json \"select timestamp, updated_timestamp, cluster_name, hostname, namespace, pod_name, container_id, container_name, host_pid, ppid, pid, type, resource, data, result, container_image, process_name, host_ppid, labels, owner_ref, owner_name, owner_namespace, source, parent_process_name, uid from network limit 10\"",
+    "type": "GET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "Q. Process",
+    "command": "sql kubearmor format=json and extend=(+node_name as node) \"select * from process where period(minute, 1, now(), timestamp) order by timestamp\"",
+    "type": "GET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "Mapping Policy",
+    "command": "blockchain get mapping where id = kubearmor-system-policy",
+    "type": "GET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "gRPC",
+    "command": "get grpc  clients",
+    "type": "GET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "Streaming",
+    "command": "get streaming",
+    "type": "GET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "Operator",
+    "command": "get operator",
+    "type": "GET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "Operators IP",
+    "command": " blockchain get operator bring.ip_port",
+    "type": "GET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "Disable Flag",
+    "command": "set alert_flag_1 = false",
+    "type": "SET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "Enable Flag",
+    "command": "set alert_flag_1 = true",
+    "type": "SET",
+    "group": "KubeArmor"
+    },
 
+    {
+    "button": "Reset Level",
+    "command": "set alert_level = 0",
 
+    "type": "SET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "Set Level",
+    "command": "set alert_level = 6",
+    "type": "SET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "Set Level 3",
+    "command": "set alert_level = 3",
+    "type": "SET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "Monitored Topics",
+    "command": "get monitored",
+    "type": "GET",
+    "group": "KubeArmor"
+    },
+    {
+    "button": "Topic Alerts",
+    "command": "get monitored alerts",
+    "type": "GET",
+    "group": "KubeArmor"
+    },
+    {
+      "button": "Data Nodes",
+      "command": "get data nodes",
+      "type": "GET",
+      "group": "CIDR"
+    },
+    {
+      "button": "Get Columns",
+      "command": "get columns where dbms=edgelab and table=lightout1",
+      "type": "GET",
+      "group": "CIDR"
+    },
+    {
+      "button": "Source Data",
+      "command": "sql edgelab format=table and include=(lightout2) and extend=(+node_name as node, @table_name as table)  \"select timestamp, value::float(3) FROM lightout1 WHERE period(minute, 15, NOW(), timestamp) ORDER BY timestamp;\"\n",
+      "type": "GET",
+      "group": "CIDR"
+    },
+    {
+      "button": "Video",
+      "command": "sql edgex extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), num_cars, speed from car_videos where start_ts >= NOW() - 1 hour and end_ts <= NOW() order by speed --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) ",
+      "type": "GET",
+      "group": "CIDR"
+    },
+    {
+      "button": "Image",
+      "command": "sql edgex extend=(+node_name, @ip, @port, @dbms_name, @table_name) and format = json and timezone=Europe/Dublin  select  timestamp, file, class, bbox, score, status  from images where timestamp >= now() - 1 hour and timestamp <= NOW() order by timestamp desc --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file) -->  description (columns: bbox as shape.rect and score)",
+      "type": "GET",
+      "group": "CIDR"
+    },
+    {
+      "button": "Streaming Video",
+      "command": "sql edgex info = (dest_type = rest) and extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), people_count, confidence from people_counter where start_ts >= NOW() - 1 hour and end_ts <= NOW() order by people_count, confidence --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
+      "type": "GET",
+      "group": "CIDR"
+    }
   ]
 }

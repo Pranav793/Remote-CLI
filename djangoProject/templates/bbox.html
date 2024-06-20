@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bounding Box on Image</title>
+<style>
+    /* Style for the bounding box */
+    .bbox {
+        position: absolute;
+        border: 2px solid red;
+        box-sizing: border-box;
+    }
+</style>
+</head>
+<body>
+  <form method="POST" class="post-form" >
+    <div style="position: relative;">
+        <!-- Image -->
+        <img src="{% static   file  %}" alt="Image" width="1600" height="1200">
+        <!-- Bounding box -->
+        <div class="bbox" style="left: 688px; top: 312px; width: 160px; height: 888px;"></div>
+    </div>
+  </form>
+</body>
+</html>

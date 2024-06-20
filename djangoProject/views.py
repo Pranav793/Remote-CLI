@@ -33,6 +33,7 @@ if os.path.exists('/.dockerenv'):
     blobs_local_dir = os.path.join("blobs", "current") + os.sep
 
 m_file_ = None          # Updated with the file name with the monitoring options
+s_node_ = None          # Node selected on the monitoring options
 monitoring_info_ = None  # The json file with the monitoring info
 
 setting_info_, error_msg = json_api.load_json(setting_file)      # Read the setting.json file
@@ -61,6 +62,11 @@ if setting_info_:
             monitoring_info_, error_msg = json_api.load_json(json_dir_ + m_file_)  # R
     else:
         monitor_files_ = None
+
+    if "nodes" in setting_info_:
+        nodes_list_ = setting_info_["nodes"]    # List that can change the connect_info nodes
+    else:
+        nodes_list_ = None
 
 
 anylog_conn.set_certificate_info(SETTING_CER, pem_dir)       # Set the certificate info in anylog_conn.py
@@ -175,7 +181,7 @@ def form_request(request):
     setting_button = request.POST.get("Setting")
     monitor_button = request.POST.get("Monitor")
 
-    if setting_button:
+    if setting_button and setting_info_:
         # Update the setting form (settings.html)
         return setting_options(request)
 
@@ -430,6 +436,7 @@ def blobs_processes(request, blobs_button):
                                     name_func = name_val[0].split('*')
                                     if len (name_func) == 2:
                                         # Include a function like: bbox as shape.rect (bbox*shape.rect)
+                                        #  each value represents a fraction of the total width or height of the image.
                                         function = name_func[1]
                                         for selected_file in files_list:
                                             if selected_file[0].startswith(file_name):
@@ -458,6 +465,12 @@ def blobs_processes(request, blobs_button):
 
     select_info["watch"] = files_list           # The files selected to watch
 
+    '''
+    Temp test code for bounding box
+    if "file" in  select_info and len(files_list):
+        select_info["file"] = files_list[0][2]  # The files selected to watch
+        return render(request, "bbox.html", select_info)  # Process the blobs page
+    '''
 
     return render(request, "blobs.html", select_info) # Process the blobs page
 # ---------------------------------------------------------------------------------------
@@ -491,7 +504,14 @@ def get_bbox_val(width, height, function, values_str):
                     # Option 1
                     for index, entry in enumerate(values_list):
                         if isinstance(entry, float) or isinstance(entry, int):
-                            coords[index] = entry
+                            if entry <= 1:
+                                if index == 0 or index == 2:
+                                    position = entry * width
+                                else:
+                                    position = entry * height
+                            else:
+                                position = entry
+                            coords[index] = position
 
                 elif isinstance(values_list[0], dict) and isinstance(values_list[3], dict):
                     # Temp work arround -  "600,0,700,200" from:
@@ -851,17 +871,19 @@ def process_anylog(request, user_cmd, is_monitored):
 # Option 2 - a table
 # Option 3 - text
 # -----------------------------------------------------------------------------------
-
-def print_network_reply(request, query_result, data, selection_output, get_columns, get_descr):
+def print_network_reply(request, query_result, msg_text, selection_output, get_columns, get_descr):
     '''
     request - the form info
     query_result - a True/False value representing SQL query data set returned
-    data - the query or command result
+    msg_text - the query or command result
     selection_output - user issued a SQL statement with "> selection" at the end - indicating output to a selection table
     get_columns - the name of the columns that includes the IP, Port, dbms name and file name to retrieve he file
     get_descr - additional columns to describe the blobs
 
     '''
+
+
+    data = msg_text.replace("\":0}", "\":\"0\"}")  # Because 0 as an int creates issues on the html (not printed when value is validated)"
 
     select_info = {}
     add_form_value(select_info, request)        # add the values of the last form to the select_info
@@ -869,6 +891,7 @@ def print_network_reply(request, query_result, data, selection_output, get_colum
     select_info['title'] = 'Network Command'
     select_info["commands_list"] = ANYLOG_COMMANDS
     select_info["commands_groups"] = COMMANDS_GROUPS
+
 
     if not data:
         if query_result:
@@ -1027,7 +1050,6 @@ def format_message_reply(msg_text):
     '''
 
     # If the message is a dictionary or a list - return the dictionary or the list
-
     policy = None
     error_msg = None
     if msg_text[0] == '{' and msg_text[-1] == '}':
@@ -1307,6 +1329,8 @@ def transfer_selections(request, select_info):
 
     global user_selections_     # The entries to pass from form to form
     global CLIENT_INFO          # Defaults from the setting.json file
+    global s_node_              # Node selected on the monitoring options
+
 
     previous_form = request.POST
 
@@ -1318,8 +1342,11 @@ def transfer_selections(request, select_info):
             if CLIENT_INFO and entry in CLIENT_INFO:
                 select_info[entry] = CLIENT_INFO[entry]  # info passed to the new form from "setting.json" file
 
+    if s_node_:     # A node was selected from the nodes list in setting - use this node for the connect_info
+        select_info["connect_info"] = s_node_
+
     if not "m_connect_info" in select_info and "connect_info" in select_info:
-        # Use the default select info
+        # Use the default select info for the monitor page
         select_info["m_connect_info"] = select_info["connect_info"]
 
 # -----------------------------------------------------------------------------------
@@ -1360,6 +1387,15 @@ def make_curl_cmd(request, select_info):
     curl_cmd += f"http://{conn_info} "
 
     curl_cmd += "--header \"User-Agent: AnyLog/1.23\" "
+
+    if request.POST.get('subset') == "on":
+        curl_cmd += "--header \"subset: true\" "
+
+    if request.POST.get('timeout'):
+        # Change the timeout in seconds
+        timeout = request.POST.get('timeout').strip()
+        if timeout.isdigit():  # Seconds to timeout
+            curl_cmd += f"--header \"timeout: {timeout}\" "
 
     user_cmd = post_data.get("command").strip()
 
@@ -1408,7 +1444,23 @@ def make_anylog_cmd(request, select_info):
 
     network = request.POST.get('network') == "on"
     if network:
-        destination =  request.POST.get('destination').strip()
+        destination =  request.POST.get('destination').strip() # List of destinations nodes
+
+        if request.POST.get('subset') == "on":
+            if destination:
+                destination += ",subset=true"
+            else:
+                destination = "subset=true"
+
+        if request.POST.get('timeout'):
+            # Change the timeout in seconds
+            timeout = request.POST.get('timeout').strip()
+            if timeout.isdigit():   # Seconds to timeout
+                if destination:
+                    destination += f",timeout={timeout}"
+                else:
+                    destination = f"timeout={timeout}"
+
         if destination:
             user_cmd = "run client (%s) %s" % (destination, user_cmd)
         else:
@@ -1447,10 +1499,20 @@ def make_qrcode(request, select_info):
 
 
     if request.POST.get('network') == "on":
+        # Flagged to send data to the network or specific nodes in the network
         destination = request.POST.get('destination').strip()
         if not destination:
             destination = "network"
         url_string += f"?destination={destination}"
+
+    if request.POST.get('subset') == "on":
+        # Allow subset of data
+        url_string += "?subset=true"
+
+    if request.POST.get('timeout'):
+        # Change the timeout in seconds
+        timeout = request.POST.get('timeout').strip()
+        url_string += f"?timeout={timeout}"
 
 
     url_string += '?command='
@@ -1520,7 +1582,8 @@ def create_qr(url:str='https://anylog.co')->pyqrcode.QRCode:
 # -----------------------------------------------------------------------------------
 def setting_options(request):
 
-    global m_file_
+    global m_file_      # Updated with the file name with the monitoring options
+    global s_node_      #  Node selected on the monitoring options
 
     select_info = {}
 
@@ -1547,6 +1610,11 @@ def setting_options(request):
         if m_file_:
             select_info["m_file"] = m_file_     # Last file selected
 
+    if nodes_list_:
+        select_info["nodes_list"] = nodes_list_
+        if s_node_:
+            select_info["s_node"] = s_node_  # Last file selected
+
 
     return render(request, "settings.html", select_info)  # Process the blobs page
 
@@ -1556,6 +1624,8 @@ def setting_options(request):
 def form_setting_info(request):
 
     global m_file_      # The name of the monitoring file
+    global s_node_      # Node selected on the monitoring options
+
     global monitoring_info_ # The json file with the monitoring info
     global json_dir_
 
@@ -1587,6 +1657,8 @@ def form_setting_info(request):
             m_file_ = file_name
             monitoring_info_, error_msg = json_api.load_json(json_dir_ + file_name)  # Read the setting.json file
 
+    if post_data.get("s_node"):     # A different node is selected for connect_info
+        s_node_ = post_data.get("s_node")
 
 # -----------------------------------------------------------------------------------
 # Monitor data from aggregator node

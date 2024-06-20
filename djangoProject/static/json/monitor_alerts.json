@@ -1,0 +1,30 @@
+
+{
+  "views": {
+    "alerts": {
+      "title": "Alerts Status",
+      "header": [
+        "Node",
+        "Node Name",
+        "Update Time",
+        "Alert Flag 1",
+        "Alert Level"
+      ],
+      "attr": [
+        "Node",
+        "Node_Name",
+        "Update time",
+        "Alert_Flag_1",
+        "Alert_Level"
+      ],
+      "totals": [
+        "New events",
+        "Total events"
+      ],
+      "alerts": {
+        "Alert_Level": "'value' > '5'"
+      }
+    }
+  }
+}
+

@@ -5,3 +5,6 @@ anylog_deploy/configs/*
 djangoProject/static/blobs/*
 .*.swp
 djangoProject/static/pem/*
+.DS_Store
+venv/
+settings.json
