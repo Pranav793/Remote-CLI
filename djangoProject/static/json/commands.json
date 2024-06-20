@@ -435,6 +435,35 @@
       "command": "sql edgex info = (dest_type = rest) and extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), people_count, confidence::float(3) from people_video     where start_ts >= NOW() - 1 hour and end_ts <= NOW() order by people_count, confidence --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
       "type": "GET",
       "group": "Webinar"
-    }
+    },
+    {
+      "button": "Last reading - commsstatus",
+      "commnad": "sql smart_city format=table \"SELECT timestamp, id, commsstatus FROM [table] WHERE timestamp <= NOW() and commsstatus is not NULL ORDER BY timestamp DESC limit 1\"",
+      "type": "GET",
+      "group": "smart-city"
+    },
+
+    {
+      "button": "Last Reading",
+      "commnad": "sql smart_city format=table \"SELECT timestamp, id, a_current, a_n_voltage, b_current, b_n_voltage, c_current, c_n_voltage, energymultiplier, frequency, powerfactor, reactivepower, realpower FROM [table] WHERE timestamp <= NOW() and commsstatus is NULL ORDER BY timestamp DESC limit 1\"",
+      "type": "GET",
+      "group": "smart-city"
+    },
+
+    {
+      "button": "Last Reading - ID",
+      "commnad": "sql smart_city format=table \"SELECT timestamp, id, a_current, a_n_voltage, b_current, b_n_voltage, c_current, c_n_voltage, energymultiplier, frequency, powerfactor, reactivepower, realpower FROM [table] WHERE id = 9 and timestamp <= NOW() and commsstatus is NULL ORDER BY timestamp DESC limit 1\"",
+      "type": "GET",
+      "group": "smart-city"
+    },
+
+    {
+      "button": "Last Interval",
+      "commnad": "sql smart_city format=table \"SELECT timestamp, id, a_current, a_n_voltage, b_current, b_n_voltage, c_current, c_n_voltage, energymultiplier, frequency, powerfactor, reactivepower, realpower FROM [table] WHERE period(minute, 10, timestamp) and commsstatus is NULL ORDER BY timestamp ASC\"",
+      "type": "GET",
+      "group": "smart-city"
+    },
+
+
   ]
 }
