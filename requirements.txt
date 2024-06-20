@@ -1,5 +1,5 @@
-django 
-requests
-pyqrcode[pi] 
-pypng
+django>=0.0
+requests>=0.0
+pyqrcode[pi]>=0.0
+pypng>=0.0
 #webbrowser
