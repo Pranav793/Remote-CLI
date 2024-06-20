@@ -474,28 +474,42 @@
       "group": "Webinar"
     },
     {
+      "button": "table columns",
+      "command": "get columns where dbms=[DBMS] and table=[TABLE]",
+      "type": "GET",
+      "group": "smart-city"
+    },
+
+    {
+      "button": "Device List",
+      "command": "sql [DBMS] format=table \"SELECT id, min(timestamp), max(timestamp), count(*) FROM [TABLE] WHERE commsstatus is NULL GROUP BY id\"",
+      "type": "GET",
+      "group": "smart-city"
+    },
+
+    {
       "button": "Last reading - commsstatus",
-      "command": "sql smart_city format=table \"SELECT timestamp, id, commsstatus FROM [table] WHERE timestamp <= NOW() and commsstatus is not NULL ORDER BY timestamp DESC limit 1\"",
+      "command": "sql [DBMS] format=table \"SELECT MAX(timestamp) AS timestamp, id, commsstatus FROM [TABLE] WHERE timestamp <= NOW() AND commsstatus IS NOT NULL GROUP BY id;\"",
       "type": "GET",
       "group": "smart-city"
     },
     {
       "button": "Last Reading",
-      "command": "sql smart_city format=table \"SELECT timestamp, id, a_current, a_n_voltage, b_current, b_n_voltage, c_current, c_n_voltage, energymultiplier, frequency, powerfactor, reactivepower, realpower FROM [table] WHERE timestamp <= NOW() and commsstatus is NULL ORDER BY timestamp DESC limit 1\"",
+      "command": "sql [DBMS] format=table \"SELECT MAX(timestamp) AS timestamp, id, a_current, a_n_voltage, b_current, b_n_voltage, c_current, c_n_voltage, energymultiplier, frequency, powerfactor, reactivepower, realpower FROM [TABLE] WHERE timestamp <= NOW() and commsstatus is NULL GROUP BY id\"",
       "type": "GET",
       "group": "smart-city"
     },
 
     {
       "button": "Last Reading - ID",
-      "command": "sql smart_city format=table \"SELECT timestamp, id, a_current, a_n_voltage, b_current, b_n_voltage, c_current, c_n_voltage, energymultiplier, frequency, powerfactor, reactivepower, realpower FROM [table] WHERE id = 9 and timestamp <= NOW() and commsstatus is NULL ORDER BY timestamp DESC limit 1\"",
+      "command": "sql [DBMS] format=table \"SELECT timestamp, id, a_current, a_n_voltage, b_current, b_n_voltage, c_current, c_n_voltage, energymultiplier, frequency, powerfactor, reactivepower, realpower FROM [TABLE] WHERE id = 9 and timestamp <= NOW() and commsstatus is NULL ORDER BY timestamp DESC limit 1\"",
       "type": "GET",
       "group": "smart-city"
     },
 
     {
       "button": "Last Interval",
-      "command": "sql smart_city format=table \"SELECT timestamp, id, a_current, a_n_voltage, b_current, b_n_voltage, c_current, c_n_voltage, energymultiplier, frequency, powerfactor, reactivepower, realpower FROM [table] WHERE period(minute, 10, timestamp) and commsstatus is NULL ORDER BY timestamp ASC\"",
+      "command": "sql [DBMS] format=table \"SELECT timestamp, id, a_current, a_n_voltage, b_current, b_n_voltage, c_current, c_n_voltage, energymultiplier, frequency, powerfactor, reactivepower, realpower FROM [TABLE] WHERE period(minute, 10, now(), timestamp) and commsstatus is NULL ORDER BY timestamp ASC\"",
       "type": "GET",
       "group": "smart-city"
     },
