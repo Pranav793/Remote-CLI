@@ -488,33 +488,33 @@
 
     {
       "button": "Device List",
-      "command": "sql [DBMS] format=table \"SELECT id, min(timestamp), max(timestamp), count(*) FROM [TABLE] WHERE commsstatus is NULL GROUP BY id\"",
+      "command": "sql [DBMS] format=table \"SELECT min(timestamp)::ljust(19) as min_ts, max(timestamp)::ljust(19) as max_ts, id, count(*) as row_count FROM [TABLE] WHERE commsstatus is NULL GROUP BY id\"",
       "type": "GET",
       "group": "smart-city"
     },
 
     {
       "button": "Last reading - commsstatus",
-      "command": "sql [DBMS] format=table \"SELECT MAX(timestamp) AS timestamp, id, commsstatus FROM [TABLE] WHERE timestamp <= NOW() AND commsstatus IS NOT NULL GROUP BY id;\"",
+      "command": "sql [DBMS] format=table \"SELECT MAX(timestamp)::ljust(19) AS timestamp, id, commsstatus FROM [TABLE] WHERE timestamp <= NOW() AND commsstatus IS NOT NULL GROUP BY id;\"",
       "type": "GET",
       "group": "smart-city"
     },
     {
       "button": "Last Reading",
-      "command": "sql [DBMS] format=table \"SELECT MAX(timestamp) AS timestamp, id, a_current, a_n_voltage, b_current, b_n_voltage, c_current, c_n_voltage, energymultiplier, frequency, powerfactor, reactivepower, realpower FROM [TABLE] WHERE timestamp <= NOW() and commsstatus is NULL GROUP BY id\"",
+      "command": "sql [DBMS] format=table \"SELECT MAX(timestamp)::ljust(19) AS timestamp, id, a_current, a_n_voltage, b_current, b_n_voltage, c_current, c_n_voltage, energymultiplier, frequency, powerfactor, reactivepower, realpower FROM [TABLE] WHERE timestamp <= NOW() and commsstatus is NULL GROUP BY id\"",
       "type": "GET",
       "group": "smart-city"
     },
 
     {
-      "button": "Last Reading - ID",
-      "command": "sql [DBMS] format=table \"SELECT timestamp, id, a_current, a_n_voltage, b_current, b_n_voltage, c_current, c_n_voltage, energymultiplier, frequency, powerfactor, reactivepower, realpower FROM [TABLE] WHERE id = 9 and timestamp <= NOW() and commsstatus is NULL ORDER BY timestamp DESC limit 1\"",
+      "button": "Increments for an ID",
+      "command": "sql [DBMS] format=table \"select increments(minute,1, timestamp), min(timestamp)::ljust(19) as min_ts,  max(timestamp)::ljust(19) as max_ts, avg(a_current) as a_current, avg(b_current) as b_current, avg(c_current) as c_current FROM [TABLE] where id=9 and timestamp >= NOW() - 1 hour and commsstatus is NULL \"",
       "type": "GET",
       "group": "smart-city"
     },
 
     {
-      "button": "Last Interval",
+      "button": "Last 10 Minute Interval",
       "command": "sql [DBMS] format=table \"SELECT timestamp, id, a_current, a_n_voltage, b_current, b_n_voltage, c_current, c_n_voltage, energymultiplier, frequency, powerfactor, reactivepower, realpower FROM [TABLE] WHERE period(minute, 10, now(), timestamp) and commsstatus is NULL ORDER BY timestamp ASC\"",
       "type": "GET",
       "group": "smart-city"
