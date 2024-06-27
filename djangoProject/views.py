@@ -174,6 +174,7 @@ def form_request(request):
     code_button = request.POST.get("Code")      # Create QrCode from the command
     setting_button = request.POST.get("Setting")
     monitor_button = request.POST.get("Monitor")
+    chart_type = request.POST.get("chart_type")     # Updated in the QR section to generate QR and HTML to do the graph
 
     if setting_button and setting_info_:
         # Update the setting form (settings.html)
@@ -186,8 +187,8 @@ def form_request(request):
         return monitor_nodes(request)
 
 
-    if code_button:
-        return code_options(request)
+    if code_button or chart_type:
+        return code_options(request, chart_type)
 
     if blobs_button or (form == "Blobs" and not client_button and not config_button):
         # Either the blobs Button was selected (on a different form) or the blobs Page is processed.
@@ -1346,11 +1347,11 @@ def transfer_selections(request, select_info):
 # AnyLog command
 # cURL command
 # -----------------------------------------------------------------------------------
-def code_options(request):
+def code_options(request, chart_type):
 
     select_info = {}
 
-    make_qrcode(request, select_info)
+    make_qrcode(request, select_info, chart_type)
 
     make_anylog_cmd(request, select_info)
 
@@ -1464,7 +1465,7 @@ def make_anylog_cmd(request, select_info):
 # pypng - required to install but not import
 # Info at https://pythonhosted.org/PyQRCode/moddoc.html
 # -----------------------------------------------------------------------------------
-def make_qrcode(request, select_info):
+def make_qrcode(request, select_info, chart_type):
 
 
     transfer_selections(request, select_info)       # Move selections from the previous fom to the current form
@@ -1478,6 +1479,11 @@ def make_qrcode(request, select_info):
         conn_info = conn_info.strip()
 
     url_string = f"http://{conn_info}/?User-Agent=AnyLog/1.23"
+    if chart_type:
+        if chart_type == "OnOff":
+            url_string += f"?into=html.on_off"
+        else:
+            url_string += f"?into=html.{chart_type.lower()}_chart"
 
 
     username = request.POST.get('auth_usr')
@@ -1531,7 +1537,8 @@ def make_qrcode(request, select_info):
     select_info["qrcode"] = html_img  # The files to watch
     select_info["url"] = url_encoded
 
-    select_info["chart_options"] = ["Bar", "Line", "Pie", "Doughnut", "Radar", "Polar Area"]
+    if user_command.startswith("sql "):
+        select_info["chart_options"] = ["", "Bar", "Line", "radar", "Doughnut", "Pie", "PolarArea", "OnOff"]
 
 
 # -----------------------------------------------------------------------------------
@@ -1656,7 +1663,7 @@ def form_setting_info(request):
 # -----------------------------------------------------------------------------------
 # Monitor data from aggregator node
 # -----------------------------------------------------------------------------------
-def monitor_nodes(request):
+def monitor_nodes(request, chart_type):
 
     global monitoring_info_
 
