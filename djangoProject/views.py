@@ -1531,6 +1531,8 @@ def make_qrcode(request, select_info):
     select_info["qrcode"] = html_img  # The files to watch
     select_info["url"] = url_encoded
 
+    select_info["chart_options"] = ["Bar", "Line", "Pie", "Doughnut", "Radar", "Polar Area"]
+
 
 # -----------------------------------------------------------------------------------
 # Make QR code - update the url string

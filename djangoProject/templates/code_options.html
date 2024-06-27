@@ -108,6 +108,20 @@
 
       <a href="{{ qr_cmd }}" target="_blank">{{ qr_cmd }} </a>
 
+
+     <text>HTML Chart:</text>
+
+    <!-- Select the type of chart for HTML  -->
+
+    <select id="chart_type" name="chart_type" onchange="this.form.submit();">
+
+    {% for entry in chart_options %}
+         <option value="{{ entry }}">&nbsp;{{ entry }}</option>
+    {%  endfor %}
+
+    </select>
+
+
   </form>
 
   </body>
