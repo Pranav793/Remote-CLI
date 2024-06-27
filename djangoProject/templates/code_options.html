@@ -23,6 +23,16 @@
         }
     </style>
 
+    <style>
+        .container {
+            display: flex;
+            align-items: center;
+        }
+        .qr-code {
+            margin-right: 20px; /* Adjust the margin as needed */
+        }
+    </style>
+
 
   </head>
   <body>
@@ -99,28 +109,23 @@
 
     <h2>QR Code</h2>
 
-    <div>
+     <div class="container">
+        <div class="qr-code">
+            <img src="{{ qrcode }}" width="320" height="240" alt="{{ file_info.0 }}" />
+        </div>
 
-    <img src="{{ qrcode }}" width=320 height=240 alt="{{ file_info.0 }}"  width="50" height="50"/>
-
+        <div>
+            <a href="{{ qr_cmd }}" target="_blank">{{ qr_cmd }}</a>
+            <div>
+                <label for="chart_type">HTML Chart:</label>
+                <select id="chart_type" name="chart_type" onchange="this.form.submit();">
+                    {% for entry in chart_options %}
+                        <option value="{{ entry }}">&nbsp;{{ entry }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
     </div>
-   &nbsp; &nbsp; &nbsp;
-
-      <a href="{{ qr_cmd }}" target="_blank">{{ qr_cmd }} </a>
-
-
-     <text>HTML Chart:</text>
-
-    <!-- Select the type of chart for HTML  -->
-
-    <select id="chart_type" name="chart_type" onchange="this.form.submit();">
-
-    {% for entry in chart_options %}
-         <option value="{{ entry }}">&nbsp;{{ entry }}</option>
-    {%  endfor %}
-
-    </select>
-
 
   </form>
 
