@@ -1665,7 +1665,7 @@ def form_setting_info(request):
 # -----------------------------------------------------------------------------------
 # Monitor data from aggregator node
 # -----------------------------------------------------------------------------------
-def monitor_nodes(request, chart_type):
+def monitor_nodes(request):
 
     global monitoring_info_
 
