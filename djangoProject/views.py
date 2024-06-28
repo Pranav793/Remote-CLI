@@ -1482,6 +1482,8 @@ def make_qrcode(request, select_info, chart_type):
     if chart_type:
         if chart_type == "OnOff":
             url_string += f"?into=html.on_off"
+        elif chart_type == "JSON":
+            url_string += f"?into=html.json"
         else:
             url_string += f"?into=html.{chart_type.lower()}_chart"
 
@@ -1538,7 +1540,7 @@ def make_qrcode(request, select_info, chart_type):
     select_info["url"] = url_encoded
 
     if user_command.startswith("sql "):
-        select_info["chart_options"] = ["", "Bar", "multiscale", "Line", "radar", "Doughnut", "Pie", "PolarArea", "OnOff"]
+        select_info["chart_options"] = ["", "Bar", "Multiscale", "Line", "radar", "Doughnut", "Pie", "PolarArea", "OnOff", "JSON"]
 
 
 # -----------------------------------------------------------------------------------
