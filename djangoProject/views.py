@@ -1490,6 +1490,7 @@ def make_qrcode(request, select_info, chart_type):
 
     html_info = request.POST.get("html_info")  # User provided info for the HTML
     if html_info:
+
         # Remove newlines and multiple spaces
         processed_text = re.sub(r'\n+', ' ', html_info)
         processed_text = re.sub(r'\s{2,}', ' ', processed_text)
@@ -1497,7 +1498,7 @@ def make_qrcode(request, select_info, chart_type):
         # Replace double quotes with \"
         processed_text = processed_text.replace('"', r'^')
 
-        url_string += "?html=" + processed_text.replace("\n","")    # add to url
+        url_string += "?html=" + processed_text
 
 
     username = request.POST.get('auth_usr')
