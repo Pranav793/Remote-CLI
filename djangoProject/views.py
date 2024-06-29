@@ -1480,10 +1480,8 @@ def make_qrcode(request, select_info, chart_type):
 
     url_string = f"http://{conn_info}/?User-Agent=AnyLog/1.23"
     if chart_type:
-        if chart_type == "OnOff":
-            url_string += f"?into=html.on_off"
-        elif chart_type == "JSON":
-            url_string += f"?into=html.json"
+        if chart_type == "OnOff" or chart_type == "JSON" or chart_type == "Gauge":
+            url_string += f"?into=html.{chart_type.lower()}"
         else:
             url_string += f"?into=html.{chart_type.lower()}_chart"
 
@@ -1540,7 +1538,7 @@ def make_qrcode(request, select_info, chart_type):
     select_info["url"] = url_encoded
 
     if user_command.startswith("sql "):
-        select_info["chart_options"] = ["", "Bar", "Multiscale", "Line", "radar", "Doughnut", "Pie", "PolarArea", "OnOff", "JSON"]
+        select_info["chart_options"] = ["", "Bar", "Multiscale", "Line", "radar", "Doughnut", "Pie", "PolarArea", "OnOff", "Gauge", "JSON"]
 
 
 # -----------------------------------------------------------------------------------
