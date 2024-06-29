@@ -1466,6 +1466,9 @@ def make_anylog_cmd(request, select_info):
 # Info at https://pythonhosted.org/PyQRCode/moddoc.html
 # -----------------------------------------------------------------------------------
 def make_qrcode(request, select_info, chart_type):
+    '''
+    chart_type = bar, line, etc.
+    '''
 
 
     transfer_selections(request, select_info)       # Move selections from the previous fom to the current form
@@ -1484,6 +1487,17 @@ def make_qrcode(request, select_info, chart_type):
             url_string += f"?into=html.{chart_type.lower()}"
         else:
             url_string += f"?into=html.{chart_type.lower()}_chart"
+
+    html_info = request.POST.get("html_info")  # User provided info for the HTML
+    if html_info:
+        # Remove newlines and multiple spaces
+        processed_text = re.sub(r'\n+', ' ', html_info)
+        processed_text = re.sub(r'\s{2,}', ' ', processed_text)
+
+        # Replace double quotes with \"
+        processed_text = processed_text.replace('"', r'^')
+
+        url_string += "?html=" + processed_text.replace("\n","")    # add to url
 
 
     username = request.POST.get('auth_usr')
