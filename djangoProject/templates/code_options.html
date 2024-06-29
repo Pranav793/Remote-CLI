@@ -149,23 +149,18 @@
                         <option value="{{ entry }}">&nbsp;{{ entry }}</option>
                     {% endfor %}
                 </select>
+                <div class="input-section">
+                    <h2>Input Data/JSON</h2>
+                    <div>
+                        <!-- Use textarea for multiline input -->
+                        <textarea id="inputBlock" rows="5" cols="30" placeholder="Enter text/JSON here..."></textarea>
+                    </div>
+
+                </div>
             </div>
             {%  endif  %}
+
         </div>
-
-        {% if chart_options %}
-             <div class="input-section">
-                <h2>Input Data/JSON</h2>
-                <div>
-                    <!-- Use textarea for multiline input -->
-                    <textarea id="inputBlock" rows="5" cols="30" placeholder="Enter text/JSON here..."></textarea>
-                </div>
-
-
-            </div>
-        {%  endif  %}
-
-    </div>
     <br/>
     <br/>
 
