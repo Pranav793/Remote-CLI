@@ -1483,10 +1483,7 @@ def make_qrcode(request, select_info, chart_type):
 
     url_string = f"http://{conn_info}/?User-Agent=AnyLog/1.23"
     if chart_type:
-        if chart_type == "OnOff" or chart_type == "JSON" or chart_type == "Gauge":
-            url_string += f"?into=html.{chart_type.lower()}"
-        else:
-            url_string += f"?into=html.{chart_type.lower()}_chart"
+        url_string += f"?into=html.{chart_type.lower()}"
 
     html_info = request.POST.get("html_info")  # User provided info for the HTML
     if html_info:
