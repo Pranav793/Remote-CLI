@@ -1550,7 +1550,7 @@ def make_qrcode(request, select_info, chart_type):
     select_info["url"] = url_encoded
 
     if user_command.startswith("sql "):
-        select_info["chart_options"] = ["", "Bar", "Multiscale", "Line", "radar", "Doughnut", "Pie", "PolarArea", "OnOff", "Gauge", "JSON"]
+        select_info["chart_options"] = ["", "Bar", "Multiscale", "Line", "radar", "Doughnut", "Pie", "PolarArea", "OnOff", "Gauge", "JSON", "Text"]
 
 
 # -----------------------------------------------------------------------------------
