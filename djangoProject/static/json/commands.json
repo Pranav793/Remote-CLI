@@ -474,52 +474,6 @@
       "group": "Webinar"
     },
     {
-      "button": "tables columns",
-      "command": "get tables where dbms=[DBMS]",
-      "type": "GET",
-      "group": "smart-city"
-    },
-    {
-      "button": "table columns",
-      "command": "get columns where dbms=[DBMS] and table=[TABLE]",
-      "type": "GET",
-      "group": "smart-city"
-    },
-
-    {
-      "button": "Device List",
-      "command": "sql [DBMS] format=table \"SELECT min(timestamp)::ljust(19) as min_ts, max(timestamp)::ljust(19) as max_ts, id, count(*) as row_count FROM [TABLE] WHERE commsstatus is NULL GROUP BY id\"",
-      "type": "GET",
-      "group": "smart-city"
-    },
-
-    {
-      "button": "Last reading - commsstatus",
-      "command": "sql [DBMS] format=table \"SELECT MAX(timestamp)::ljust(19) AS timestamp, id, commsstatus FROM [TABLE] WHERE timestamp <= NOW() AND commsstatus IS NOT NULL GROUP BY id;\"",
-      "type": "GET",
-      "group": "smart-city"
-    },
-    {
-      "button": "Last Reading",
-      "command": "sql [DBMS] format=table \"SELECT MAX(timestamp)::ljust(19) AS timestamp, id, a_current, a_n_voltage, b_current, b_n_voltage, c_current, c_n_voltage, energymultiplier, frequency, powerfactor, reactivepower, realpower FROM [TABLE] WHERE timestamp <= NOW() and commsstatus is NULL GROUP BY id\"",
-      "type": "GET",
-      "group": "smart-city"
-    },
-
-    {
-      "button": "Increments for an ID",
-      "command": "sql [DBMS] format=table \"select increments(minute,1, timestamp), min(timestamp)::ljust(19) as min_ts,  max(timestamp)::ljust(19) as max_ts, avg(a_current) as a_current, avg(b_current) as b_current, avg(c_current) as c_current FROM [TABLE] where id=9 and timestamp >= NOW() - 1 hour and commsstatus is NULL \"",
-      "type": "GET",
-      "group": "smart-city"
-    },
-
-    {
-      "button": "Last 10 Minute Interval",
-      "command": "sql [DBMS] format=table \"SELECT timestamp, id, a_current, a_n_voltage, b_current, b_n_voltage, c_current, c_n_voltage, energymultiplier, frequency, powerfactor, reactivepower, realpower FROM [TABLE] WHERE period(minute, 10, now(), timestamp) and commsstatus is NULL ORDER BY timestamp ASC\"",
-      "type": "GET",
-      "group": "smart-city"
-    },
-    {
       "button": "Tables",
       "command": "get tables where dbms = kubearmor",
       "type": "GET",
@@ -676,6 +630,36 @@
       "command": "sql edgex info = (dest_type = rest) and extend=(+country, +city, @ip, @port, @dbms_name, @table_name) and format = json and timezone = utc  select  file, start_ts::ljust(19), end_ts::ljust(19), people_count, confidence from people_counter where start_ts >= NOW() - 1 hour and end_ts <= NOW() order by people_count, confidence --> selection (columns: ip using ip and port using port and dbms using dbms_name and table using table_name and file using file)",
       "type": "GET",
       "group": "CIDR"
+    },
+    {
+      "button": "Get Columns for bf table",
+      "type": "GET",
+      "command": "get columns where dbms = power_plant and table = bf",
+      "group": "smart-city"
+    },
+    {
+      "button": "Last Values Reported",
+      "type": "GET",
+      "command": "sql power_plant \"select timestamp, a_current, b_current, c_current from bf where timestamp <= now() and id = 2 order by timestamp desc limit 1\"",
+      "group": "smart-city"
+    },
+    {
+      "button": "Min/Max Values last 10hrs",
+      "type": "GET",
+      "command": "sql power_plant \"select increments(hour, 1, timestamp), max(timestamp), min(a_current), max(a_current), min(b_current), max(b_current), min(c_current), max(c_current) from bf where timestamp >= NOW() - 10 hours and id = 2\"",
+      "group": "smart-city"
+    },
+    {
+      "button": "Reported time and provide Max value - 10min",
+      "type": "GET",
+      "command": "sql power_plant \"select max(timestamp), max(a_current), max(b_current), max(c_current) from bf where period(minute, 10, now(), timestamp) and id = 2\"",
+      "group": "smart-city"
+    },
+    {
+      "button": "Reported time and provide Max value - 10min",
+      "type": "GET",
+      "command": "sql water_plant SELECT timestamp, atsnormalrdydi, atsonstandbydi, atsstandybyrdydi, clearwellhighleveldi, clearwelllowleveldi, generatoralarmdi, generatorstatusdi, oxygenmonitordi, plantrunningdi, plantstartdi, servicepump1running_di, servicepump2running_di, plantshutdowndo, watertowerlevelcommsdi, plantenablechemicalsdo, combinedchlorinatorvacdi, freechlorinatorvacdi, carbonfeeder_runningfwd FROM plc_status order by timestamp desc limit 1",
+      "group": "smart-city"
     }
   ]
 }
