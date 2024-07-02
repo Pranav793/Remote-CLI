@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
@@ -21,6 +18,32 @@
         margin: 4px 2px;
         cursor: pointer;
         }
+    </style>
+
+     <style>
+        /* Optional: CSS for styling the textarea */
+        #inputBlock {
+            width: 300px; /* Adjust width as needed */
+            height: 150px; /* Adjust height as needed */
+            resize: none; /* Prevent resizing by user */
+            border: 1px solid #ccc; /* Optional border style */
+            padding: 10px; /* Optional padding */
+            font-size: 14px; /* Optional font size */
+        }
+         /* Adjust the margin and width of the container */
+        .input-section {
+            margin-top: 20px; /* Add space between elements */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        /* Position the label to the left */
+        .input-section h2 {
+            align-self: flex-start;
+            margin-bottom: 5px; /* Optional: Adjust margin as needed */
+        }
+
     </style>
 
     <style>
@@ -123,10 +146,18 @@
                         <option value="{{ entry }}">&nbsp;{{ entry }}</option>
                     {% endfor %}
                 </select>
+                <div class="input-section">
+                    <h2>Input Data/JSON</h2>
+                    <div>
+                        <!-- Use textarea for multiline input -->
+                        <textarea id="inputBlock" id="html_info" name="html_info" rows="5" cols="30" placeholder="Enter text/JSON here..."></textarea>
+                    </div>
+
+
             </div>
             {%  endif  %}
+
         </div>
-    </div>
     <br/>
     <br/>
 

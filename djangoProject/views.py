@@ -1466,6 +1466,9 @@ def make_anylog_cmd(request, select_info):
 # Info at https://pythonhosted.org/PyQRCode/moddoc.html
 # -----------------------------------------------------------------------------------
 def make_qrcode(request, select_info, chart_type):
+    '''
+    chart_type = bar, line, etc.
+    '''
 
 
     transfer_selections(request, select_info)       # Move selections from the previous fom to the current form
@@ -1480,12 +1483,19 @@ def make_qrcode(request, select_info, chart_type):
 
     url_string = f"http://{conn_info}/?User-Agent=AnyLog/1.23"
     if chart_type:
-        if chart_type == "OnOff":
-            url_string += f"?into=html.on_off"
-        elif chart_type == "JSON":
-            url_string += f"?into=html.json"
-        else:
-            url_string += f"?into=html.{chart_type.lower()}_chart"
+        url_string += f"?into=html.{chart_type.lower()}"
+
+    html_info = request.POST.get("html_info")  # User provided info for the HTML
+    if html_info:
+
+        # Remove newlines and multiple spaces
+        processed_text = re.sub(r'\n+', ' ', html_info)
+        processed_text = re.sub(r'\s{2,}', ' ', processed_text)
+
+        # Replace double quotes with \"
+        processed_text = processed_text.replace('"', r'^')
+
+        url_string += "?html=" + processed_text
 
 
     username = request.POST.get('auth_usr')
@@ -1540,7 +1550,7 @@ def make_qrcode(request, select_info, chart_type):
     select_info["url"] = url_encoded
 
     if user_command.startswith("sql "):
-        select_info["chart_options"] = ["", "Bar", "Multiscale", "Line", "radar", "Doughnut", "Pie", "PolarArea", "OnOff", "JSON"]
+        select_info["chart_options"] = ["", "Bar", "Multiscale", "Line", "radar", "Doughnut", "Pie", "PolarArea", "OnOff", "Gauge", "JSON", "Text"]
 
 
 # -----------------------------------------------------------------------------------
@@ -1665,7 +1675,7 @@ def form_setting_info(request):
 # -----------------------------------------------------------------------------------
 # Monitor data from aggregator node
 # -----------------------------------------------------------------------------------
-def monitor_nodes(request, chart_type):
+def monitor_nodes(request):
 
     global monitoring_info_
 
