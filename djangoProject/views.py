@@ -106,6 +106,9 @@ COMMANDS_GROUPS = [
 ]
 '''
 
+pattern_dbms_name_ = re.compile(re.escape("[DBMS]"), re.IGNORECASE)
+pattern_table_name_ = re.compile(re.escape("[TABLE]"), re.IGNORECASE)
+
 COMMAND_BY_BUTTON = {}
 for index, entry in enumerate(ANYLOG_COMMANDS):
     # Add ID as f(group) + button name
@@ -171,6 +174,7 @@ def form_request(request):
     code_button = request.POST.get("Code")      # Create QrCode from the command
     setting_button = request.POST.get("Setting")
     monitor_button = request.POST.get("Monitor")
+    chart_type = request.POST.get("chart_type")     # Updated in the QR section to generate QR and HTML to do the graph
 
     if setting_button and setting_info_:
         # Update the setting form (settings.html)
@@ -183,8 +187,8 @@ def form_request(request):
         return monitor_nodes(request)
 
 
-    if code_button:
-        return code_options(request)
+    if code_button or chart_type:
+        return code_options(request, chart_type)
 
     if blobs_button or (form == "Blobs" and not client_button and not config_button):
         # Either the blobs Button was selected (on a different form) or the blobs Page is processed.
@@ -544,17 +548,6 @@ def client_processes(request, client_button):
 
         user_cmd = request.POST.get("command").strip()
 
-        # add dbms name and table name (if specified on the form)
-        dbms_name = request.POST.get('dbms')
-        table_name = request.POST.get('table')
-
-        if dbms_name:
-            pattern = re.compile(re.escape("[DBMS]"), re.IGNORECASE)
-            user_cmd = pattern.sub(dbms_name, user_cmd)
-        if table_name:
-            pattern = re.compile(re.escape("[TABLE]"), re.IGNORECASE)
-            user_cmd = pattern.sub(table_name, user_cmd)
-
         if len(user_cmd) > 5 and user_cmd[:4].lower() == "sql ":
             query_result = True
 
@@ -744,6 +737,14 @@ def command_button_selected(request, command_button):
                 select_info["help_url"] = help_url      # Form will print URL
         else:
             user_cmd = cmd_info["command"]  # Set the command
+            # add dbms name and table name (if specified on the form)
+            dbms_name = request.POST.get('dbms')
+            table_name = request.POST.get('table')
+
+            if dbms_name:
+                user_cmd = pattern_dbms_name_.sub(dbms_name, user_cmd)
+            if table_name:
+                user_cmd = pattern_table_name_.sub(table_name, user_cmd)
 
             if len(user_cmd) > 5 and user_cmd[:4].lower().startswith("sql "):
                 select_info["network"] = True  # Used to Flag the network bool on the page
@@ -1346,11 +1347,11 @@ def transfer_selections(request, select_info):
 # AnyLog command
 # cURL command
 # -----------------------------------------------------------------------------------
-def code_options(request):
+def code_options(request, chart_type):
 
     select_info = {}
 
-    make_qrcode(request, select_info)
+    make_qrcode(request, select_info, chart_type)
 
     make_anylog_cmd(request, select_info)
 
@@ -1464,7 +1465,10 @@ def make_anylog_cmd(request, select_info):
 # pypng - required to install but not import
 # Info at https://pythonhosted.org/PyQRCode/moddoc.html
 # -----------------------------------------------------------------------------------
-def make_qrcode(request, select_info):
+def make_qrcode(request, select_info, chart_type):
+    '''
+    chart_type = bar, line, etc.
+    '''
 
 
     transfer_selections(request, select_info)       # Move selections from the previous fom to the current form
@@ -1478,6 +1482,20 @@ def make_qrcode(request, select_info):
         conn_info = conn_info.strip()
 
     url_string = f"http://{conn_info}/?User-Agent=AnyLog/1.23"
+    if chart_type:
+        url_string += f"?into=html.{chart_type.lower()}"
+
+    html_info = request.POST.get("html_info")  # User provided info for the HTML
+    if html_info:
+
+        # Remove newlines and multiple spaces
+        processed_text = re.sub(r'\n+', ' ', html_info)
+        processed_text = re.sub(r'\s{2,}', ' ', processed_text)
+
+        # Replace double quotes with \"
+        processed_text = processed_text.replace('"', r'^')
+
+        url_string += "?html=" + processed_text
 
 
     username = request.POST.get('auth_usr')
@@ -1530,6 +1548,9 @@ def make_qrcode(request, select_info):
     select_info["qr_cmd"] = qrcode_command
     select_info["qrcode"] = html_img  # The files to watch
     select_info["url"] = url_encoded
+
+    if user_command.startswith("sql "):
+        select_info["chart_options"] = ["", "Bar", "Multiscale", "Line", "radar", "Doughnut", "Pie", "PolarArea", "OnOff", "Gauge", "JSON", "Text"]
 
 
 # -----------------------------------------------------------------------------------

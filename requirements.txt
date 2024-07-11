@@ -1,5 +1,7 @@
-django>=0.0
-requests>=0.0
-pyqrcode[pi]>=0.0
-pypng>=0.0
+cython
+configparser
+django
+requests
+pyqrcode[pi] 
+pypng
 #webbrowser

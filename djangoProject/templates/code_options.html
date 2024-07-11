@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
@@ -20,6 +17,42 @@
         text-decoration: none;
         margin: 4px 2px;
         cursor: pointer;
+        }
+    </style>
+
+     <style>
+        /* Optional: CSS for styling the textarea */
+        #inputBlock {
+            width: 300px; /* Adjust width as needed */
+            height: 150px; /* Adjust height as needed */
+            resize: none; /* Prevent resizing by user */
+            border: 1px solid #ccc; /* Optional border style */
+            padding: 10px; /* Optional padding */
+            font-size: 14px; /* Optional font size */
+        }
+         /* Adjust the margin and width of the container */
+        .input-section {
+            margin-top: 20px; /* Add space between elements */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        /* Position the label to the left */
+        .input-section h2 {
+            align-self: flex-start;
+            margin-bottom: 5px; /* Optional: Adjust margin as needed */
+        }
+
+    </style>
+
+    <style>
+        .container {
+            display: flex;
+            align-items: flex-start; /* Align items to the top */
+        }
+        .qr-code {
+            margin-right: 20px; /* Adjust the margin as needed */
         }
     </style>
 
@@ -99,14 +132,36 @@
 
     <h2>QR Code</h2>
 
-    <div>
+     <div class="container">
+        <div class="qr-code">
+            <img src="{{ qrcode }}" width="320" height="240" alt="{{ file_info.0 }}" />
+        </div>
 
-    <img src="{{ qrcode }}" width=320 height=240 alt="{{ file_info.0 }}"  width="50" height="50"/>
+        <div>
+             {% if chart_options %}
+            <div>
+                <label for="chart_type">HTML Chart:</label>
+                <select id="chart_type" name="chart_type" onchange="this.form.submit();">
+                    {% for entry in chart_options %}
+                        <option value="{{ entry }}">&nbsp;{{ entry }}</option>
+                    {% endfor %}
+                </select>
+                <div class="input-section">
+                    <h2>Input Data/JSON</h2>
+                    <div>
+                        <!-- Use textarea for multiline input -->
+                        <textarea id="inputBlock" id="html_info" name="html_info" rows="5" cols="30" placeholder="Enter text/JSON here..."></textarea>
+                    </div>
 
-    </div>
-   &nbsp; &nbsp; &nbsp;
 
-      <a href="{{ qr_cmd }}" target="_blank">{{ qr_cmd }} </a>
+            </div>
+            {%  endif  %}
+
+        </div>
+    <br/>
+    <br/>
+
+   <a href="{{ qr_cmd }}" target="_blank">{{ qr_cmd }}</a>
 
   </form>
 
