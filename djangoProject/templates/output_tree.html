@@ -22,7 +22,7 @@
         {% if entry.key  %}
             {{entry.key}}
              <span class="key">
-            {% if entry.value  %}
+            {% if entry.value != None  %}
                  &nbsp : &nbsp
                 {{entry.value}}         <!-- Dictionary Value  -->
             {% endif %}
