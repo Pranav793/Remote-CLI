@@ -752,6 +752,12 @@ def command_button_selected(request, command_button):
                 # Add output format
                 user_cmd = add_sql_instructions(request, user_cmd) # Add format and timezone
 
+            destination = cmd_info.get('nodes')     # JSON file specifies destination (for command and query)
+            if destination:
+                select_info["network"] = True  # Used to Flag the network bool on the page
+                select_info["destination"] = destination  # IP and Port or blockchain cmd
+
+
             select_info["command"] = user_cmd
             rest_call = cmd_info["type"]
             if rest_call == "GET":
