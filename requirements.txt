@@ -1,4 +1,6 @@
-django 
+cython
+configparser
+django
 requests
 pyqrcode[pi] 
 pypng
