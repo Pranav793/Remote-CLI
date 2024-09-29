@@ -15,7 +15,7 @@ RUN mkdir -p $ROOT_DIR/Remote-CLI/djangoProject/static/blobs/current/ && \
     chmod 775 $ROOT_DIR && \
     apk update && apk upgrade && \
     apk update && \
-    python3 -m pip install --upgrade pip && \
+    python3 -m pip install --upgrade pip setuptools wheel && \
     python3 -m pip install --upgrade -r $ROOT_DIR/Remote-CLI/requirements.txt || true && \
     apk del py3-pip && \
     apk update && \
