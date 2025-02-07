@@ -28,6 +28,7 @@ python3 $HOME/Django-API/manage.py runserver ${IP}:${PORT}
 ### Build and deploy to docker
 
 ```
+docker build -t my-remote-cli .
 chmod +x remote_cli.sh
 ./remote_cli.sh
 ```
