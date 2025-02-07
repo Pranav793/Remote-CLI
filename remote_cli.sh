@@ -4,6 +4,8 @@
 CONN_IP=0.0.0.0
 CLI_PORT=31800
 
+docker-compose down
+
 docker run -p ${CLI_PORT}:${CLI_PORT} --name remote-cli \
    -e CONN_IP=${CONN_IP} \
    -e CLI_PORT=${CLI_PORT} \

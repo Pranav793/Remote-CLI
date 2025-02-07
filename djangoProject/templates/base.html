@@ -1,274 +1,241 @@
-
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
-  <head>
-    {% load static %}
-    <link rel="icon" href="{% static 'css/anylog-logo.ico' %}">
-    <link rel='stylesheet' href="{% static 'css/default.css' %}">
-
-    <meta charset="UTF-8">
-    <title>AnyLog</title>
-
-      <style>
-        input[type=button], input[type=submit], input[type=reset] {
-        background-color: lightslategray;
-        border: none;
-        color: white;
-        padding: 16px 32px;
-        text-decoration: none;
-        margin: 4px 2px;
-        cursor: pointer;
-        }
-      </style>
-
-  </head>
-  <body>
-
-
-
-  <form method="POST" class="post-form" >
-    {% csrf_token %}
-    {{ form.as_p }}
-
-    {% load static %} <img src="{% static "css/anylog-logo.ico" %}" alt="AnyLog Network" onclick="window.location.href='https://anylog.co/'" class="floatleft"/>
-
-    <div class="networktext">
-    <text style="float: left">AnyLog Network Client</text>
-    </div>
-
-   <input type ="submit" name = "dummy" id="dummy" value="dummy" style="background:transparent; border:none; color:transparent; height:1px; width:1px" />
-
-  <!input type ="submit" name = "Config" id="Config" value="Config" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Setting" id="Setting" value="Setting" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Code" id="Code" value="Code" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Monitor" id="Monitor" value="Monitor" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Stream" id="Stream" value="Stream" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Blobs" id="Blobs" value="Blobs" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-
-  <input type="hidden" id="Form" name="Form" value="Client">
-  <input type="hidden" id="m_connect_info" name="m_connect_info" value="{{m_connect_info}}">
-
-    <br/> <br/> <br/>
-
-    <select id="rest_call" name="rest_call">
-
-
-    {% if rest_call %}
-        <option selected value="get">&nbsp;GET</option>
-    {% else %}
-        <option value="get">&nbsp;GET</option>
-    {% endif %}
-    {% if rest_call %}
-        <option  value="post">&nbsp;POST</option>
-    {% else %}
-        <option selected value="post">&nbsp;POST</option>
-    {% endif %}
-
-    </select>
-
-    &nbsp; &nbsp;
-
-    <label for="connect_info">Connect info:</label>
-    {% if connect_info %}
-        <input type="text" id="connect_info" name="connect_info" value="{{connect_info}}">
-    {% else %}
-        <input type="text" id="connect_info" name="connect_info">
-    {% endif %}
-
-    &nbsp; &nbsp;
-
-    <label for="auth_usr">Auth user:</label>
-    <input type="text" id="auth_usr" name="auth_usr">
-
-    &nbsp; &nbsp;
-
-    <label for="auth_pass">Auth password:</label>
-    <input type="password" id="auth_pass" name="auth_pass">
-
-    &nbsp; &nbsp;
-
-    <text>Options:</text>
-
-    <!-- Print the options for buttons types: Logs, Queries, Blockchain etc.  -->
-
-    <select id="cmd_type" name="cmd_type" onchange="this.form.submit();">
-
-    {% for entry in commands_groups %}
-         {% if entry == cmd_type %}
-            <option selected value="{{ entry }}">&nbsp;{{ entry }}</option>
-        {% else %}
-            <option value="{{ entry }}">&nbsp;{{ entry }}</option>
-        {% endif %}
-
-    {%  endfor %}
-
-     </select>
-
-   &nbsp;
-   &nbsp;
-
-   <label for="subset">Subset:</label>
-
-    {% if subset %}
-        <input type="checkbox" id="subset" name="subset" checked>
-    {% else %}
-        <input type="checkbox" id="subset" name="subset">
-    {% endif %}
-
-   &nbsp;
-   &nbsp;
-
-    <label for="timeout">Timeout:</label>
-    {% if timeout %}
-        <input type="text" id="timeout" name="timeout" value="{{timeout}}"  size="2">
-    {% else %}
-        <input type="text" id="timeout" name="timeout" size="2">
-    {% endif %}
-
-
-    &nbsp; &nbsp;
-    <label for="help">Help:</label>
-
-    {% if help %}
-        <input type="checkbox" id="help" name="help" checked>
-    {% else %}
-        <input type="checkbox" id="help" name="help">
-    {% endif %}
-
-
-    <br/> <br/> <br/>
-
-    <label for="dbms">DBMS:</label>
-
-    {% if dbms %}
-        <input type="text" id="dbms" name="dbms" value="{{dbms}}">
-    {% else %}
-        <input type="text" id="dbms" name="dbms">
-    {% endif %}
-
-     &nbsp; &nbsp;
-
-    <label for="table">Table:</label>
-
-    {% if table %}
-        <input type="text" id="table" name="table" value="{{table}}">
-    {% else %}
-        <input type="text" id="table" name="table">
-    {% endif %}
-
-       &nbsp; &nbsp;
-
-    <label for="timezone">Timezone:</label>
-
-    {% if timezone %}
-        <input type="text" id="timezone" name="timezone" value="{{timezone}}" size="4">
-    {% else %}
-        <input type="text" id="timezone" name="timezone" size="4">
-    {% endif %}
-
-
-    &nbsp; &nbsp;
-
-    <text>Format:</text>
-    &nbsp;
-
-    <select id="out_format" name="out_format">
-
-    {% if out_format  %}
-        <option selected value="table">&nbsp;TABLE</option>
-    {% else %}
-        <option value="table">&nbsp;TABLE</option>
-    {% endif %}
-    {% if out_format %}
-        <option  value="json">&nbsp;JSON</option>
-    {% else %}
-        <option selected value="json">&nbsp;JSON</option>
-    {% endif %}
-
-    </select>
-
-    &nbsp; &nbsp;
-
-    <label for="network">Network:</label>
-
-    {% if network %}
-        <input type="checkbox" id="network" name="network" checked>
-    {% else %}
-        <input type="checkbox" id="network" name="network">
-    {% endif %}
-
-     &nbsp;
-
-     <label for="destination">Nodes:</label>
-    {% if destination %}
-        <input type="text" id="destination" name="destination" value="{{destination}}"  size="60">
-    {% else %}
-        <input type="text" id="destination" name="destination" size="60">
-    {% endif %}
-
-
-    <br/> <br/> <br/>
-
-    <input type ="submit" name = "Send" id="Send" value="Send"  onclick="spin1();" style="font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey"/>
-
-     &nbsp; &nbsp;
-
-    <label for="command">Command:</label>
-
-    {% if command %}
-        <input type="text" id="command" name="command" value="{{command}}" size="166" onkeypress="disableEnter()" >
-    {% else %}
-        <input type="text" id="command" name="command" size="166">
-    {% endif %}
-
-
-    <br/> <br/> <br/>
-
-    <!-- Print the buttons that satisfy the selected cmd_type  -->
-
-    {% for entry in commands_list %}
-        {% if cmd_type == "All" %}
-            <input type ="submit" name = "button" value="({{entry.group}}) {{entry.button}}"/>
-        {% elif cmd_type == entry.group %}
-            <input type ="submit" name = "button" value="{{entry.button}}"/>
-        {%  endif %}
-    {% endfor %}
-
-    <br/>
-
-
-
-    {% if node_reply %}
-    <p>
-        {{ node_reply }}<br>
-    </p>
-
-   {% elif help_url %}
-   <p>
-    <br/>
-       <text>Help Link: </text>
-       <a href="{{help_url}}">{{help_url}}</a>
-   </p>
-   {% endif %}
-
-   {% block content %} {% endblock content %} <!-- Extended by other html like output tree  -->
-
-
-  </form>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AnyLog Network Client</title>
+  <link rel="icon" href="{% static 'css/anylog-logo.ico' %}">
+  <link rel="stylesheet" href="{% static 'css/default.css' %}">
+  <!-- Include Bootstrap for quick styling -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <style>
+    /* Custom styles for buttons and layout */
+    .btn-custom {
+      background-color: #f3f1ec;
+      color: black;
+      border: 3pt ridge lightgrey;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      margin: 5px;
+    }
+    .btn-custom:hover {
+      background-color: #e0ded8;
+    }
+    .btn-submit.processing {
+      background-color: transparent;
+      animation: blink 2s infinite alternate;
+    }
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+    .header-logo {
+      cursor: pointer;
+    }
+    header {
+      margin-bottom: 20px;
+    }
+    fieldset {
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    legend {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container my-4">
+    <header class="d-flex align-items-center">
+      <img src="https://anylog.co/wp-content/uploads/2019/07/logo1.png" alt="AnyLog Network" class="header-logo mr-3" width="60" height="60" onclick="window.location.href='https://anylog.co/'">
+      <h1 class="h3 mb-0">Network Client</h1>
+      <div class="ml-auto">
+        <!-- Top action buttons -->
+        <div class="btn-group" role="group">
+          <input type="submit" name="Setting" id="Setting" value="Setting" class="btn btn-custom">
+          <input type="submit" name="Code" id="Code" value="Code" class="btn btn-custom">
+          <input type="submit" name="Monitor" id="Monitor" value="Monitor" class="btn btn-custom">
+          <input type="submit" name="Stream" id="Stream" value="Stream" class="btn btn-custom">
+          <input type="submit" name="Blobs" id="Blobs" value="Blobs" class="btn btn-custom">
+        </div>
+      </div>
+    </header>
+
+    <form method="POST" class="post-form" novalidate>
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input type="hidden" id="Form" name="Form" value="Client">
+      <input type="hidden" id="m_connect_info" name="m_connect_info" value="{{ m_connect_info }}">
+
+      <!-- Connection Settings -->
+      <fieldset>
+        <legend>Connection Settings</legend>
+        <div class="form-row align-items-center">
+          <div class="form-group col-md-3">
+            <label for="rest_call">REST Call:</label>
+            <select id="rest_call" name="rest_call" class="form-control">
+              {% if rest_call %}
+                <option selected value="get">GET</option>
+              {% else %}
+                <option value="get">GET</option>
+              {% endif %}
+              {% if rest_call %}
+                <option value="post">POST</option>
+              {% else %}
+                <option selected value="post">POST</option>
+              {% endif %}
+            </select>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="connect_info">Connect Info:</label>
+            <input type="text" id="connect_info" name="connect_info" class="form-control" value="{{ connect_info|default_if_none:'' }}">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="auth_usr">Auth User:</label>
+            <input type="text" id="auth_usr" name="auth_usr" class="form-control">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="auth_pass">Auth Password:</label>
+            <input type="password" id="auth_pass" name="auth_pass" class="form-control">
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Options -->
+      <fieldset>
+        <legend>Options</legend>
+        <div class="form-row align-items-center">
+          <div class="form-group col-md-3">
+            <label for="cmd_type">Command Type:</label>
+            <select id="cmd_type" name="cmd_type" class="form-control" onchange="this.form.submit();">
+              {% for entry in commands_groups %}
+                <option value="{{ entry }}" {% if entry == cmd_type %}selected{% endif %}>{{ entry }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group col-md-2">
+            <div class="form-check mt-4">
+              <input type="checkbox" id="subset" name="subset" class="form-check-input" {% if subset %}checked{% endif %}>
+              <label for="subset" class="form-check-label">Subset</label>
+            </div>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="timeout">Timeout:</label>
+            <input type="text" id="timeout" name="timeout" class="form-control" size="2" value="{{ timeout|default_if_none:'' }}">
+          </div>
+          <div class="form-group col-md-2">
+            <div class="form-check mt-4">
+              <input type="checkbox" id="help" name="help" class="form-check-input" {% if help %}checked{% endif %}>
+              <label for="help" class="form-check-label">Help</label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Database & Formatting -->
+      <fieldset>
+        <legend>Database & Formatting</legend>
+        <div class="form-row align-items-center">
+          <div class="form-group col-md-3">
+            <label for="dbms">DBMS:</label>
+            <input type="text" id="dbms" name="dbms" class="form-control" value="{{ dbms|default_if_none:'' }}">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="table">Table:</label>
+            <input type="text" id="table" name="table" class="form-control" value="{{ table|default_if_none:'' }}">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="timezone">Timezone:</label>
+            <input type="text" id="timezone" name="timezone" class="form-control" size="4" value="{{ timezone|default_if_none:'' }}">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="out_format">Output Format:</label>
+            <select id="out_format" name="out_format" class="form-control">
+              {% if out_format %}
+                <option selected value="table">TABLE</option>
+              {% else %}
+                <option value="table">TABLE</option>
+              {% endif %}
+              {% if out_format %}
+                <option value="json">JSON</option>
+              {% else %}
+                <option selected value="json">JSON</option>
+              {% endif %}
+            </select>
+          </div>
+          <div class="form-group col-md-2">
+            <div class="form-check mt-4">
+              <input type="checkbox" id="network" name="network" class="form-check-input" {% if network %}checked{% endif %}>
+              <label for="network" class="form-check-label">Network</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col">
+            <label for="destination">Nodes:</label>
+            <input type="text" id="destination" name="destination" class="form-control" size="60" value="{{ destination|default_if_none:'' }}">
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Command Execution -->
+      <fieldset>
+        <legend>Command Execution</legend>
+        <div class="form-group">
+          <label for="command">Command:</label>
+          <input type="text" id="command" name="command" class="form-control" size="166" onkeypress="disableEnter()" value="{{ command|default_if_none:'' }}">
+        </div>
+        <div class="form-group">
+          <label>Predefined Commands:</label>
+          <div class="btn-group" role="group" aria-label="Predefined Commands">
+            {% for entry in commands_list %}
+              {% if cmd_type == "All" or cmd_type == entry.group %}
+                <input type="submit" name="button" value="{% if cmd_type == 'All' %}({{ entry.group }}) {% endif %}{{ entry.button }}" class="btn btn-secondary">
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="form-group">
+        <input type="submit" name="Send" id="Send" value="Send" class="btn btn-primary" onclick="spin1();">
+      </div>
+
+      {% if node_reply %}
+        <div class="alert alert-info mt-3">
+          {{ node_reply }}
+        </div>
+      {% elif help_url %}
+        <div class="mt-3">
+          <strong>Help Link:</strong> <a href="{{ help_url }}">{{ help_url }}</a>
+        </div>
+      {% endif %}
+
+      {% block content %}{% endblock content %}
+    </form>
+  </div>
 
   <script>
-    	function spin1()
-        {
-            document.getElementById("Send").style.color = "black";
-            document.getElementById("Send").value = "Processing ...";
-            document.getElementById("Send").style.border = "";
-            document.getElementById("Send").style.backgroundColor = "transparent";
-            document.getElementById("Send").style.animation = "blink 2s infinite alternate";
-        }
+    function spin1() {
+      var sendButton = document.getElementById("Send");
+      sendButton.classList.add("processing");
+      sendButton.value = "Processing ...";
+    }
+    function disableEnter(event) {
+      if (event.keyCode === 13) {
+        event.preventDefault();
+      }
+    }
   </script>
 
-
-
-  </body>
-
+  <!-- Include Bootstrap JS and dependencies (optional) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
 </html>
