@@ -2,6 +2,7 @@
 
 
 .boxed_cmd {
+    /* border: 15px solid lightsteelblue; */
     border: 15px solid lightsteelblue;
     background-color: whitesmoke;
     color: black;

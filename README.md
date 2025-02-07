@@ -24,3 +24,23 @@ commands include, but not limited to:
 cd $HOME/Django-API
 python3 $HOME/Django-API/manage.py runserver ${IP}:${PORT}
 ```
+
+### Build and deploy to docker
+
+```
+docker build -t remote-cli .
+docker run -p 8000:8000 remote-cli
+```
+
+### Current IP
+
+23.239.12.151:31800
+
+
+
+
+
+#### Process
+ 1. Clone github repo
+ 2. run docker commands
+ 3. open localhost:8000
