@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
@@ -21,23 +18,56 @@
         margin: 4px 2px;
         cursor: pointer;
         }
+
+        .form-section {
+            border: 2px solid #ddd;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        .form-section h2 {
+            margin-top: 0;
+        }
+
+        .form-section label {
+            font-weight: bold;
+        }
+
+        .form-section input[type="text"], .form-section select {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-section input[type="checkbox"] {
+            margin-left: 10px;
+        }
+
+        .form-section .networktext {
+            margin-top: 20px;
+        }
+
+        .form-section.ca-certificate {
+            margin-top: 25px;
+        }
+
     </style>
-
-
   </head>
+
   <body>
+    <form method="POST" class="post-form">
 
-  <form method="POST" class="post-form" >
+      {% csrf_token %}
+      {{ form.as_p }}
 
-    {% csrf_token %}
-    {{ form.as_p }}
-
-    {% load static %} <img src="{% static "css/anylog-logo.ico" %}" alt="AnyLog Network" onclick="window.location.href='https://anylog.co/'" class="floatleft"/>
-
-    <div class="networktext">
-    <text style="float: left">AnyLog Network Client</text>
-    </div>
-
+      <div class="networktext">
+        <img src="{% static 'css/anylog-logo.ico' %}" alt="AnyLog Network" onclick="window.location.href='https://anylog.co/'" class="floatleft"/>
+        <text style="float: left">AnyLog Network Client</text>
+      </div>
 
       <input type="hidden" id="connect_info" name="connect_info" value="{{connect_info}}">
       <input type="hidden" id="auth_usr" name="auth_usr" value="{{auth_usr}}">
@@ -53,118 +83,85 @@
       <input type="hidden" id="command" name="command" value="{{command}}">
       <input type="hidden" id="m_connect_info" name="m_connect_info" value="{{m_connect_info}}">
 
+      <!-- Button Section -->
+    <input type ="submit" name = "dummy" id="dummy" value="dummy" style="background:transparent; border:none; color:transparent; height:1px; width:1px" />
+    <input type="submit" name="Code" id="Code" value="Code" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
+    <input type="submit" name="Blobs" id="Blobs" value="Blobs" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
+    <input type="submit" name="Monitor" id="Monitor" value="Monitor" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
+    <input type="submit" name="Client" id="Client" value="Client" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
 
-
-  <input type ="submit" name = "dummy" id="dummy" value="dummy" style="background:transparent; border:none; color:transparent; height:1px; width:1px" />
-  <!input type ="submit" name = "Config" id="Config" value="Config" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Code" id="Code" value="Code" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Blobs" id="Blobs" value="Blobs" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Monitor" id="Monitor" value="Monitor" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Client" id="Client" value="Client" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-
-    <div>
-    <br/>
-
-        &nbsp; &nbsp;
-
-    <h2>CA Certificate</h2>
-
-    <input type="hidden" id="certificate" name="certificate" value="off">   <!--SET DEFAULT as off -->
-
-    <label for="certificate">Enable: &nbsp</label>
-
-    {% if certificate %}
-        <input type="checkbox" id="certificate" name="certificate" checked>
-    {% else %}
-        <input type="checkbox" id="certificate" name="certificate">
-    {% endif %}
-
-    <h3>Trusted certificate in PEM format</h3>
-    <label for="pem_file">PEM file:</label>
-    {% if pem_file %}
-        <input type="text" id="pem_file" name="pem_file" value="{{pem_file}}" size="100">
-    {% else %}
-        <input type="text" id="pem_file" name="pem_file" size="100">
-    {% endif %}
-
-    <br/>
-
-    <h2>Client Certificate</h2>
-
-    <h3>SSL certificates</h3>
-    <label for="crt_file">CRT file:</label>
-    {% if crt_file %}
-        <input type="text" id="crt_file" name="crt_file" value="{{crt_file}}" size="100">
-    {% else %}
-        <input type="text" id="crt_file" name="crt_file" size="100">
-    {% endif %}
-    <br/><br/>
-    <label for="key_file">KEY file:</label>
-    {% if pem_file %}
-        <input type="text" id="key_file" name="key_file" value="{{key_file}}" size="100">
-    {% else %}
-        <input type="text" id="key_file" name="key_file" size="100">
-    {% endif %}
-
-    </div>
-
-    <br/>
-
-    {% if monitor_files %}
-
-      <h2>Monitor</h2>
-
-      <br/>
-      <text>File:</text>
-
-    <!-- Print the options for monitoring files.  -->
-
-    <select id="m_file" name="m_file">
-
-    {% for entry in monitor_files %}
-         {% if entry.1 == m_file %}
-            <option selected value={{ entry.1 }}>&nbsp;{{ entry.0 }}</option>
+      <!-- CA Certificate Section -->
+      <div class="form-section ca-certificate">
+        <h2>CA Certificate</h2>
+        <label for="certificate">Enable:</label>
+        {% if certificate %}
+          <input type="checkbox" id="certificate" name="certificate" checked>
         {% else %}
-            <option value={{ entry.1 }}>&nbsp;{{ entry.0 }}</option>
+          <input type="checkbox" id="certificate" name="certificate">
         {% endif %}
 
-    {%  endfor %}
-
-     </select>
-
-  {% endif %}
-
-  <br/>
-  <br/>
-
-  {% if nodes_list %}
-
-      <h2>Nodes List</h2>
-
-      <br/>
-      <text>Nodes:</text>
-
-    <!-- Print the options for nodes to use (will change the connect info node).  -->
-
-    <select id="s_node" name="s_node">
-
-    {% for entry in nodes_list %}
-         {% if entry.1 == s_node %}
-            <option selected value={{ entry.1 }}>&nbsp;{{ entry.0 }}</option>
+        <h3>Trusted certificate in PEM format</h3>
+        <label for="pem_file">PEM file:</label>
+        {% if pem_file %}
+          <input type="text" id="pem_file" name="pem_file" value="{{pem_file}}" size="100">
         {% else %}
-            <option value={{ entry.1 }}>&nbsp;{{ entry.0 }}</option>
+          <input type="text" id="pem_file" name="pem_file" size="100">
         {% endif %}
+      </div>
 
-    {%  endfor %}
+      <!-- Client Certificate Section -->
+      <div class="form-section">
+        <h2>Client Certificate</h2>
+        <h3>SSL certificates</h3>
+        <label for="crt_file">CRT file:</label>
+        {% if crt_file %}
+          <input type="text" id="crt_file" name="crt_file" value="{{crt_file}}" size="100">
+        {% else %}
+          <input type="text" id="crt_file" name="crt_file" size="100">
+        {% endif %}
+        <br/><br/>
+        <label for="key_file">KEY file:</label>
+        {% if pem_file %}
+          <input type="text" id="key_file" name="key_file" value="{{key_file}}" size="100">
+        {% else %}
+          <input type="text" id="key_file" name="key_file" size="100">
+        {% endif %}
+      </div>
 
-     </select>
+      <!-- Monitor Section -->
+      {% if monitor_files %}
+      <div class="form-section">
+        <h2>Monitor</h2>
+        <label for="m_file">File:</label>
+        <select id="m_file" name="m_file">
+          {% for entry in monitor_files %}
+            {% if entry.1 == m_file %}
+              <option selected value="{{ entry.1 }}">&nbsp;{{ entry.0 }}</option>
+            {% else %}
+              <option value="{{ entry.1 }}">&nbsp;{{ entry.0 }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
 
-  {% endif %}
+      <!-- Nodes List Section -->
+      {% if nodes_list %}
+      <div class="form-section">
+        <h2>Nodes List</h2>
+        <label for="s_node">Nodes:</label>
+        <select id="s_node" name="s_node">
+          {% for entry in nodes_list %}
+            {% if entry.1 == s_node %}
+              <option selected value="{{ entry.1 }}">&nbsp;{{ entry.0 }}</option>
+            {% else %}
+              <option value="{{ entry.1 }}">&nbsp;{{ entry.0 }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
 
-
-  </form>
-
+    </form>
   </body>
-
 </html>
-
