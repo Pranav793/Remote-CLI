@@ -64,9 +64,9 @@
       {% csrf_token %}
       {{ form.as_p }}
 
+      <img src="{% static 'css/anylog-logo.ico' %}" alt="AnyLog Network" onclick="window.location.href='https://anylog.co/'" class="floatleft"/>
       <div class="networktext">
-        <img src="{% static 'css/anylog-logo.ico' %}" alt="AnyLog Network" onclick="window.location.href='https://anylog.co/'" class="floatleft"/>
-        <text style="float: left">AnyLog Network Client</text>
+      <text style="float: left">AnyLog Network Client</text>
       </div>
 
       <input type="hidden" id="connect_info" name="connect_info" value="{{connect_info}}">
