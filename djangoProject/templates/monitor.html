@@ -30,6 +30,11 @@
         margin-left: 5px;
       }
       
+      /* Make the Pull button rounded */
+      .rounded-btn {
+        border-radius: 25px;
+      }
+      
       /* Header container styling */
       .header-container {
         display: flex;
@@ -68,14 +73,23 @@
         margin-bottom: 20px;
       }
       
-      /* Each input and its label take up one line */
-      .form-row {
-        margin-bottom: 15px;
+      /* New inline row styling for monitor-box fields */
+      .form-inline {
         display: flex;
-        flex-direction: column;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: flex-start;
+        margin-bottom: 15px;
       }
       
-      .form-row label {
+      /* Each input container in the inline row */
+      .form-group {
+        flex: 1;
+        min-width: 200px;
+      }
+      
+      .form-group label {
+        display: block;
         font-weight: bold;
         margin-bottom: 5px;
       }
@@ -177,7 +191,7 @@
           <div class="right-header">
             <input type="submit" name="Setting" id="Setting" value="Setting" class="nav-btn">
             <input type="submit" name="Code" id="Code" value="Code" class="nav-btn">
-            <input type="submit" name="Monitor" id="Monitor" value="Monitor" class="nav-btn">
+            <input type="submit" name="Monitor" id="HeaderMonitor" value="Monitor" class="nav-btn">
             <input type="submit" name="Stream" id="Stream" value="Stream" class="nav-btn">
             <input type="submit" name="Blobs" id="Blobs" value="Blobs" class="nav-btn">
             <input type="submit" name="Client" id="Client" value="Client" class="nav-btn">
@@ -206,48 +220,51 @@
         <div class="monitor-box" id="div_scroll" onwheel="fScroll(this)" onload="fScrollMove('div_scroll')">
           <h2>Monitor</h2>
           
-          <div class="form-row">
-            <label for="Monitor">Pull:</label>
-            <input type="submit" name="Monitor" id="Monitor" value="Pull" class="nav-btn">
+          <!-- First inline row: Pull button and Collection dropdown -->
+          <div class="form-inline">
+            <div class="form-group">
+              <label for="Monitor">Pull:</label>
+              <input type="submit" name="Monitor" id="Monitor" value="Pull" class="nav-btn rounded-btn">
+            </div>
+            <div class="form-group">
+              <label for="collection">Collection:</label>
+              <select id="collection" name="collection">
+                {% for entry in pages %}
+                  {% if entry.1 == collection %}
+                    <option selected value="{{ entry.1 }}">&nbsp;{{ entry.0 }}</option>
+                  {% else %}
+                    <option value="{{ entry.1 }}">&nbsp;{{ entry.0 }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
           </div>
           
-          <div class="form-row">
-            <label for="collection">Collection:</label>
-            <select id="collection" name="collection">
-              {% for entry in pages %}
-                {% if entry.1 == collection %}
-                  <option selected value="{{ entry.1 }}">&nbsp;{{ entry.0 }}</option>
-                {% else %}
-                  <option value="{{ entry.1 }}">&nbsp;{{ entry.0 }}</option>
-                {% endif %}
-              {% endfor %}
-            </select>
+          <!-- Second inline row: Connect info, Auth user, Auth password and Refresh -->
+          <div class="form-inline">
+            <div class="form-group">
+              <label for="m_connect_info">Connect info:</label>
+              {% if m_connect_info %}
+                <input type="text" id="m_connect_info" name="m_connect_info" value="{{ m_connect_info }}">
+              {% else %}
+                <input type="text" id="m_connect_info" name="m_connect_info">
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="m_auth_usr">Auth user:</label>
+              <input type="text" id="m_auth_usr" name="m_auth_usr">
+            </div>
+            <div class="form-group">
+              <label for="m_auth_pass">Auth password:</label>
+              <input type="password" id="m_auth_pass" name="m_auth_pass">
+            </div>
+            <div class="form-group">
+              <label for="m_refresh">Refresh (sec):</label>
+              <input type="number" id="m_refresh" min="0" name="m_refresh" step="20" max="86400" value="{{ m_refresh }}">
+            </div>
           </div>
           
-          <div class="form-row">
-            <label for="m_connect_info">Connect info:</label>
-            {% if m_connect_info %}
-              <input type="text" id="m_connect_info" name="m_connect_info" value="{{ m_connect_info }}">
-            {% else %}
-              <input type="text" id="m_connect_info" name="m_connect_info">
-            {% endif %}
-          </div>
-          
-          <div class="form-row">
-            <label for="m_auth_usr">Auth user:</label>
-            <input type="text" id="m_auth_usr" name="m_auth_usr">
-          </div>
-          
-          <div class="form-row">
-            <label for="m_auth_pass">Auth password:</label>
-            <input type="password" id="m_auth_pass" name="m_auth_pass">
-          </div>
-          
-          <div class="form-row">
-            <label for="m_refresh">Refresh (sec):</label>
-            <input type="number" id="m_refresh" min="0" name="m_refresh" step="20" max="86400" value="{{ m_refresh }}">
-          </div>
-          
+          <!-- Table section (if header exists) -->
           {% if header %}
             <div class="form-row">
               <table>
