@@ -3,13 +3,14 @@
   <head>
     {% load static %}
     <link rel="icon" href="{% static 'css/anylog-logo.ico' %}">
-    <link rel='stylesheet' href="{% static 'css/default.css' %}">
-
+    <link rel="stylesheet" href="{% static 'css/default.css' %}">
     <meta charset="UTF-8">
     <title>AnyLog</title>
-
     <style>
-        input[type=button], input[type=submit], input[type=reset]{
+      /* Global button styles */
+      input[type="button"],
+      input[type="submit"],
+      input[type="reset"] {
         background-color: lightslategray;
         border: none;
         color: white;
@@ -17,58 +18,101 @@
         text-decoration: none;
         margin: 4px 2px;
         cursor: pointer;
-        }
-
-        .form-section {
-            border: 2px solid #ddd;
-            padding: 20px;
-            margin: 10px 0;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-        }
-
-        .form-section h2 {
-            margin-top: 0;
-        }
-
-        .form-section label {
-            font-weight: bold;
-        }
-
-        .form-section input[type="text"], .form-section select {
-            width: 100%;
-            padding: 8px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .form-section input[type="checkbox"] {
-            margin-left: 10px;
-        }
-
-        .form-section .networktext {
-            margin-top: 20px;
-        }
-
-        .form-section.ca-certificate {
-            margin-top: 25px;
-        }
-
+      }
+      
+      /* Navigation button class */
+      .nav-btn {
+        font-family: 'Comic Sans MS', cursive;
+        color: black;
+        background-color: #f3f1ec;
+        border: 3pt ridge lightgrey;
+        margin-left: 5px;
+      }
+      
+      /* Flex container for header */
+      .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .left-header {
+        display: flex;
+        align-items: center;
+      }
+      .left-header img {
+        cursor: pointer;
+      }
+      .left-header .networktext {
+        font-size: 1.5em;
+        margin-left: 10px;
+        line-height: 60px; /* Align with logo height */
+      }
+      /* Right header: buttons */
+      .right-header {
+        display: flex;
+        align-items: center;
+      }
+      
+      /* Form section styling */
+      .form-section {
+        border: 2px solid #ddd;
+        padding: 20px;
+        margin: 10px 0;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+      }
+      .form-section h2 {
+        margin-top: 0;
+      }
+      .form-section label {
+        font-weight: bold;
+      }
+      .form-section input[type="text"],
+      .form-section select {
+        width: 100%;
+        padding: 8px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .form-section input[type="checkbox"] {
+        margin-left: 10px;
+      }
+      .form-section .networktext {
+        margin-top: 20px;
+      }
+      .form-section.ca-certificate {
+        margin-top: 25px;
+      }
     </style>
   </head>
-
   <body>
     <form method="POST" class="post-form">
-
       {% csrf_token %}
       {{ form.as_p }}
-
-      <img src="{% static 'css/anylog-logo.ico' %}" alt="AnyLog Network" onclick="window.location.href='https://anylog.co/'" class="floatleft"/>
-      <div class="networktext">
-      <text style="float: left">AnyLog Network Client</text>
+      
+      <!-- Header: Logo and Network Text on Left; Navigation Buttons on Right -->
+      <div class="header-container">
+        <!-- Left side: Logo and network text -->
+        <div class="left-header">
+          <img src="https://anylog.co/wp-content/uploads/2019/07/logo1.png" alt="AnyLog Network" 
+               width="60" height="60" onclick="window.location.href='https://anylog.co/'">
+          <span class="networktext">AnyLog Network Client</span>
+        </div>
+        <!-- Right side: Navigation Buttons -->
+        <div class="right-header">
+          <!-- Dummy button to satisfy form submission if needed -->
+          <input type="submit" name="dummy" id="dummy" value="dummy" 
+                 style="background:transparent; border:none; color:transparent; height:1px; width:1px">
+          <input type="submit" name="Code" id="Code" value="Code" class="nav-btn">
+          <input type="submit" name="Blobs" id="Blobs" value="Blobs" class="nav-btn">
+          <input type="submit" name="Monitor" id="Monitor" value="Monitor" class="nav-btn">
+          <input type="submit" name="Client" id="Client" value="Client" class="nav-btn">
+        </div>
       </div>
-
+      
+      <!-- Hidden Fields -->
       <input type="hidden" id="connect_info" name="connect_info" value="{{connect_info}}">
       <input type="hidden" id="auth_usr" name="auth_usr" value="{{auth_usr}}">
       <input type="hidden" id="auth_pass" name="auth_pass" value="{{auth_pass}}">
@@ -82,14 +126,7 @@
       <input type="hidden" id="destination" name="destination" value="{{destination}}">
       <input type="hidden" id="command" name="command" value="{{command}}">
       <input type="hidden" id="m_connect_info" name="m_connect_info" value="{{m_connect_info}}">
-
-      <!-- Button Section -->
-    <input type ="submit" name = "dummy" id="dummy" value="dummy" style="background:transparent; border:none; color:transparent; height:1px; width:1px" />
-    <input type="submit" name="Code" id="Code" value="Code" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-    <input type="submit" name="Blobs" id="Blobs" value="Blobs" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-    <input type="submit" name="Monitor" id="Monitor" value="Monitor" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-    <input type="submit" name="Client" id="Client" value="Client" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-
+      
       <!-- CA Certificate Section -->
       <div class="form-section ca-certificate">
         <h2>CA Certificate</h2>
@@ -99,7 +136,6 @@
         {% else %}
           <input type="checkbox" id="certificate" name="certificate">
         {% endif %}
-
         <h3>Trusted certificate in PEM format</h3>
         <label for="pem_file">PEM file:</label>
         {% if pem_file %}
@@ -108,7 +144,7 @@
           <input type="text" id="pem_file" name="pem_file" size="100">
         {% endif %}
       </div>
-
+      
       <!-- Client Certificate Section -->
       <div class="form-section">
         <h2>Client Certificate</h2>
@@ -127,7 +163,7 @@
           <input type="text" id="key_file" name="key_file" size="100">
         {% endif %}
       </div>
-
+      
       <!-- Monitor Section -->
       {% if monitor_files %}
       <div class="form-section">
@@ -144,7 +180,7 @@
         </select>
       </div>
       {% endif %}
-
+      
       <!-- Nodes List Section -->
       {% if nodes_list %}
       <div class="form-section">
@@ -161,7 +197,7 @@
         </select>
       </div>
       {% endif %}
-
+      
     </form>
   </body>
 </html>

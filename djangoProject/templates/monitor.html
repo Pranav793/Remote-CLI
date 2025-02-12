@@ -1,23 +1,17 @@
-
-
-
-
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
     {% load static %}
     <link rel="icon" href="{% static 'css/anylog-logo.ico' %}">
-    <link rel='stylesheet' href="{% static 'css/default.css' %}">
-    <link rel='stylesheet' href="{% static 'css/monitored_topic.css' %}">
-
-
-
-
+    <link rel="stylesheet" href="{% static 'css/default.css' %}">
+    <link rel="stylesheet" href="{% static 'css/monitored_topic.css' %}">
     <meta charset="UTF-8">
-    <title>AnyLog</title>
-
+    <title>AnyLog Network Client</title>
     <style>
-        input[type=button], input[type=submit], input[type=reset]{
+      /* Global button styles */
+      input[type="button"],
+      input[type="submit"],
+      input[type="reset"] {
         background-color: lightslategray;
         border: none;
         color: white;
@@ -25,178 +19,275 @@
         text-decoration: none;
         margin: 4px 2px;
         cursor: pointer;
-        }
+      }
+      
+      /* Navigation buttons */
+      .nav-btn {
+        font-family: 'Comic Sans MS', cursive;
+        color: black;
+        background-color: #f3f1ec;
+        border: 3pt ridge lightgrey;
+        margin-left: 5px;
+      }
+      
+      /* Header container styling */
+      .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      
+      .left-header {
+        display: flex;
+        align-items: center;
+      }
+      
+      .logo {
+        cursor: pointer;
+      }
+      
+      .networktext {
+        font-size: 1.5em;
+        margin-left: 10px;
+        line-height: 60px;
+      }
+      
+      /* Form container */
+      .form-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      
+      /* Monitor box styling: one bordered box for all inputs */
+      .monitor-box {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      
+      /* Each input and its label take up one line */
+      .form-row {
+        margin-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .form-row label {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      
+      /* Input styling */
+      select,
+      input[type="text"],
+      input[type="password"],
+      input[type="number"] {
+        padding: 10px;
+        font-size: 1em;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        width: 100%;
+      }
+      
+      select:focus,
+      input[type="text"]:focus,
+      input[type="password"]:focus,
+      input[type="number"]:focus {
+        outline: none;
+        border-color: #66afe9;
+        box-shadow: 0 0 8px rgba(102,175,233,0.6);
+      }
+      
+      /* Table styling */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      
+      table th,
+      table td {
+        border: 1px solid #ccc;
+        padding: 8px;
+      }
+      
+      /* Optional: Alert and warning cell styles */
+      .alert {
+        background-color: #fdd;
+      }
+      .warning {
+        background-color: #ffd;
+      }
     </style>
-
-      <script>
-
-          const myInterval = setInterval(locationreload, "{{refresh_ms}}");
-            function locationreload() {
-                if ("{{refresh_ms}}" > 0) {
-                    location.reload();  <!-- AUto refresh  -->
-                }
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="http://davidlynch.org/projects/maphilight/jquery.maphilight.js"></script>
+    <script>
+      $(document).ready(function () {
+        $('.map').maphilight({ alwaysOn: true });
+      });
+      
+      // Auto-refresh script using refresh_ms (if set)
+      const refreshInterval = parseInt("{{ refresh_ms }}", 10);
+      if (refreshInterval > 0) {
+        setInterval(function() {
+          location.reload();
+        }, refreshInterval);
+      }
+      
+      // Save scroll position
+      function fScroll(val) {
+        var hidScroll = document.getElementById('hidScroll');
+        if (hidScroll) {
+          hidScroll.value = val.scrollTop;
+          document.getElementById("scroll_position").value = val.scrollTop;
         }
-
-      </script>
-      <script>
-      // function saves scroll position
-      function fScroll(val)
-      {
-              var hidScroll = document.getElementById('hidScroll');
-              hidScroll.value = val.scrollTop;
-
-               document.getElementById("scroll_position").value=val.scrollTop;
       }
-
-      // function moves scroll position to saved value
-      function fScrollMove(what)
-      {
-              var hidScroll = document.getElementById('hidScroll');
-              document.getElementById(what).scrollTop = hidScroll.value;
+      
+      // Restore scroll position
+      function fScrollMove(elementId) {
+        var hidScroll = document.getElementById('hidScroll');
+        var elem = document.getElementById(elementId);
+        if (elem && hidScroll) {
+          elem.scrollTop = hidScroll.value;
+        }
       }
-      </script>
-
+    </script>
   </head>
   <body>
-
-  <form method="POST" class="post-form" >
-
-    {% csrf_token %}
-    {{ form.as_p }}
-
-    {% load static %} <img src="{% static "css/anylog-logo.ico" %}" alt="AnyLog Network" onclick="window.location.href='https://anylog.co/'" class="floatleft"/>
-
-    <div class="networktext">
-    <text style="float: left">AnyLog Network Client</text>
-    </div>
-
-
-      <input type="hidden" id="connect_info" name="connect_info" value="{{connect_info}}">
-      <input type="hidden" id="auth_usr" name="auth_usr" value="{{auth_usr}}">
-      <input type="hidden" id="auth_pass" name="auth_pass" value="{{auth_pass}}">
-      <input type="hidden" id="cmd_type" name="cmd_type" value="{{cmd_type}}">
-      <input type="hidden" id="timeout" name="timeout" value="{{timeout}}">
-      <input type="hidden" id="dbms" name="dbms" value="{{dbms}}">
-      <input type="hidden" id="table" name="table" value="{{table}}">
-      <input type="hidden" id="timezone" name="timezone" value="{{timezone}}">
-      <input type="hidden" id="out_format" name="out_format" value="{{out_format}}">
-      <input type="hidden" id="network" name="network" value="{{network}}">
-      <input type="hidden" id="destination" name="destination" value="{{destination}}">
-      <input type="hidden" id="command" name="command" value="{{command}}">
-      <input type="hidden" id="m_connect_info" name="m_connect_info" value="{{m_connect_info}}">
-
-     <input type="hidden" name="scroll_position" id="scroll_position">
-     <input type="hidden" name="hidScroll" id="hidScroll">
-  <div id="div_scroll"  onwheel="fScroll(this)"  onload="fScrollMove('div_scroll')" >
-
-  <input type ="submit" name = "dummy" id="dummy" value="dummy" style="background:transparent; border:none; color:transparent; height:1px; width:1px" />
-  <!input type ="submit" name = "Config" id="Config" value="Config" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Setting" id="Setting" value="Setting" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Code" id="Code" value="Code" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Blobs" id="Blobs" value="Blobs" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Client" id="Client" value="Client" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-
-
-
-
-  {% if pages %}
-
-      <h2>Monitor</h2>
-
-      <input type ="submit" name = "Monitor" id="Monitor" value="Pull" style="font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-
-      &nbsp
-
-      <text>Collection:</text>
-
-    <!-- Print the options for monitoring files.  -->
-
-    <select id="collection" name="collection">
-
-    {% for entry in pages %}
-         {% if entry.1 == collection %}
-            <option selected value={{ entry.1 }}>&nbsp;{{ entry.0 }}</option>
-        {% else %}
-            <option value={{ entry.1 }}>&nbsp;{{ entry.0 }}</option>
-        {% endif %}
-
-    {%  endfor %}
-
-     </select>
-
-     &nbsp
-      
-     <label for="connect_info">Connect info:</label>
-    {% if m_connect_info %}
-        <input type="text" id="m_connect_info" name="m_connect_info" value="{{m_connect_info}}">
-    {% else %}
-        <input type="text" id="m_connect_info" name="m_connect_info">
-    {% endif %}
-
-    &nbsp; &nbsp;
-
-    <label for="auth_usr">Auth user:</label>
-    <input type="text" id="m_auth_usr" name="m_auth_usr">
-
-    &nbsp; &nbsp;
-
-    <label for="auth_pass">Auth password:</label>
-    <input type="password" id="m_auth_pass" name="m_auth_pass">
-
-     &nbsp
-
-    <label for="m_refresh">Refresh (sec):</label>
-
-    <input type="number" id="m_refresh" min="0" name="m_refresh" step = "20" max = "86400" value="{{m_refresh}}">
-
-
-      <br/>   <br/>
-
-    {% if header %}     <!-- If with Data to show -->
-    <table  border="1">
-        <thead>
-        <tr>    <!-- table header  -->
-            {% for col_name in header %}
-                <td>{{col_name}}</td> <!-- table cell  -->
-            {% endfor %}
-        </tr>
-        </thead>
-        <tbody>
-        {% for row in rows %}
-        <tr>
-            {% for col_info in row %}
-                {% if not col_info.1 %}        <!-- No alerts -->
-                    {% if col_info.2 %}         <!-- Align Right -->
-                        <td style="text-align: right">{{ col_info.0 }}</td>
-                    {% else %}
-                        <td style="text-align: left">{{ col_info.0 }}</td>
-                    {% endif %}
-                {% else %}                      <!-- With alerts -->
-                    {% if col_info.2 %}         <!-- Align Right -->
-                        <td class="alert " style="text-align: right">{{ col_info.0 }}</td>
-                    {% else %}
-                        {% if col_info.3 %}     <!-- True means alert -->
-                            <td class="alert" style="text-align: left">{{ col_info.0 }}</td>
-                        {% else %}               <!-- False means warning - impact the color -->
-                            <td class="warning" style="text-align: left">{{ col_info.0 }}</td>
-                        {% endif %}
-                    {% endif %}
+    <div class="form-container">
+      <form method="POST" class="post-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        <!-- Header container with logo and navigation buttons -->
+        <div class="header-container">
+          <div class="left-header">
+            <img src="https://anylog.co/wp-content/uploads/2019/07/logo1.png" 
+                 alt="AnyLog Network" 
+                 class="logo" 
+                 width="60" 
+                 height="60" 
+                 onclick="window.location.href='https://anylog.co/'">
+            <span class="networktext">AnyLog Network Client</span>
+          </div>
+          <div class="right-header">
+            <input type="submit" name="Setting" id="Setting" value="Setting" class="nav-btn">
+            <input type="submit" name="Code" id="Code" value="Code" class="nav-btn">
+            <input type="submit" name="Monitor" id="Monitor" value="Monitor" class="nav-btn">
+            <input type="submit" name="Stream" id="Stream" value="Stream" class="nav-btn">
+            <input type="submit" name="Blobs" id="Blobs" value="Blobs" class="nav-btn">
+            <input type="submit" name="Client" id="Client" value="Client" class="nav-btn">
+            <input type="submit" name="dummy" id="dummy" value="dummy" style="display:none;">
+          </div>
+        </div>
+        
+        <!-- Hidden fields -->
+        <input type="hidden" id="connect_info" name="connect_info" value="{{ connect_info }}">
+        <input type="hidden" id="auth_usr" name="auth_usr" value="{{ auth_usr }}">
+        <input type="hidden" id="auth_pass" name="auth_pass" value="{{ auth_pass }}">
+        <input type="hidden" id="cmd_type" name="cmd_type" value="{{ cmd_type }}">
+        <input type="hidden" id="timeout" name="timeout" value="{{ timeout }}">
+        <input type="hidden" id="dbms" name="dbms" value="{{ dbms }}">
+        <input type="hidden" id="table" name="table" value="{{ table }}">
+        <input type="hidden" id="timezone" name="timezone" value="{{ timezone }}">
+        <input type="hidden" id="out_format" name="out_format" value="{{ out_format }}">
+        <input type="hidden" id="network" name="network" value="{{ network }}">
+        <input type="hidden" id="destination" name="destination" value="{{ destination }}">
+        <input type="hidden" id="command" name="command" value="{{ command }}">
+        <input type="hidden" id="m_connect_info" name="m_connect_info" value="{{ m_connect_info }}">
+        <input type="hidden" name="scroll_position" id="scroll_position">
+        <input type="hidden" name="hidScroll" id="hidScroll">
+        
+        <!-- Monitor Box: All monitor-related inputs in one bordered container -->
+        <div class="monitor-box" id="div_scroll" onwheel="fScroll(this)" onload="fScrollMove('div_scroll')">
+          <h2>Monitor</h2>
+          
+          <div class="form-row">
+            <label for="Monitor">Pull:</label>
+            <input type="submit" name="Monitor" id="Monitor" value="Pull" class="nav-btn">
+          </div>
+          
+          <div class="form-row">
+            <label for="collection">Collection:</label>
+            <select id="collection" name="collection">
+              {% for entry in pages %}
+                {% if entry.1 == collection %}
+                  <option selected value="{{ entry.1 }}">&nbsp;{{ entry.0 }}</option>
+                {% else %}
+                  <option value="{{ entry.1 }}">&nbsp;{{ entry.0 }}</option>
                 {% endif %}
-            {% endfor %}
-        </tr>
-        {% endfor %}
-
-        </tbody>
-    </table>
-
-    {% endif %}
-
-  {% endif %}
-
-  </div>
-  </form>
-
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="form-row">
+            <label for="m_connect_info">Connect info:</label>
+            {% if m_connect_info %}
+              <input type="text" id="m_connect_info" name="m_connect_info" value="{{ m_connect_info }}">
+            {% else %}
+              <input type="text" id="m_connect_info" name="m_connect_info">
+            {% endif %}
+          </div>
+          
+          <div class="form-row">
+            <label for="m_auth_usr">Auth user:</label>
+            <input type="text" id="m_auth_usr" name="m_auth_usr">
+          </div>
+          
+          <div class="form-row">
+            <label for="m_auth_pass">Auth password:</label>
+            <input type="password" id="m_auth_pass" name="m_auth_pass">
+          </div>
+          
+          <div class="form-row">
+            <label for="m_refresh">Refresh (sec):</label>
+            <input type="number" id="m_refresh" min="0" name="m_refresh" step="20" max="86400" value="{{ m_refresh }}">
+          </div>
+          
+          {% if header %}
+            <div class="form-row">
+              <table>
+                <thead>
+                  <tr>
+                    {% for col_name in header %}
+                      <th>{{ col_name }}</th>
+                    {% endfor %}
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in rows %}
+                    <tr>
+                      {% for col_info in row %}
+                        {% if not col_info.1 %}
+                          {% if col_info.2 %}
+                            <td style="text-align: right">{{ col_info.0 }}</td>
+                          {% else %}
+                            <td style="text-align: left">{{ col_info.0 }}</td>
+                          {% endif %}
+                        {% else %}
+                          {% if col_info.2 %}
+                            <td class="alert" style="text-align: right">{{ col_info.0 }}</td>
+                          {% else %}
+                            {% if col_info.3 %}
+                              <td class="alert" style="text-align: left">{{ col_info.0 }}</td>
+                            {% else %}
+                              <td class="warning" style="text-align: left">{{ col_info.0 }}</td>
+                            {% endif %}
+                          {% endif %}
+                        {% endif %}
+                      {% endfor %}
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+        </div>
+      </form>
+    </div>
   </body>
-
 </html>
-

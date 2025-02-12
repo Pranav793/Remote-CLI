@@ -29,23 +29,24 @@
         margin-left: 5px;
       }
       
-      /* Clearfix */
-      .clearfix::after {
-        content: "";
-        display: table;
-        clear: both;
-      }
-      
-      /* Header: logo and network text */
-      .header {
+      /* Flex container for header */
+      .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         margin-bottom: 20px;
       }
+      
+      .left-header {
+        display: flex;
+        align-items: center;
+      }
+      
       .logo {
-        float: left;
         cursor: pointer;
       }
+      
       .networktext {
-        float: left;
         font-size: 1.5em;
         margin-left: 10px;
         line-height: 60px; /* Align with logo height */
@@ -187,21 +188,23 @@
         {% csrf_token %}
         {{ form.as_p }}
         
-        <!-- Header: Logo in top left and Network Text -->
-        <div class="clearfix header">
-          <img src="https://anylog.co/wp-content/uploads/2019/07/logo1.png" alt="AnyLog Network" class="logo" width="60" height="60" onclick="window.location.href='https://anylog.co/'">
-          <span class="networktext">Anylog Network Client</span>
-        </div>
-        
-        <!-- Navigation Buttons -->
-        <div class="clearfix" style="margin-bottom:20px;">
-          <input type="submit" name="Setting" id="Setting" value="Setting" class="nav-btn">
-          <input type="submit" name="Code" id="Code" value="Code" class="nav-btn">
-          <input type="submit" name="Monitor" id="Monitor" value="Monitor" class="nav-btn">
-          <input type="submit" name="Stream" id="Stream" value="Stream" class="nav-btn">
-          <input type="submit" name="Blobs" id="Blobs" value="Blobs" class="nav-btn">
-          <input type="submit" name="Client" id="Client" value="Client" class="nav-btn">
-          <input type="submit" name="dummy" id="dummy" value="dummy" style="display:none;">
+        <!-- Header container: Logo on left, Navigation Buttons on right -->
+        <div class="header-container">
+          <!-- Left side: Logo and network text -->
+          <div class="left-header">
+            <img src="https://anylog.co/wp-content/uploads/2019/07/logo1.png" alt="AnyLog Network" class="logo" width="60" height="60" onclick="window.location.href='https://anylog.co/'">
+            <span class="networktext">Anylog Network Client</span>
+          </div>
+          <!-- Right side: Navigation buttons -->
+          <div class="right-header">
+            <input type="submit" name="Setting" id="Setting" value="Setting" class="nav-btn">
+            <input type="submit" name="Code" id="Code" value="Code" class="nav-btn">
+            <input type="submit" name="Monitor" id="Monitor" value="Monitor" class="nav-btn">
+            <input type="submit" name="Stream" id="Stream" value="Stream" class="nav-btn">
+            <input type="submit" name="Blobs" id="Blobs" value="Blobs" class="nav-btn">
+            <input type="submit" name="Client" id="Client" value="Client" class="nav-btn">
+            <input type="submit" name="dummy" id="dummy" value="dummy" style="display:none;">
+          </div>
         </div>
         
         <!-- Hidden fields -->
