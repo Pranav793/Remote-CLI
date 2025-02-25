@@ -10,13 +10,22 @@
 
     <style>
         input[type=button], input[type=submit], input[type=reset]{
-        background-color: lightslategray;
-        border: none;
-        color: white;
-        padding: 16px 32px;
-        text-decoration: none;
-        margin: 4px 2px;
-        cursor: pointer;
+            background-color: lightslategray;
+            border: none;
+            color: white;
+            padding: 16px 32px;
+            text-decoration: none;
+            margin: 4px 2px;
+            cursor: pointer;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        .nav-btn {
+        font-family: 'Comic Sans MS', cursive;
+        color: black;
+        background-color: #f3f1ec;
+        border: 3pt ridge lightgrey;
+        margin-left: 5px;
+        float: right;
         }
     </style>
 
@@ -90,10 +99,10 @@
 
   <input type ="submit" name = "dummy" id="dummy" value="dummy" style="background:transparent; border:none; color:transparent; height:1px; width:1px" />
   <!input type ="submit" name = "Config" id="Config" value="Config" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Setting" id="Setting" value="Setting" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Blobs" id="Blobs" value="Blobs" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Monitor" id="Monitor" value="Monitor" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
-  <input type ="submit" name = "Client" id="Client" value="Client" style="float: right; font-face: 'Comic Sans MS'; color: black; background-color: #f3f1ec; border: 3pt ridge lightgrey" />
+  <input type ="submit" name = "Setting" id="Setting" value="Setting" class="nav-btn">
+  <input type ="submit" name = "Blobs" id="Blobs" value="Blobs" class="nav-btn">
+  <input type ="submit" name = "Monitor" id="Monitor" value="Monitor" class="nav-btn">
+  <input type ="submit" name = "Client" id="Client" value="Client" class="nav-btn">
 
 
     <br/>
